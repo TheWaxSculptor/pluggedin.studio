@@ -1,8 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Set the launch date - 30 days from now
-    const now = new Date();
-    const launchDate = new Date(now);
-    launchDate.setDate(launchDate.getDate() + 30);
+    // Loading indicator
+    const loader = document.getElementById('page-loader');
+    
+    // Hide loader when page is fully loaded
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            loader.classList.add('loader-hidden');
+        }, 500); // Small delay for smoother transition
+    });
+    
+    // Set a specific launch date (July 3rd, 2025)
+    const launchDate = new Date('2025-07-03T00:00:00');
     
     // Update countdown timer
     function updateCountdown() {
@@ -54,18 +62,85 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Handle subscription form
+    // Handle subscription form with improved validation
     const subscribeForm = document.getElementById('subscribe-form');
+    const successMessage = document.getElementById('success-message');
+    const emailInput = document.getElementById('email');
+    
+    function validateEmail(email) {
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    }
+    
+    emailInput.addEventListener('input', () => {
+        const email = emailInput.value;
+        if (validateEmail(email)) {
+            emailInput.setCustomValidity('');
+        } else {
+            emailInput.setCustomValidity('Please enter a valid email address');
+        }
+    });
     
     subscribeForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = subscribeForm.querySelector('input[type="email"]').value;
+        const email = emailInput.value;
         
-        // Here you would typically send this to your backend
-        // For now, just show an alert
-        alert(`Thank you! ${email} has been added to our notification list.`);
+        if (!validateEmail(email)) {
+            emailInput.reportValidity();
+            return;
+        }
         
-        // Clear the form
-        subscribeForm.reset();
+        // Send to our serverless backend
+        const submitButton = subscribeForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+        
+        // Call the serverless function
+        fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Show success message
+            subscribeForm.style.display = 'none';
+            successMessage.style.display = 'block';
+            
+            // Reset form
+            subscribeForm.reset();
+            
+            // Reset the form after 5 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                subscribeForm.style.display = 'flex';
+            }, 5000);
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            alert('There was an issue submitting your email. Please try again.');
+        })
+        .finally(() => {
+            // Re-enable button
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        });
+    });
+    
+    // Accessibility enhancement: make ESC key close success message
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && successMessage.style.display === 'block') {
+            successMessage.style.display = 'none';
+            subscribeForm.style.display = 'flex';
+        }
     });
 });

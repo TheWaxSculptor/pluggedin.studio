@@ -125,8 +125,27 @@
             <p>Support the development</p>
             <script type="text/javascript" src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
             <script type="text/javascript">
-                kofiwidget2.init('Buy us a coffee', '#000000', 'pluggedindotstudio');
-                kofiwidget2.draw();
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Set initial color based on current mode
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    const buttonColor = isDarkMode ? '#FFFFFF' : '#000000';
+                    
+                    kofiwidget2.init('Buy us a coffee', buttonColor, 'pluggedindotstudio');
+                    kofiwidget2.draw();
+                    
+                    // Update button when dark mode changes
+                    document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+                        setTimeout(function() {
+                            const updatedIsDarkMode = document.body.classList.contains('dark-mode');
+                            const updatedButtonColor = updatedIsDarkMode ? '#FFFFFF' : '#000000';
+                            
+                            // Redraw with new color
+                            document.querySelector('.support-text').innerHTML = '<p>Support the development</p>';
+                            kofiwidget2.init('Buy us a coffee', updatedButtonColor, 'pluggedindotstudio');
+                            kofiwidget2.draw();
+                        }, 100);
+                    });
+                });
             </script>
         </div>
     </div>

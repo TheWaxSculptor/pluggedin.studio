@@ -383,6 +383,9 @@ body.dark-mode button:hover {
     text-decoration: none;
     transition: all 0.3s ease;
     border: 2px solid var(--primary-color);
+    /* Ensure icon is visible */
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 .social-links a:hover {
@@ -397,9 +400,11 @@ body.dark-mode button:hover {
 }
 
 body.dark-mode .social-links a {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.1);
     color: var(--dark-text);
     border-color: var(--dark-text);
+    /* Ensure visibility */
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode .social-links a:hover {

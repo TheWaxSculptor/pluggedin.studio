@@ -397,14 +397,15 @@ body.dark-mode button:hover {
 }
 
 body.dark-mode .social-links a {
-    background: var(--bg-dark);
-    color: var(--dark-primary);
-    border-color: var(--dark-primary);
+    background: transparent;
+    color: var(--dark-text);
+    border-color: var(--dark-text);
 }
 
 body.dark-mode .social-links a:hover {
-    background: var(--dark-primary);
+    background: var(--dark-text);
     color: var(--bg-dark);
+    border-color: var(--dark-text);
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
@@ -436,8 +437,19 @@ body.dark-mode .support-text {
 }
 
 body.dark-mode .kofi-button {
-    background: var(--dark-primary) !important;
+    background: var(--dark-text) !important;
     color: var(--bg-dark) !important;
+}
+
+/* Override Ko-fi button hover state */
+.kofi-button:hover {
+    background: var(--primary-color) !important;
+    opacity: 0.9 !important;
+}
+
+body.dark-mode .kofi-button:hover {
+    background: var(--dark-text) !important;
+    opacity: 0.9 !important;
 }
 
 .support-text iframe {

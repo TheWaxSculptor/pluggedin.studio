@@ -1,0 +1,42 @@
+.whitepaper-section {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0 1rem;
+}
+
+.whitepaper-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: all 0.3s ease;
+}
+
+.whitepaper-link i {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.whitepaper-link:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.whitepaper-link:hover i {
+    transform: translateY(-1px);
+}
+
+body.dark-mode .whitepaper-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text);
+}
+
+body.dark-mode .whitepaper-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}

@@ -168,17 +168,24 @@ body.dark-mode .time-label {
     }
 
     .social-links {
-        gap: 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
         margin: 1.5rem 0;
     }
 
-    .social-links a {
-        width: 2.25rem;
-        height: 2.25rem;
+    .social-button {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
     }
 
-    .social-icon {
+    .social-button i {
         font-size: 1.1rem;
+        margin-right: 0.5rem;
+    }
+
+    .social-button span {
+        font-size: 0.9rem;
     }
 
     .support-text {
@@ -367,52 +374,58 @@ body.dark-mode button:hover {
 .social-links {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 1rem;
     margin: 2rem 0;
 }
 
-.social-links a {
+.social-button {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: var(--bg-color);
-    color: var(--primary-color);
+    justify-content: flex-start;
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
     text-decoration: none;
     transition: all 0.3s ease;
-    border: 2px solid var(--primary-color);
-    /* Ensure icon is visible */
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-weight: 600;
+    min-width: 140px;
 }
 
-.social-links a:hover {
+.social-button i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+.social-button span {
+    font-size: 0.95rem;
+}
+
+/* Twitter styling */
+.social-button.twitter {
+    background-color: #1DA1F2;
+    color: white;
+    box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+}
+
+.social-button.twitter:hover {
+    background-color: #0d8ed9;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background: var(--primary-color);
-    color: var(--bg-color);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.4);
 }
 
-.social-icon {
-    font-size: 1.2rem;
+/* Instagram styling */
+.social-button.instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 39, 67, 0.3);
 }
 
-body.dark-mode .social-links a {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--dark-text);
-    border-color: var(--dark-text);
-    /* Ensure visibility */
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+.social-button.instagram:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 39, 67, 0.4);
+    filter: saturate(1.2);
 }
 
-body.dark-mode .social-links a:hover {
-    background: var(--dark-text);
-    color: var(--bg-dark);
-    border-color: var(--dark-text);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
+/* Dark mode doesn't need special handling since buttons use brand colors */
 
 .support-text {
     margin: 2rem 0 1rem;

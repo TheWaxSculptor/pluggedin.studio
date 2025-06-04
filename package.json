@@ -16,6 +16,7 @@
     "url": "https://github.com/TheWaxSculptor/pluggedin.studio/issues"
   },
   "homepage": "https://github.com/TheWaxSculptor/pluggedin.studio#readme",
+  "funding": "https://coff.ee/yishay",
   "description": "",
   "devDependencies": {
     "netlify-cli": "^21.5.2"

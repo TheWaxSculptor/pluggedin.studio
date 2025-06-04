@@ -37,6 +37,16 @@ body.dark-mode {
     color: var(--dark-text);
 }
 
+body.dark-mode .logo-container {
+    background-color: rgba(255, 255, 255, 0.03);
+    margin: -2rem -2rem 3rem;
+    padding: 2rem 2rem 3rem;
+}
+
+body.dark-mode .coming-soon {
+    color: rgba(255, 255, 255, 0.9);
+}
+
 body.dark-mode .time-block span:first-child {
     color: var(--dark-text);
 }
@@ -143,22 +153,13 @@ body.dark-mode .tagline {
     color: var(--subtle-color);
 }
 
-body.dark-mode .time-block {
-    background: transparent;
-}
-
-.time-block span {
-    display: block;
-}
-
-.time-block span:first-child {
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.time-label {
-    font-size: 0.8rem;
-    opacity: 0.8;
+.coming-soon {
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--subtle-color);
 }
 
 .video-container {

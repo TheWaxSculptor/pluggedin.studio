@@ -3,11 +3,11 @@
     --secondary-color: #000000;
     --text-color: #000000;
     --bg-color: #ffffff;
-    --bg-dark: #000000;
-    --dark-primary: #000000;
-    --dark-secondary: #000000;
+    --bg-dark: #121212;
+    --dark-primary: #ffffff;
+    --dark-secondary: #e0e0e0;
     --dark-text: #ffffff;
-    --dark-hover: #000000;
+    --dark-hover: #2c2c2c;
     --accent-color: #000000;
     --error-color: #ff4444;
     --subtle-color: rgba(0, 0, 0, 0.7);
@@ -50,10 +50,26 @@ h1 {
     letter-spacing: 0.1em;
     margin: 2rem 0;
     text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 body.dark-mode h1 {
-    color: var(--dark-text);
+    color: var(--dark-primary);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.tagline {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    opacity: 0.9;
+}
+
+body.dark-mode .tagline {
+    color: var(--dark-secondary);
 }
 
 body.dark-mode .time-block span:first-child {

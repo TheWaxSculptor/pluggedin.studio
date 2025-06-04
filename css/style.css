@@ -221,7 +221,7 @@ body.dark-mode button:hover {
     box-shadow: 0 3px 10px rgba(122, 104, 255, 0.4);
 }
 
-.coffee-text {
+.support-text {
     margin: 2rem 0 1rem;
     font-size: 0.95rem;
     text-align: center;
@@ -234,23 +234,31 @@ body.dark-mode button:hover {
     gap: 1rem;
 }
 
-.coffee-text p {
+.support-text p {
     margin: 0;
+    font-weight: 500;
+    letter-spacing: -0.01em;
 }
 
-.bmc-btn {
+.donate-btn {
     display: inline-block;
-    transition: transform 0.3s ease;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 0.8rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    transition: opacity 0.3s ease;
 }
 
-.bmc-btn:hover {
-    transform: scale(1.02);
+.donate-btn:hover {
+    opacity: 0.8;
 }
 
-.bmc-btn img {
-    height: 32px;
-    width: auto;
-    vertical-align: middle;
+.donate-btn span {
+    font-family: 'Inter', sans-serif;
 }
 
 .social-links {

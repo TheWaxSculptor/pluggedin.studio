@@ -109,6 +109,63 @@
             line-height: 1.4;
         }
 
+        .comparison-table {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.03);
+            font-weight: 600;
+        }
+
+        td:first-child {
+            font-weight: 500;
+        }
+
+        .check {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .x {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .partial {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .legend {
+            text-align: center;
+            margin: 1rem 0 2rem;
+            font-size: 0.9rem;
+            color: var(--subtle-color);
+        }
+
+        body.dark-mode th {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        body.dark-mode th, 
+        body.dark-mode td {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
             .feature-grid, .pricing-grid {
                 grid-template-columns: 1fr;
@@ -264,6 +321,102 @@
             </div>
         </div>
         
+        <div class="section">
+            <h2>Competitive Analysis</h2>
+            <p>While there are various studio booking solutions in the market, PluggedIn.studio offers unique advantages that set us apart:</p>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>PluggedIn.studio</th>
+                            <th>Traditional Booking</th>
+                            <th>Generic Booking Apps</th>
+                            <th>Studio Directories</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Real-time Availability</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Verification</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Instant Booking</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Audio Samples</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Virtual Tours</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Verified Reviews</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Search</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Secure Payments</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Booking Protection</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="legend">
+                <p><span class="check">✓</span> Full Support &nbsp;&nbsp; <span class="partial">~</span> Partial Support &nbsp;&nbsp; <span class="x">✗</span> Not Supported</p>
+            </div>
+
+            <h3>Key Differentiators</h3>
+            <ul>
+                <li><strong>Specialized Focus:</strong> Built specifically for recording studios, not a generic booking system</li>
+                <li><strong>Quality Assurance:</strong> Verified equipment lists and acoustic environment assessments</li>
+                <li><strong>Community Features:</strong> Audio samples, virtual tours, and verified reviews from real musicians</li>
+                <li><strong>Technical Integration:</strong> DAW compatibility information and technical specifications</li>
+            </ul>
+        </div>
+
         <div class="section">
             <h2>Market Strategy</h2>
             <p>Our go-to-market strategy focuses on:</p>

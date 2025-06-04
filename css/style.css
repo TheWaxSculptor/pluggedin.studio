@@ -104,6 +104,10 @@ body.dark-mode h1 {
     margin-right: auto;
 }
 
+body.dark-mode .tagline {
+    color: rgba(255, 255, 255, 0.8);
+}
+
 .countdown {
     display: flex;
     justify-content: center;

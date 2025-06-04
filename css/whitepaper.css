@@ -53,3 +53,73 @@ body.dark-mode .whitepaper-link {
 body.dark-mode .whitepaper-link:hover {
     background-color: rgba(255, 255, 255, 0.15);
 }
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .whitepaper-title {
+        font-size: 2rem;
+        margin: 1.5rem 0;
+    }
+
+    .whitepaper {
+        padding: 1rem;
+    }
+
+    .comparison-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 1rem -1rem;
+        padding: 0 1rem;
+    }
+
+    .comparison-table table {
+        font-size: 0.9rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.75rem 0.5rem;
+        min-width: 100px;
+    }
+
+    .comparison-table th:first-child,
+    .comparison-table td:first-child {
+        position: sticky;
+        left: 0;
+        background: var(--bg-color);
+        z-index: 1;
+        min-width: 140px;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode .comparison-table th:first-child,
+    body.dark-mode .comparison-table td:first-child {
+        background: var(--bg-dark);
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .legend {
+        font-size: 0.9rem;
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+    .legend p {
+        margin: 0.5rem 0;
+    }
+
+    .section {
+        margin: 2rem 0;
+    }
+
+    .section h2 {
+        font-size: 1.5rem;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .section p {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+}

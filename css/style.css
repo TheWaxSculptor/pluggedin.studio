@@ -378,15 +378,18 @@ body.dark-mode button:hover {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background: var(--primary-color);
-    color: var(--bg-color);
+    background: var(--bg-color);
+    color: var(--primary-color);
     text-decoration: none;
     transition: all 0.3s ease;
+    border: 2px solid var(--primary-color);
 }
 
 .social-links a:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: var(--primary-color);
+    color: var(--bg-color);
 }
 
 .social-icon {
@@ -394,12 +397,15 @@ body.dark-mode button:hover {
 }
 
 body.dark-mode .social-links a {
-    background: var(--dark-primary);
-    color: var(--bg-dark);
+    background: var(--bg-dark);
+    color: var(--dark-primary);
+    border-color: var(--dark-primary);
 }
 
 body.dark-mode .social-links a:hover {
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    background: var(--dark-primary);
+    color: var(--bg-dark);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .support-text {
@@ -407,18 +413,31 @@ body.dark-mode .social-links a:hover {
     font-size: 0.95rem;
     text-align: center;
     color: var(--text-color);
-    opacity: 0.9;
-    line-height: 1.5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+body.dark-mode .support-text {
+    color: var(--dark-text);
+    background: var(--bg-dark);
 }
 
 .support-text p {
     margin: 0;
     font-weight: 500;
     letter-spacing: -0.01em;
+}
+
+/* Ko-fi button overrides */
+.kofi-button {
+    background: var(--primary-color) !important;
+    color: var(--bg-color) !important;
+}
+
+body.dark-mode .kofi-button {
+    background: var(--dark-primary) !important;
+    color: var(--bg-dark) !important;
 }
 
 .support-text iframe {

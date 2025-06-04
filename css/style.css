@@ -85,6 +85,8 @@ body.dark-mode .time-label {
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
+    display: block;
+    visibility: visible;
 }
 
 @media (max-width: 768px) {
@@ -198,6 +200,8 @@ body.dark-mode .time-label {
     margin-bottom: 3rem;
     padding-bottom: 3rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: block;
+    visibility: visible;
 }
 
 body.dark-mode .logo-container {
@@ -435,6 +439,8 @@ body.dark-mode button:hover {
     background: var(--bg-color);
     padding: 1rem;
     border-radius: 8px;
+    position: relative;
+    z-index: 1;
 }
 
 body.dark-mode .support-text {
@@ -592,6 +598,13 @@ body.dark-mode .mode-toggle {
     transform: scale(1.1);
 }
 
+/* GitHub Pages Fix */
+.container, .container > div, .container > h1, .container > p, .container > form {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 /* Loading Animation */
 .loader {
     position: fixed;
@@ -614,6 +627,7 @@ body.dark-mode .loader {
 .loader-hidden {
     opacity: 0;
     visibility: hidden;
+    display: none !important;
 }
 
 .loader-content {

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- GitHub Pages Fix -->
+    <base href="/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -27,9 +29,16 @@
     <meta name="twitter:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
     
     <!-- Favicon and App Icons -->
-    <link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.svg">
-    <link rel="manifest" href="site.webmanifest">
+    <link rel="icon" href="favicon/light/apple-icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon/light/apple-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="favicon/light/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/light/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/light/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon/light/favicon-96x96.png">
+    <link rel="manifest" href="favicon/light/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="favicon/light/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
     
     <link rel="stylesheet" href="css/style.css?v=1.3">
     <link rel="stylesheet" href="css/whitepaper.css?v=1.0">
@@ -39,7 +48,7 @@
 </head>
 <body>
     <!-- Loading Indicator -->
-    <div class="loader" id="page-loader">
+    <div class="loader loader-hidden" id="page-loader">
         <div class="loader-content">
             <div class="loader-spinner" aria-hidden="true"></div>
             <p class="loader-text">Loading PluggedIn.studio...</p>
@@ -111,6 +120,7 @@
                     <iframe id="whitepaperFrame" src="whitepaper.html"></iframe>
                 </div>
             </div>
+        </div>
 
         <div class="social-links">
             <a href="https://twitter.com/pluggedinstudio" target="_blank" rel="noopener" aria-label="Follow us on Twitter" class="social-button twitter">
@@ -125,34 +135,66 @@
 
         <div class="support-text">
             <p>Support the development</p>
+            <div id="kofi-container"></div>
             <script type="text/javascript" src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
             <script type="text/javascript">
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Set initial color based on current mode
-                    const isDarkMode = document.body.classList.contains('dark-mode');
-                    const buttonColor = isDarkMode ? '#FFFFFF' : '#000000';
-                    
-                    kofiwidget2.init('Buy us a coffee', buttonColor, 'pluggedindotstudio');
-                    kofiwidget2.draw();
-                    
-                    // Update button when dark mode changes
-                    document.getElementById('dark-mode-toggle').addEventListener('click', function() {
-                        setTimeout(function() {
-                            const updatedIsDarkMode = document.body.classList.contains('dark-mode');
-                            const updatedButtonColor = updatedIsDarkMode ? '#FFFFFF' : '#000000';
-                            
-                            // Redraw with new color
-                            document.querySelector('.support-text').innerHTML = '<p>Support the development</p>';
-                            kofiwidget2.init('Buy us a coffee', updatedButtonColor, 'pluggedindotstudio');
-                            kofiwidget2.draw();
-                        }, 100);
-                    });
+                // Delay Ko-fi initialization to ensure it doesn't block other content
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        // Set initial color based on current mode
+                        const isDarkMode = document.body.classList.contains('dark-mode');
+                        const buttonColor = isDarkMode ? '#FFFFFF' : '#000000';
+                        
+                        kofiwidget2.init('Buy us a coffee', buttonColor, 'pluggedindotstudio');
+                        const kofiContainer = document.getElementById('kofi-container');
+                        if (kofiContainer) {
+                            kofiwidget2.draw(kofiContainer);
+                        }
+                        
+                        // Update button when dark mode changes
+                        const darkModeToggle = document.getElementById('dark-mode-toggle');
+                        if (darkModeToggle) {
+                            darkModeToggle.addEventListener('click', function() {
+                                setTimeout(function() {
+                                    const updatedIsDarkMode = document.body.classList.contains('dark-mode');
+                                    const updatedButtonColor = updatedIsDarkMode ? '#FFFFFF' : '#000000';
+                                    
+                                    // Redraw with new color
+                                    const kofiContainer = document.getElementById('kofi-container');
+                                    if (kofiContainer) {
+                                        kofiContainer.innerHTML = '';
+                                        kofiwidget2.init('Buy us a coffee', updatedButtonColor, 'pluggedindotstudio');
+                                        kofiwidget2.draw(kofiContainer);
+                                    }
+                                }, 100);
+                            });
+                        }
+                    }, 1000); // Delay Ko-fi initialization by 1 second
                 });
             </script>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="js/script.js?v=1.3"></script>
+    <script src="js/script.js?v=1.4"></script>
+    <!-- GitHub Pages Fix Script -->
+    <script>
+        // Ensure content is visible regardless of CSS loading issues
+        window.addEventListener('DOMContentLoaded', function() {
+            // Force display all content
+            document.querySelectorAll('.container, .container > *').forEach(function(el) {
+                el.style.display = el.tagName === 'DIV' ? 'block' : '';
+                el.style.visibility = 'visible';
+                el.style.opacity = '1';
+            });
+            
+            // Hide loader immediately
+            var loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('loader-hidden');
+                loader.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

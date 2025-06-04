@@ -30,8 +30,23 @@ window.openWhitepaper = openWhitepaper;
 window.closeWhitepaper = closeWhitepaper;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure all content is visible
+    document.querySelector('.container').style.display = 'block';
+    document.querySelector('.container').style.visibility = 'visible';
+    document.querySelectorAll('.container > *').forEach(el => {
+        el.style.display = el.tagName === 'DIV' ? 'block' : '';
+        el.style.visibility = 'visible';
+    });
     // Loading indicator
     const loader = document.getElementById('page-loader');
+    
+    // Force hide loader after 2 seconds in case it gets stuck
+    setTimeout(() => {
+        if (loader) {
+            loader.classList.add('loader-hidden');
+            loader.style.display = 'none';
+        }
+    }, 2000);
     
     // Hide loader when page is fully loaded
     window.addEventListener('load', () => {
@@ -73,23 +88,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add dark mode toggle button
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('mode-toggle');
+    toggleButton.id = 'dark-mode-toggle'; // Add ID for reference in other scripts
     toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
     document.body.appendChild(toggleButton);
     
     // Check if user prefers dark mode
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (prefersDarkMode) {
         body.classList.add('dark-mode');
         toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+        // Initialize dark mode favicons
+        updateFavicons(true);
+    } else {
+        // Initialize light mode favicons
+        updateFavicons(false);
+    }
+    
+    // Function to update favicons based on theme
+    function updateFavicons(isDarkMode) {
+        const themeFolder = isDarkMode ? 'dark' : 'light';
+        
+        // Update all favicon links
+        document.querySelector('link[rel="icon"]').href = `favicon/${themeFolder}/apple-icon.png`;
+        document.querySelector('link[rel="apple-touch-icon"]').href = `favicon/${themeFolder}/apple-icon.png`;
+        document.querySelectorAll('link[rel="apple-touch-icon"][sizes]').forEach(link => {
+            const size = link.getAttribute('sizes');
+            link.href = `favicon/${themeFolder}/apple-icon-${size}.png`;
+        });
+        document.querySelector('link[rel="icon"][sizes="192x192"]').href = `favicon/${themeFolder}/android-icon-192x192.png`;
+        document.querySelector('link[rel="icon"][sizes="96x96"]').href = `favicon/${themeFolder}/favicon-96x96.png`;
+        document.querySelector('link[rel="manifest"]').href = `favicon/${themeFolder}/manifest.json`;
+        document.querySelector('meta[name="msapplication-TileImage"]').content = `favicon/${themeFolder}/ms-icon-144x144.png`;
     }
     
     // Toggle dark mode
     toggleButton.addEventListener('click', () => {
         body.classList.toggle('dark-mode');
+        const isDarkMode = body.classList.contains('dark-mode');
         
-        if (body.classList.contains('dark-mode')) {
+        if (isDarkMode) {
             toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+            updateFavicons(true);
         } else {
             toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+            updateFavicons(false);
         }
     });
     

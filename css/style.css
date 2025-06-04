@@ -166,6 +166,25 @@ body.dark-mode .time-label {
         bottom: 1rem;
         right: 1rem;
     }
+
+    .social-links {
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .social-links a {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+
+    .social-icon {
+        font-size: 1.1rem;
+    }
+
+    .support-text {
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+    }
 }
 
 .logo-container {
@@ -343,6 +362,44 @@ button[type="submit"]:disabled {
 body.dark-mode button:hover {
     background-color: var(--dark-hover);
     box-shadow: 0 3px 10px rgba(122, 104, 255, 0.4);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: var(--bg-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.social-icon {
+    font-size: 1.2rem;
+}
+
+body.dark-mode .social-links a {
+    background: var(--dark-primary);
+    color: var(--bg-dark);
+}
+
+body.dark-mode .social-links a:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
 .support-text {

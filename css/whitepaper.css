@@ -154,8 +154,9 @@ body.dark-mode .comparison-table .legend {
 /* Mobile Styles */
 @media (max-width: 768px) {
     .whitepaper-title {
-        font-size: 2rem;
-        margin: 1.5rem 0;
+        font-size: 1.8rem;
+        margin: 1rem 0;
+        letter-spacing: -0.02em;
     }
 
     .whitepaper {
@@ -163,46 +164,30 @@ body.dark-mode .comparison-table .legend {
     }
 
     .comparison-table {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin: 1rem -1rem;
-        padding: 0 1rem;
+        margin: 1.5rem -1rem;
+        padding: 1rem;
+        border-radius: 0;
     }
 
     .comparison-table table {
         font-size: 0.9rem;
+        min-width: 600px;
     }
 
     .comparison-table th,
     .comparison-table td {
-        padding: 0.75rem 0.5rem;
-        min-width: 100px;
+        padding: 0.75rem;
     }
 
-    .comparison-table th:first-child,
     .comparison-table td:first-child {
-        position: sticky;
-        left: 0;
-        background: var(--bg-color);
-        z-index: 1;
-        min-width: 140px;
-        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+        min-width: 160px;
+        padding-right: 1rem;
     }
 
-    body.dark-mode .comparison-table th:first-child,
-    body.dark-mode .comparison-table td:first-child {
-        background: var(--bg-dark);
-        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .legend {
-        font-size: 0.9rem;
-        margin: 1rem 0;
-        text-align: center;
-    }
-
-    .legend p {
-        margin: 0.5rem 0;
+    .comparison-table .check,
+    .comparison-table .partial,
+    .comparison-table .x {
+        font-size: 1.1rem;
     }
 
     .section {
@@ -210,13 +195,44 @@ body.dark-mode .comparison-table .legend {
     }
 
     .section h2 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         margin: 1.5rem 0 1rem;
+        letter-spacing: -0.02em;
     }
 
     .section p {
         font-size: 1rem;
-        line-height: 1.5;
-        margin-bottom: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+    }
+
+    .section ul {
+        padding-left: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .section li {
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .highlight {
+        padding: 1.25rem;
+        margin: 1.5rem 0;
+        border-radius: 8px;
+    }
+
+    .legend {
+        margin: 1rem 0;
+        font-size: 0.9rem;
+    }
+
+    .legend p {
+        margin: 0.5rem 0;
+    }
+
+    .note {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
     }
 }

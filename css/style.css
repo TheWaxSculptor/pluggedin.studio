@@ -87,6 +87,87 @@ body.dark-mode .time-label {
     text-align: center;
 }
 
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin: 1.5rem 0;
+        letter-spacing: 0.05em;
+    }
+
+    .tagline {
+        font-size: 1rem;
+        margin: 0 auto 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .logo {
+        max-width: 250px;
+        width: 80%;
+    }
+
+    .countdown {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .time-block {
+        min-width: calc(50% - 0.5rem);
+        padding: 0.75rem;
+    }
+
+    .time-block span:first-child {
+        font-size: 2rem;
+    }
+
+    .time-label {
+        font-size: 0.9rem;
+    }
+
+    .video-container {
+        margin: 2rem -1rem;
+        border-radius: 0;
+    }
+
+    .subscribe {
+        padding: 1.5rem 1rem;
+    }
+
+    .subscribe h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .subscribe form {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .subscribe input,
+    .subscribe button {
+        width: 100%;
+        max-width: none;
+    }
+
+    .subscribe input {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .subscribe button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .dark-mode-toggle {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
 .logo-container {
     margin-bottom: 3rem;
     padding-bottom: 3rem;

@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Initialize EmailJS
+    (function() {
+        emailjs.init('WpKgdxlt2TVymbQ1O');
+    })();
+
     subscribeForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = emailInput.value;
@@ -90,28 +95,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Send to our serverless backend
         const submitButton = subscribeForm.querySelector('button[type="submit"]');
         const originalText = submitButton.textContent;
         
         submitButton.disabled = true;
         submitButton.textContent = 'Sending...';
         
-        // Call the serverless function
-        fetch('/api/subscribe', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email: email })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
+        // Prepare the email parameters
+        const templateParams = {
+            to_email: 'yishaystewartmitchell@gmail.com',
+            email: email,
+            message: `New newsletter subscription request`,
+            time: new Date().toLocaleString()
+        };
+        
+        // Send email using EmailJS
+        emailjs.send(
+            'service_3edcf5g',
+            'template_20kbkoq',
+            templateParams
+        )
+        .then((response) => {
+            console.log('SUCCESS!', response.status, response.text);
+            
             // Show success message
             subscribeForm.style.display = 'none';
             successMessage.style.display = 'block';
@@ -124,9 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 successMessage.style.display = 'none';
                 subscribeForm.style.display = 'flex';
             }, 5000);
-        })
-        .catch(error => {
-            console.error('Error submitting form:', error);
+        }, (error) => {
+            console.error('FAILED...', error);
             alert('There was an issue submitting your email. Please try again.');
         })
         .finally(() => {

@@ -189,11 +189,31 @@ body.dark-mode button:hover {
     box-shadow: 0 3px 10px rgba(122, 104, 255, 0.4);
 }
 
+.coffee-text {
+    margin: 2rem 0 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
 .social-links {
+    margin-top: 1rem;
     display: flex;
-    justify-content: center;
     gap: 1.5rem;
-    margin-top: 2rem;
+    justify-content: center;
+}
+
+.social-icon:hover .fa-mug-hot {
+    animation: steam 1s ease infinite;
+}
+
+@keyframes steam {
+    0% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-3px) rotate(-5deg); }
+    75% { transform: translateY(-3px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0); }
 }
 
 .visually-hidden {

@@ -1,27 +1,35 @@
 :root {
-    --primary-color: #6c5ce7;
-    --secondary-color: #a29bfe;
-    --text-color: #333;
-    --bg-color: #f9f9f9;
+    --primary-color: #000000;
+    --secondary-color: #000000;
+    --text-color: #000000;
+    --bg-color: #ffffff;
     --bg-dark: #000000;
-    --dark-primary: #5e48ff;
-    --dark-secondary: #8a7bff;
+    --dark-primary: #000000;
+    --dark-secondary: #000000;
     --dark-text: #ffffff;
-    --dark-hover: #7a68ff;
-    --accent-color: #00cec9;
+    --dark-hover: #000000;
+    --accent-color: #000000;
+    --error-color: #ff4444;
+    --subtle-color: rgba(0, 0, 0, 0.7);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
     background-color: var(--bg-color);
     color: var(--text-color);
-    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease;
+    letter-spacing: -0.02em;
 }
 
 body.dark-mode {
@@ -64,8 +72,12 @@ body.dark-mode .dark-logo {
 }
 
 h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 3.5rem;
+    margin: 1rem 0;
+    text-align: center;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
     color: var(--primary-color);
 }
 
@@ -74,8 +86,11 @@ body.dark-mode h1 {
 }
 
 .tagline {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    text-align: center;
+    margin: 1rem 0 2rem;
+    color: var(--subtle-color);
+    font-weight: 500;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
@@ -84,17 +99,30 @@ body.dark-mode h1 {
 .countdown {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    gap: 3rem;
+    margin: 3rem 0;
 }
 
 .time-block {
-    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    min-width: 80px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.time-block span:first-child {
+    font-size: 3.5rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.time-label {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    color: var(--subtle-color);
 }
 
 body.dark-mode .time-block {
@@ -164,24 +192,28 @@ body.dark-mode input[type="email"] {
     color: #fff;
 }
 
-button {
-    background-color: var(--primary-color);
+button[type="submit"] {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    background-color: var(--accent-color);
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
-button:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-2px);
+button[type="submit"]:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
 }
 
-body.dark-mode button {
-    background-color: var(--dark-primary);
+button[type="submit"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }
 
 body.dark-mode button:hover {

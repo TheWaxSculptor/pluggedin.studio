@@ -598,8 +598,8 @@ body.dark-mode .mode-toggle {
     transform: scale(1.1);
 }
 
-/* GitHub Pages Fix */
-.container, .container > div, .container > h1, .container > p, .container > form {
+/* GitHub Pages Fix - Prevent content from being hidden */
+body, .container, .container > div, .container > h1, .container > p, .container > form, .logo-container, .tagline, .countdown, .video-container, .subscribe, .whitepaper-section, .social-links {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;

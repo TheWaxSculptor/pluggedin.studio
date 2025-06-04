@@ -135,48 +135,43 @@
 
         <div class="support-text">
             <p>Support the development</p>
-            <div id="kofi-container"></div>
-            <script type="text/javascript" src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
-            <script type="text/javascript">
-                // Delay Ko-fi initialization to ensure it doesn't block other content
-                window.addEventListener('load', function() {
-                    setTimeout(function() {
-                        // Set initial color based on current mode
-                        const isDarkMode = document.body.classList.contains('dark-mode');
-                        const buttonColor = isDarkMode ? '#FFFFFF' : '#000000';
-                        
-                        kofiwidget2.init('Buy us a coffee', buttonColor, 'pluggedindotstudio');
-                        const kofiContainer = document.getElementById('kofi-container');
-                        if (kofiContainer) {
-                            kofiwidget2.draw(kofiContainer);
-                        }
-                        
-                        // Update button when dark mode changes
-                        const darkModeToggle = document.getElementById('dark-mode-toggle');
-                        if (darkModeToggle) {
-                            darkModeToggle.addEventListener('click', function() {
-                                setTimeout(function() {
-                                    const updatedIsDarkMode = document.body.classList.contains('dark-mode');
-                                    const updatedButtonColor = updatedIsDarkMode ? '#FFFFFF' : '#000000';
-                                    
-                                    // Redraw with new color
-                                    const kofiContainer = document.getElementById('kofi-container');
-                                    if (kofiContainer) {
-                                        kofiContainer.innerHTML = '';
-                                        kofiwidget2.init('Buy us a coffee', updatedButtonColor, 'pluggedindotstudio');
-                                        kofiwidget2.draw(kofiContainer);
-                                    }
-                                }, 100);
-                            });
-                        }
-                    }, 1000); // Delay Ko-fi initialization by 1 second
-                });
-            </script>
+            <!-- Use iframe to completely isolate Ko-fi button -->
+            <iframe src="kofi.html" id="kofi-iframe" style="border: none; overflow: hidden; width: 100%; height: 70px;" title="Ko-fi donate button"></iframe>
         </div>
+        
+        <!-- Script to handle dark mode for Ko-fi iframe -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const darkModeToggle = document.getElementById('dark-mode-toggle');
+                const kofiIframe = document.getElementById('kofi-iframe');
+                
+                if (darkModeToggle && kofiIframe) {
+                    // Initial theme
+                    const initialIsDarkMode = document.body.classList.contains('dark-mode');
+                    if (initialIsDarkMode) {
+                        setTimeout(function() {
+                            kofiIframe.contentWindow.postMessage('dark-mode', '*');
+                        }, 1000);
+                    }
+                    
+                    // Listen for theme changes
+                    darkModeToggle.addEventListener('click', function() {
+                        setTimeout(function() {
+                            const updatedIsDarkMode = document.body.classList.contains('dark-mode');
+                            kofiIframe.contentWindow.postMessage(
+                                updatedIsDarkMode ? 'dark-mode' : 'light-mode', 
+                                '*'
+                            );
+                        }, 100);
+                    });
+                }
+            });
+        </script>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="js/script.js?v=1.4"></script>
+    <script src="js/content-keeper.js?v=1.0"></script>
     <!-- GitHub Pages Fix Script -->
     <script>
         // Ensure content is visible regardless of CSS loading issues

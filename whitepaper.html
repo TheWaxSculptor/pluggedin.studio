@@ -218,11 +218,19 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        th, td {
+        table td, table th {
             padding: 1rem;
             text-align: left;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        table td:first-child {
+            font-weight: 500;
+        }
+
+        table td:not(:first-child) {
+            text-align: center;
         }
 
         th {
@@ -230,8 +238,19 @@
             font-weight: 600;
         }
 
-        td:first-child {
-            font-weight: 500;
+        body.dark-mode th {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        body.dark-mode table td, body.dark-mode table th {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: var(--subtle-color);
+            margin-top: 0.5rem;
         }
 
         .check {
@@ -254,15 +273,6 @@
             margin: 1rem 0 2rem;
             font-size: 0.9rem;
             color: var(--subtle-color);
-        }
-
-        body.dark-mode th {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        body.dark-mode th, 
-        body.dark-mode td {
-            border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
         @media (max-width: 768px) {
@@ -403,7 +413,7 @@
                     <ul>
                         <li>Full studio profile</li>
                         <li>Instant booking system</li>
-                        <li>12% booking commission</li>
+                        <li>10% booking commission</li>
                         <li>Basic analytics</li>
                         <li>Standard support</li>
                     </ul>
@@ -415,7 +425,7 @@
                     <ul>
                         <li>Enhanced profile features</li>
                         <li>Priority in search results</li>
-                        <li>8% booking commission</li>
+                        <li>7% booking commission</li>
                         <li>Advanced analytics</li>
                         <li>Priority support</li>
                         <li>Social media promotion</li>
@@ -428,7 +438,7 @@
                     <ul>
                         <li>Multi-room management</li>
                         <li>Custom branding options</li>
-                        <li>5% booking commission</li>
+                        <li>4% booking commission</li>
                         <li>Full analytics suite</li>
                         <li>Dedicated support</li>
                         <li>Featured studio status</li>
@@ -448,26 +458,47 @@
                             <th>Features</th>
                             <th>PluggedIn.studio</th>
                             <th>Peerspace</th>
-                            <th>Traditional Booking</th>
-                            <th>Generic Booking Apps</th>
-                            <th>Studio Directories</th>
+                            <th>Soundbetter</th>
+                            <th>Studiotime</th>
+                            <th>Pirate Studios</th>
+                            <th>Soundspace</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>Base Fee</td>
+                            <td>Free</td>
+                            <td>Free</td>
+                            <td>$59/mo</td>
+                            <td>Free</td>
+                            <td>Free</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Commission</td>
+                            <td>10%</td>
+                            <td>15%</td>
+                            <td>20%</td>
+                            <td>12%</td>
+                            <td>0%*</td>
+                            <td>13%</td>
+                        </tr>
                         <tr>
                             <td>Real-time Availability</td>
                             <td><span class="check">✓</span></td>
                             <td><span class="check">✓</span></td>
                             <td><span class="x">✗</span></td>
                             <td><span class="check">✓</span></td>
-                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
                         </tr>
                         <tr>
                             <td>Equipment Verification</td>
                             <td><span class="check">✓</span></td>
                             <td><span class="partial">~</span></td>
                             <td><span class="x">✗</span></td>
-                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="check">✓</span></td>
                             <td><span class="partial">~</span></td>
                         </tr>
                         <tr>
@@ -476,38 +507,45 @@
                             <td><span class="check">✓</span></td>
                             <td><span class="x">✗</span></td>
                             <td><span class="check">✓</span></td>
-                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
                         </tr>
                         <tr>
                             <td>Audio Samples</td>
                             <td><span class="check">✓</span></td>
                             <td><span class="x">✗</span></td>
-                            <td><span class="x">✗</span></td>
-                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
                             <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
                         </tr>
                         <tr>
                             <td>Virtual Tours</td>
                             <td><span class="check">✓</span></td>
                             <td><span class="partial">~</span></td>
                             <td><span class="x">✗</span></td>
-                            <td><span class="x">✗</span></td>
-                            <td><span class="x">✗</span></td>
-                        </tr>
-                        <tr>
-                            <td>Verified Reviews</td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="x">✗</span></td>
                             <td><span class="partial">~</span></td>
+                            <td><span class="check">✓</span></td>
                             <td><span class="partial">~</span></td>
                         </tr>
                         <tr>
                             <td>Equipment Search</td>
                             <td><span class="check">✓</span></td>
                             <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
                             <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
                             <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Engineer Matching</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
                             <td><span class="partial">~</span></td>
                         </tr>
                         <tr>
@@ -532,6 +570,7 @@
 
             <div class="legend">
                 <p><span class="check">✓</span> Full Support &nbsp;&nbsp; <span class="partial">~</span> Partial Support &nbsp;&nbsp; <span class="x">✗</span> Not Supported</p>
+                <p class="note">* Pirate Studios owns their studios and charges hourly rates directly</p>
             </div>
 
             <h3>Marketing & Promotion</h3>

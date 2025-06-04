@@ -1,3 +1,34 @@
+// Modal functions
+function openWhitepaper() {
+    const modal = document.getElementById('whitepaperModal');
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeWhitepaper() {
+    const modal = document.getElementById('whitepaperModal');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeWhitepaper();
+    }
+});
+
+// Close modal on outside click
+document.getElementById('whitepaperModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeWhitepaper();
+    }
+});
+
+// Make functions globally available
+window.openWhitepaper = openWhitepaper;
+window.closeWhitepaper = closeWhitepaper;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Loading indicator
     const loader = document.getElementById('page-loader');

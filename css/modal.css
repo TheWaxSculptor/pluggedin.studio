@@ -1,0 +1,111 @@
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    height: 90vh;
+    margin: auto;
+    background: var(--bg-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 10;
+}
+
+.close-button {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .close-button {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#whitepaperFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: var(--bg-color);
+}
+
+/* Whitepaper button styles */
+.whitepaper-link button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    color: var(--text-color);
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.whitepaper-link button:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .whitepaper-link button {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .whitepaper-link button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        height: 95vh;
+    }
+    
+    .close-button {
+        width: 32px;
+        height: 32px;
+    }
+}

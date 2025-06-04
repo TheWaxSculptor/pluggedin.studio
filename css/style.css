@@ -240,25 +240,12 @@ body.dark-mode button:hover {
     letter-spacing: -0.01em;
 }
 
-.donate-btn {
-    display: inline-block;
-    background-color: var(--text-color);
-    color: var(--bg-color);
-    padding: 0.8rem 2rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    transition: opacity 0.3s ease;
-}
-
-.donate-btn:hover {
-    opacity: 0.8;
-}
-
-.donate-btn span {
-    font-family: 'Inter', sans-serif;
+.support-text iframe {
+    border: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: scale(1.1);
 }
 
 .social-links {

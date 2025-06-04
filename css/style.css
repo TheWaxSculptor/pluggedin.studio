@@ -196,6 +196,14 @@ body.dark-mode button:hover {
     color: var(--text-color);
     opacity: 0.9;
     line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.coffee-text p {
+    margin: 0;
 }
 
 .bmc-btn {
@@ -204,12 +212,13 @@ body.dark-mode button:hover {
 }
 
 .bmc-btn:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .bmc-btn img {
-    height: 40px;
+    height: 32px;
     width: auto;
+    vertical-align: middle;
 }
 
 .social-links {

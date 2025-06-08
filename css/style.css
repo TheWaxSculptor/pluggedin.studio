@@ -479,9 +479,12 @@ body.dark-mode .kofi-button:hover {
 .support-text iframe {
     border: none !important;
     background: transparent !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     transform: scale(1.1);
+    display: block !important;
+    max-width: 200px !important;
+    transform-origin: center !important;
 }
 
 .social-links {

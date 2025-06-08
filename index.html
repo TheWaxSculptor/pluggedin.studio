@@ -141,6 +141,40 @@
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+<style>
+/* Custom styles to fix visibility issues */
+.whitepaper-link button {
+    background-color: #3a3a3a;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #555;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.whitepaper-link button:hover {
+    background-color: #4a4a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Dark mode specific styles */
+body.dark-mode .whitepaper-link button {
+    background-color: #555;
+    color: white;
+    border-color: #777;
+}
+
+body.light-mode .whitepaper-link button {
+    background-color: #e0e0e0;
+    color: #333;
+    border-color: #ccc;
+}
+</style>
 </head>
 <body>
     <!-- Loading Indicator -->
@@ -179,9 +213,9 @@
             </div>
         </div>
         
-        <div class="video-container">
-            <video controls autoplay loop preload="auto">
-                <source src="./0608.mp4" type="video/mp4">
+        <div class="video-container" style="overflow:hidden;">
+            <video controls autoplay loop preload="auto" style="width:100%; height:auto; display:block;">
+                <source src="0608.mp4?v=2" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>

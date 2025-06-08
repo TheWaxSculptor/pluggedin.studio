@@ -73,6 +73,15 @@
             text-align: center;
         }
         
+        .twitter-widget-container {
+            margin: 10px auto;
+            text-align: center;
+        }
+        
+        .twitter-widget-container + .twitter-widget-container {
+            margin-top: 20px;
+        }
+        
         .twitter-fallback p {
             margin: 0;
             font-size: 1rem;
@@ -194,19 +203,33 @@
         <div class="twitter-feed-container">
             <h3>Latest Updates</h3>
             <div class="twitter-feed">
-                <!-- Multiple X embeds using official Tweet IDs -->
-                <blockquote class="twitter-tweet" data-theme="light">
-                    <p lang="en" dir="ltr">Sound quality should be a right, not a privilege.</p>&mdash; Waves Audio (@WavesAudio) <a href="https://twitter.com/WavesAudio/status/1778842321927831880?ref_src=twsrc%5Etfw">July 12, 2024</a>
-                </blockquote>
+                <!-- Direct PluggedFeed embed without specific tweet IDs -->
+                <div class="twitter-widget-container">
+                    <a class="twitter-follow-button" href="https://twitter.com/pluggedfeed" data-size="large" data-show-count="true">Follow @pluggedfeed</a>
+                </div>
                 
-                <blockquote class="twitter-tweet" data-theme="light">
-                    <p lang="en" dir="ltr">Artists, Producers, Engineers, Musicians: What's your go-to plugin chain? Share below 👇</p>&mdash; iZotope (@iZotope) <a href="https://twitter.com/iZotope/status/1680028561165529088?ref_src=twsrc%5Etfw">July 15, 2023</a>
-                </blockquote>
-                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                <div class="twitter-widget-container">
+                    <a class="twitter-mention-button" href="https://twitter.com/intent/tweet?screen_name=pluggedfeed" data-size="large">Tweet to @pluggedfeed</a>
+                </div>
                 
-                <!-- Fallback content in case tweets don't load -->
+                <script>window.twttr = (function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0],
+                        t = window.twttr || {};
+                    if (d.getElementById(id)) return t;
+                    js = d.createElement(s);
+                    js.id = id;
+                    js.src = "https://platform.twitter.com/widgets.js";
+                    fjs.parentNode.insertBefore(js, fjs);
+                    t._e = [];
+                    t.ready = function(f) {
+                        t._e.push(f);
+                    };
+                    return t;
+                }(document, "script", "twitter-wjs"));</script>
+                
+                <!-- Fallback content in case widgets don't load -->
                 <div class="twitter-fallback">
-                    <p>Follow us <a href="https://twitter.com/pluggedfeed" target="_blank" rel="noopener">@pluggedfeed</a> for the latest updates!</p>
+                    <p>Keep up with the latest from PluggedIn! Follow us <a href="https://twitter.com/pluggedfeed" target="_blank" rel="noopener">@PluggedFeed</a> for updates on our studio booking platform.</p>
                 </div>
             </div>
         </div>

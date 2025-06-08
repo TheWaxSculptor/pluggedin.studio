@@ -109,6 +109,99 @@
         body.dark-mode .twitter-fallback {
             background-color: rgba(29, 161, 242, 0.05);
         }
+        
+        /* Social Feed Container */
+        .social-feed-container {
+            margin: 30px auto;
+            max-width: 600px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+        
+        .social-feed-container h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        /* Social Buttons Grid */
+        .social-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 0 auto;
+        }
+        
+        /* Modern Social Button Style */
+        .modern-social-button {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modern-social-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modern-social-button i {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .modern-social-button span {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+        
+        /* Button Colors */
+        .modern-social-button.twitter {
+            background: linear-gradient(45deg, #1DA1F2, #19608F);
+        }
+        
+        .modern-social-button.instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        }
+        
+        .modern-social-button.tweet {
+            background: linear-gradient(45deg, #1DA1F2, #0C7ABF);
+        }
+        
+        .modern-social-button.email {
+            background: linear-gradient(45deg, #6b77e8, #4757e6);
+        }
+        
+        /* Dark mode adjustments */
+        body.dark-mode .social-feed-container {
+            background-color: var(--bg-secondary-dark);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        }
+        
+        body.dark-mode .social-feed-container h3 {
+            color: var(--text-primary-dark);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .social-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-feed-container {
+                padding: 15px;
+                max-width: 90%;
+            }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
@@ -200,37 +293,25 @@
             </a>
         </div>
 
-        <div class="twitter-feed-container">
-            <h3>Latest Updates</h3>
-            <div class="twitter-feed">
-                <!-- Direct PluggedFeed embed without specific tweet IDs -->
-                <div class="twitter-widget-container">
-                    <a class="twitter-follow-button" href="https://twitter.com/pluggedfeed" data-size="large" data-show-count="true">Follow @pluggedfeed</a>
-                </div>
-                
-                <div class="twitter-widget-container">
-                    <a class="twitter-mention-button" href="https://twitter.com/intent/tweet?screen_name=pluggedfeed" data-size="large">Tweet to @pluggedfeed</a>
-                </div>
-                
-                <script>window.twttr = (function(d, s, id) {
-                    var js, fjs = d.getElementsByTagName(s)[0],
-                        t = window.twttr || {};
-                    if (d.getElementById(id)) return t;
-                    js = d.createElement(s);
-                    js.id = id;
-                    js.src = "https://platform.twitter.com/widgets.js";
-                    fjs.parentNode.insertBefore(js, fjs);
-                    t._e = [];
-                    t.ready = function(f) {
-                        t._e.push(f);
-                    };
-                    return t;
-                }(document, "script", "twitter-wjs"));</script>
-                
-                <!-- Fallback content in case widgets don't load -->
-                <div class="twitter-fallback">
-                    <p>Keep up with the latest from PluggedIn! Follow us <a href="https://twitter.com/pluggedfeed" target="_blank" rel="noopener">@PluggedFeed</a> for updates on our studio booking platform.</p>
-                </div>
+        <div class="social-feed-container">
+            <h3>Connect With Us</h3>
+            <div class="social-buttons-grid">
+                <a href="https://twitter.com/pluggedfeed" target="_blank" rel="noopener" class="modern-social-button twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Follow<br>@PluggedFeed</span>
+                </a>
+                <a href="https://instagram.com/pluggedin.studioapp" target="_blank" rel="noopener" class="modern-social-button instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>Follow on<br>Instagram</span>
+                </a>
+                <a href="https://twitter.com/intent/tweet?screen_name=pluggedfeed" target="_blank" rel="noopener" class="modern-social-button tweet">
+                    <i class="fas fa-comment"></i>
+                    <span>Tweet to Us</span>
+                </a>
+                <a href="mailto:hello@pluggedin.studio" class="modern-social-button email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                </a>
             </div>
         </div>
 

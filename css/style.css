@@ -718,3 +718,28 @@ body.dark-mode .loader-text {
         height: 50px;
     }
 }
+
+/* Tooltip styles for the mode toggle button */
+.toggle-tooltip {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+body.dark-mode .toggle-tooltip {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #121212;
+}
+
+.mode-toggle:hover .toggle-tooltip {
+    opacity: 1;
+}

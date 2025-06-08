@@ -89,14 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('mode-toggle');
     toggleButton.id = 'dark-mode-toggle'; // Add ID for reference in other scripts
-    toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+    toggleButton.setAttribute('aria-label', 'Toggle dark mode');
+    toggleButton.innerHTML = '<i class="fas fa-moon"></i><span class="toggle-tooltip">Dark Mode</span>';
     document.body.appendChild(toggleButton);
     
     // Check if user prefers dark mode
     const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (prefersDarkMode) {
         body.classList.add('dark-mode');
-        toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+        toggleButton.innerHTML = '<i class="fas fa-sun"></i><span class="toggle-tooltip">Light Mode</span>';
         // Initialize dark mode favicons
         updateFavicons(true);
     } else {
@@ -127,10 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDarkMode = body.classList.contains('dark-mode');
         
         if (isDarkMode) {
-            toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+            toggleButton.innerHTML = '<i class="fas fa-sun"></i><span class="toggle-tooltip">Light Mode</span>';
             updateFavicons(true);
         } else {
-            toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+            toggleButton.setAttribute('aria-label', 'Toggle dark mode');
+    toggleButton.innerHTML = '<i class="fas fa-moon"></i><span class="toggle-tooltip">Dark Mode</span>';
             updateFavicons(false);
         }
     });

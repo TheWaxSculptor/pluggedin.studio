@@ -213,12 +213,32 @@ body.light-mode .whitepaper-link button {
             </div>
         </div>
         
-        <div class="video-container" style="overflow:hidden;">
-            <video controls autoplay loop preload="auto" style="width:100%; height:auto; display:block;">
-                <source src="0608.mp4?v=2" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
+<div class="video-container" style="position:relative; max-width:100%; overflow:hidden;">
+    <video id="mainVideo" controls style="width:100%; height:auto; display:block;">
+        <source src="https://raw.githubusercontent.com/TheWaxSculptor/pluggedin.studio/main/0608.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const video = document.getElementById("mainVideo");
+    
+    // Force video reload and play
+    video.load();
+    video.addEventListener("loadedmetadata", function() {
+        // Video has now been loaded
+        if (video.paused) {
+            video.play().catch(e => {
+                console.log("Auto-play prevented by browser:", e);
+            });
+        }
+    });
+    
+    video.addEventListener("error", function(e) {
+        console.error("Video error:", e);
+    });
+});
+</script>
         
         <div class="subscribe">
             <h2>Be the first to know when we launch</h2>

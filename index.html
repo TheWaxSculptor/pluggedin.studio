@@ -43,6 +43,36 @@
     <link rel="stylesheet" href="css/style.css?v=1.3">
     <link rel="stylesheet" href="css/whitepaper.css?v=1.0">
     <link rel="stylesheet" href="css/modal.css?v=1.0">
+    <style>
+        .twitter-feed-container {
+            margin: 30px auto;
+            max-width: 500px;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .twitter-feed-container h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .twitter-feed {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        /* Dark mode adjustments */
+        body.dark-mode .twitter-feed-container {
+            background-color: var(--bg-secondary-dark);
+        }
+        
+        body.dark-mode .twitter-feed-container h3 {
+            color: var(--text-primary-dark);
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
 </head>
@@ -133,6 +163,14 @@
             </a>
         </div>
 
+        <div class="twitter-feed-container">
+            <h3>Latest Updates</h3>
+            <div class="twitter-feed">
+                <a class="twitter-timeline" data-height="400" data-theme="light" href="https://twitter.com/pluggedfeed">Tweets by @pluggedfeed</a>
+                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            </div>
+        </div>
+
         <div class="support-text">
             <p>Support the development</p>
             <!-- Use iframe to completely isolate Ko-fi button -->
@@ -144,6 +182,34 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const darkModeToggle = document.getElementById('dark-mode-toggle');
                 const kofiIframe = document.getElementById('kofi-iframe');
+                
+                // Function to update Twitter widget theme based on current site theme
+                function updateTwitterTheme() {
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    const existingTimeline = document.querySelector('.twitter-timeline');
+                    
+                    if (existingTimeline) {
+                        // Remove existing timeline
+                        const parent = existingTimeline.parentNode;
+                        parent.removeChild(existingTimeline);
+                        
+                        // Create new timeline with appropriate theme
+                        const newTimeline = document.createElement('a');
+                        newTimeline.className = 'twitter-timeline';
+                        newTimeline.setAttribute('data-height', '400');
+                        newTimeline.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+                        newTimeline.setAttribute('href', 'https://twitter.com/pluggedfeed');
+                        newTimeline.textContent = 'Tweets by @pluggedfeed';
+                        
+                        // Add to DOM
+                        parent.appendChild(newTimeline);
+                        
+                        // Reload widget
+                        if (window.twttr && window.twttr.widgets) {
+                            window.twttr.widgets.load();
+                        }
+                    }
+                }
                 
                 if (darkModeToggle && kofiIframe) {
                     // Initial theme
@@ -162,6 +228,9 @@
                                 updatedIsDarkMode ? 'dark-mode' : 'light-mode', 
                                 '*'
                             );
+                            
+                            // Update Twitter theme
+                            updateTwitterTheme();
                         }, 100);
                     });
                 }

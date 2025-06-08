@@ -213,8 +213,8 @@ body.light-mode .whitepaper-link button {
             </div>
         </div>
         
-<div class="video-container" style="position:relative; max-width:100%; overflow:hidden;">
-    <video id="mainVideo" controls style="width:100%; height:auto; display:block;">
+<div class="video-container" style="position:relative; width:100%; max-width:100%; overflow:hidden;">
+    <video id="mainVideo" controls playsinline webkit-playsinline style="width:100%; height:auto; max-height:100vh; display:block; object-fit:contain;">
         <source src="https://raw.githubusercontent.com/TheWaxSculptor/pluggedin.studio/main/0608.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
@@ -223,10 +223,24 @@ body.light-mode .whitepaper-link button {
 document.addEventListener("DOMContentLoaded", function() {
     const video = document.getElementById("mainVideo");
     
-    // Force video reload and play
+    // Add mobile-specific attributes
+    if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.setAttribute("muted", ""); // Initially mute on mobile to allow autoplay
+        video.setAttribute("autoplay", "");
+        
+        // Allow user to unmute with first interaction
+        document.addEventListener("touchstart", function() {
+            video.muted = false;
+        }, {once: true});
+    }
+    
+    // Force video reload and handle errors
     video.load();
+    
     video.addEventListener("loadedmetadata", function() {
-        // Video has now been loaded
+        console.log("Video metadata loaded");
         if (video.paused) {
             video.play().catch(e => {
                 console.log("Auto-play prevented by browser:", e);
@@ -235,7 +249,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     video.addEventListener("error", function(e) {
-        console.error("Video error:", e);
+        console.error("Video error:", video.error);
+        console.error("Error details:", e);
     });
 });
 </script>

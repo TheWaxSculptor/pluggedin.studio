@@ -213,43 +213,48 @@ body.light-mode .whitepaper-link button {
             </div>
         </div>
         
-<div class="video-container" style="position:relative; width:100%; max-width:100%; overflow:hidden;">
-    <video id="mainVideo" controls playsinline webkit-playsinline style="width:100%; height:auto; max-height:100vh; display:block; object-fit:contain;">
-        <source src="https://raw.githubusercontent.com/TheWaxSculptor/pluggedin.studio/main/0608.mp4" type="video/mp4">
+<div class="video-container" style="position:relative; width:100%; max-width:100%; overflow:hidden; display:flex; justify-content:center;">
+    <video id="mainVideo" controls playsinline webkit-playsinline preload="metadata"
+           style="width:auto; max-width:100%; height:auto; max-height:90vh; display:block; object-fit:contain;">
+        <source src="0608.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 </div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const video = document.getElementById("mainVideo");
     
-    // Add mobile-specific attributes
-    if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    // Mobile-specific fixes
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile) {
+        // iOS Specific
         video.setAttribute("playsinline", "");
         video.setAttribute("webkit-playsinline", "");
-        video.setAttribute("muted", ""); // Initially mute on mobile to allow autoplay
-        video.setAttribute("autoplay", "");
         
-        // Allow user to unmute with first interaction
-        document.addEventListener("touchstart", function() {
-            video.muted = false;
-        }, {once: true});
+        // Size adjustments for portrait
+        video.style.width = "auto";
+        video.style.height = "80vh";
+        
+        // Force reload video from disk/server not cache
+        const currentSrc = video.querySelector("source").src;
+        video.querySelector("source").src = currentSrc + "?v=" + new Date().getTime();
+        
+        // Debug info
+        console.log("Mobile device detected:", navigator.userAgent);
     }
     
-    // Force video reload and handle errors
     video.load();
     
-    video.addEventListener("loadedmetadata", function() {
-        console.log("Video metadata loaded");
-        if (video.paused) {
-            video.play().catch(e => {
-                console.log("Auto-play prevented by browser:", e);
-            });
-        }
-    });
+    // Debug events
+    video.addEventListener("loadstart", () => console.log("Video loadstart"));
+    video.addEventListener("loadeddata", () => console.log("Video loadeddata"));
+    video.addEventListener("loadedmetadata", () => console.log("Video metadata loaded"));
+    video.addEventListener("canplay", () => console.log("Video canplay"));
+    video.addEventListener("playing", () => console.log("Video playing"));
     
     video.addEventListener("error", function(e) {
-        console.error("Video error:", video.error);
+        console.error("Video error code:", video.error ? video.error.code : "unknown");
         console.error("Error details:", e);
     });
 });

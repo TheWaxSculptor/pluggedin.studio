@@ -43,6 +43,7 @@
     <link rel="stylesheet" href="css/style.css?v=1.3">
     <link rel="stylesheet" href="css/whitepaper.css?v=1.0">
     <link rel="stylesheet" href="css/modal.css?v=1.0">
+    <link rel="stylesheet" href="css/faq.css">
     <style>
         
         /* Social Feed Container */
@@ -217,7 +218,56 @@
             </div>
         </div>
 
-        <div class="social-feed-container">
+        <section class="faq-section">
+    <div class="faq-container">
+        <h2>Frequently Asked Questions</h2>
+        <p class="faq-subtitle">Everything you need to know about PluggedIn.studio</p>
+        
+        <div class="faq-accordion">
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-1">
+                    <span>What is PluggedIn.studio?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer" id="faq-answer-1">
+                    <p>PluggedIn.studio is a platform that connects music creators with recording studios. We make it easy to discover, book, and pay for studio time without the back-and-forth communication, helping both artists and studio owners streamline the process.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-2">
+                    <span>How do I book a studio?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer" id="faq-answer-2">
+                    <p>Booking a studio is simple! Browse available studios based on location, equipment, and price. Select your preferred date and time, complete the booking process, and receive instant confirmation. Our platform handles payments securely so you can focus on your music.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-3">
+                    <span>I own a studio. How can I list it on PluggedIn?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer" id="faq-answer-3">
+                    <p>Studio owners can sign up for a free account and create a detailed profile showcasing your space, equipment, and availability. Set your own rates and booking policies, manage your calendar, and get paid directly through our platform. We charge a small commission only when bookings are made.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-4">
+                    <span>What if I need to cancel my booking?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer" id="faq-answer-4">
+                    <p>Cancellation policies vary by studio. Each listing clearly displays the cancellation terms before you book. Many studios offer full refunds with 24-48 hours notice, while others may have stricter policies. Always check the specific terms before booking.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="social-feed-container">
             <h3>Connect With Us</h3>
             <div class="social-buttons-grid">
                 <a href="https://twitter.com/pluggedfeed" target="_blank" rel="noopener" class="modern-social-button twitter">
@@ -328,5 +378,6 @@
             }
         });
     </script>
+<script src="js/faq.js"></script>
 </body>
 </html>

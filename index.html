@@ -213,50 +213,89 @@ body.light-mode .whitepaper-link button {
             </div>
         </div>
         
-<div class="video-container" style="position:relative; width:100%; max-width:100%; overflow:hidden; display:flex; justify-content:center;">
-    <video id="mainVideo" controls playsinline webkit-playsinline preload="metadata"
-           style="width:auto; max-width:100%; height:auto; max-height:90vh; display:block; object-fit:contain;">
+<div class="video-container" style="position:relative; width:100%; max-width:100%; overflow:hidden; display:flex; justify-content:center; align-items:center;">
+    <video id="mainVideo" controls autoplay loop preload="auto"
+           style="width:auto; max-width:100%; height:auto; max-height:90vh; display:block;">
         <source src="0608.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 </div>
 
 <script>
+// Use a precise approach with clearly defined behaviors to avoid ambiguity
 document.addEventListener("DOMContentLoaded", function() {
     const video = document.getElementById("mainVideo");
     
-    // Mobile-specific fixes
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if(isMobile) {
-        // iOS Specific
+    // Ensure video plays properly on all devices
+    if (video) {
+        // Define explicit attributes for mobile compatibility
         video.setAttribute("playsinline", "");
         video.setAttribute("webkit-playsinline", "");
+        video.setAttribute("x-webkit-airplay", "allow");
         
-        // Size adjustments for portrait
-        video.style.width = "auto";
-        video.style.height = "80vh";
+        // Force specific properties on the element
+        video.playsInline = true;
+        video.controls = true;
+        video.muted = false;
         
-        // Force reload video from disk/server not cache
-        const currentSrc = video.querySelector("source").src;
-        video.querySelector("source").src = currentSrc + "?v=" + new Date().getTime();
-        
-        // Debug info
-        console.log("Mobile device detected:", navigator.userAgent);
+        // Mobile detection with precise browser handling
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            // Create a completely new video element with simplified attributes
+            const mobileVideo = document.createElement("video");
+            mobileVideo.id = "mobileVideo";
+            mobileVideo.controls = true;
+            mobileVideo.playsinline = true;
+            mobileVideo.setAttribute("playsinline", "");
+            mobileVideo.setAttribute("webkit-playsinline", "");
+            mobileVideo.style.width = "100%";
+            mobileVideo.style.maxHeight = "90vh";
+            mobileVideo.style.objectFit = "contain";
+            
+            // Create a simplified source element
+            const source = document.createElement("source");
+            source.src = "0608.mp4?" + new Date().getTime(); // Force fresh load
+            source.type = "video/mp4";
+            
+            mobileVideo.appendChild(source);
+            
+            // Replace the original video with our mobile-optimized one
+            video.parentNode.replaceChild(mobileVideo, video);
+            
+            // Initialize the mobile video
+            mobileVideo.load();
+            
+            // Attach explicit event handlers
+            mobileVideo.addEventListener("error", function(e) {
+                console.error("Mobile video error:", e);
+            });
+            
+            // Add tap-to-play instruction for iOS devices
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                const instructions = document.createElement("div");
+                instructions.style.padding = "10px";
+                instructions.style.background = "rgba(0,0,0,0.7)";
+                instructions.style.color = "white";
+                instructions.style.textAlign = "center";
+                instructions.style.position = "absolute";
+                instructions.style.bottom = "70px";
+                instructions.style.left = "0";
+                instructions.style.right = "0";
+                instructions.style.zIndex = "100";
+                instructions.style.fontSize = "14px";
+                instructions.innerHTML = "Tap to play video with sound";
+                video.parentNode.appendChild(instructions);
+                
+                // Remove instructions on first tap
+                document.addEventListener("touchstart", function() {
+                    instructions.style.display = "none";
+                }, {once: true});
+            }
+        } else {
+            // Desktop behavior
+            video.load();
+        }
     }
-    
-    video.load();
-    
-    // Debug events
-    video.addEventListener("loadstart", () => console.log("Video loadstart"));
-    video.addEventListener("loadeddata", () => console.log("Video loadeddata"));
-    video.addEventListener("loadedmetadata", () => console.log("Video metadata loaded"));
-    video.addEventListener("canplay", () => console.log("Video canplay"));
-    video.addEventListener("playing", () => console.log("Video playing"));
-    
-    video.addEventListener("error", function(e) {
-        console.error("Video error code:", video.error ? video.error.code : "unknown");
-        console.error("Error details:", e);
-    });
 });
 </script>
         

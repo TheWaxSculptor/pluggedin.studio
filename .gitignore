@@ -4,3 +4,8 @@ node_modules/
 .env.local
 .vscode/
 *.log
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm

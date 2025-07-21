@@ -1,0 +1,906 @@
+:root {
+    --primary-color: #000000;
+    --secondary-color: #000000;
+    --text-color: #000000;
+    --bg-color: #ffffff;
+    --bg-dark: #121212;
+    --dark-primary: #ffffff;
+    --dark-secondary: #e0e0e0;
+    --dark-text: #ffffff;
+    --dark-hover: #2c2c2c;
+    --accent-color: #000000;
+    --error-color: #ff4444;
+    --subtle-color: rgba(0, 0, 0, 0.7);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease;
+    letter-spacing: -0.02em;
+}
+
+body.dark-mode {
+    background-color: var(--bg-dark);
+    color: var(--dark-text);
+}
+
+body.dark-mode .logo-container {
+    background-color: rgba(255, 255, 255, 0.03);
+    margin: -2rem -2rem 3rem;
+    padding: 2rem 2rem 3rem;
+}
+
+h1 {
+    color: var(--text-color);
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    margin: 2rem 0;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode h1 {
+    color: var(--dark-primary);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.tagline {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    opacity: 0.9;
+}
+
+body.dark-mode .tagline {
+    color: var(--dark-secondary);
+}
+
+body.dark-mode .time-block span:first-child {
+    color: var(--dark-text);
+}
+
+body.dark-mode .time-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    display: block;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin: 1.5rem 0;
+        letter-spacing: 0.05em;
+    }
+
+    .tagline {
+        font-size: 1rem;
+        margin: 0 auto 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .logo {
+        max-width: 250px;
+        width: 80%;
+    }
+
+    .countdown {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .time-block {
+        min-width: calc(50% - 0.5rem);
+        padding: 0.75rem;
+    }
+
+    .time-block span:first-child {
+        font-size: 2rem;
+    }
+
+    .time-label {
+        font-size: 0.9rem;
+    }
+
+    .video-container {
+        margin: 2rem -1rem;
+        border-radius: 0;
+    }
+
+    .subscribe {
+        padding: 1.5rem 1rem;
+    }
+
+    .subscribe h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .subscribe form {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .subscribe input,
+    .subscribe button {
+        width: 100%;
+        max-width: none;
+    }
+
+    .subscribe input {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .subscribe button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .dark-mode-toggle {
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    .social-links {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .social-button {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+    }
+
+    .social-button i {
+        font-size: 1.1rem;
+        margin-right: 0.5rem;
+    }
+
+    .social-button span {
+        font-size: 0.9rem;
+    }
+
+    .support-text {
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+    }
+}
+
+.logo-container {
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: block;
+    visibility: visible;
+}
+
+body.dark-mode .logo-container {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    max-width: 300px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
+
+.light-logo {
+    display: block;
+}
+
+.dark-logo {
+    display: none;
+}
+
+body.dark-mode .light-logo {
+    display: none;
+}
+
+body.dark-mode .dark-logo {
+    display: block;
+}
+
+h1 {
+    font-size: 3.5rem;
+    margin: 1rem 0;
+    text-align: center;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--primary-color);
+}
+
+body.dark-mode h1 {
+    color: var(--dark-primary);
+}
+
+.tagline {
+    font-size: 1.25rem;
+    text-align: center;
+    margin: 1rem 0 2rem;
+    color: var(--subtle-color);
+    font-weight: 500;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.dark-mode .tagline {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin: 3rem 0;
+}
+
+.time-block {
+    text-align: center;
+}
+
+.time-block span:first-child {
+    font-size: 3.5rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.time-label {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    color: var(--subtle-color);
+}
+
+.coming-soon {
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--subtle-color);
+}
+
+.video-container {
+    margin: 2rem auto;
+    max-width: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode .video-container {
+    box-shadow: 0 10px 30px rgba(94, 72, 255, 0.3);
+}
+
+video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.subscribe {
+    margin: 3rem auto;
+    max-width: 500px;
+}
+
+.subscribe h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+#subscribe-form {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="email"] {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+}
+
+body.dark-mode input[type="email"] {
+    background-color: #1a1a1a;
+    border-color: #333;
+    color: #fff;
+}
+
+button[type="submit"] {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+button[type="submit"]:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+button[type="submit"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+body.dark-mode button:hover {
+    background-color: var(--dark-hover);
+    box-shadow: 0 3px 10px rgba(122, 104, 255, 0.4);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.social-button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    min-width: 140px;
+}
+
+.social-button i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+.social-button span {
+    font-size: 0.95rem;
+}
+
+/* Twitter styling */
+.social-button.twitter {
+    background-color: #1DA1F2;
+    color: white;
+    box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+}
+
+.social-button.twitter:hover {
+    background-color: #0d8ed9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.4);
+}
+
+/* Instagram styling */
+.social-button.instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 39, 67, 0.3);
+}
+
+.social-button.instagram:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 39, 67, 0.4);
+    filter: saturate(1.2);
+}
+
+/* Dark mode doesn't need special handling since buttons use brand colors */
+
+.support-text {
+    margin: 2rem 0 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+body.dark-mode .support-text {
+    color: var(--dark-text);
+    background: var(--bg-dark);
+}
+
+.support-text p {
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+/* Ko-fi button overrides */
+.kofi-button {
+    background: var(--primary-color) !important;
+    color: var(--bg-color) !important;
+}
+
+body.dark-mode .kofi-button {
+    background: var(--dark-text) !important;
+    color: var(--bg-dark) !important;
+}
+
+/* Override Ko-fi button hover state */
+.kofi-button:hover {
+    background: var(--primary-color) !important;
+    opacity: 0.9 !important;
+}
+
+body.dark-mode .kofi-button:hover {
+    background: var(--dark-text) !important;
+    opacity: 0.9 !important;
+}
+
+.support-text iframe {
+    border: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: scale(1.1);
+}
+
+.social-links {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.social-icon:hover .fa-mug-hot {
+    animation: steam 1s ease infinite;
+}
+
+@keyframes steam {
+    0% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-3px) rotate(-5deg); }
+    75% { transform: translateY(-3px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0); }
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 1;
+}
+
+.social-icon i {
+    position: relative;
+    z-index: 2;
+}
+
+body.dark-mode .social-icon {
+    background-color: var(--dark-primary);
+}
+
+body.dark-mode .social-icon:hover {
+    background-color: var(--dark-hover);
+    box-shadow: 0 0 15px rgba(122, 104, 255, 0.5);
+}
+
+.social-icon:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 6px 15px rgba(108, 92, 231, 0.25);
+}
+
+.social-icon:hover::before {
+    width: 150%;
+    height: 150%;
+}
+
+.mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+    z-index: 100;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .mode-toggle {
+    background-color: var(--dark-primary);
+    color: var(--dark-text);
+    box-shadow: 0 2px 10px rgba(94, 72, 255, 0.3);
+}
+
+.mode-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* GitHub Pages Fix - Prevent content from being hidden */
+body, .container, .container > div, .container > h1, .container > p, .container > form, .logo-container, .tagline, .countdown, .video-container, .subscribe, .whitepaper-section, .social-links {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Loading Animation */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s, visibility 0.5s;
+}
+
+body.dark-mode .loader {
+    background-color: var(--bg-dark);
+}
+
+.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    display: none !important;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(108, 92, 231, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 15px;
+}
+
+body.dark-mode .loader-spinner {
+    border: 5px solid rgba(94, 72, 255, 0.2);
+    border-top-color: var(--dark-primary);
+}
+
+.loader-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+body.dark-mode .loader-text {
+    color: var(--dark-text);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Studio Signup Form Styles */
+.studio-signup {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: var(--bg-secondary, rgba(0, 0, 0, 0.02));
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .studio-signup {
+    background-color: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.studio-signup h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+body.dark-mode .studio-signup h2 {
+    color: var(--dark-text);
+}
+
+.signup-description {
+    font-size: 1.1rem;
+    color: var(--subtle-color);
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+body.dark-mode .signup-description {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+.studio-registration-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+body.dark-mode .form-group label {
+    color: var(--dark-text);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+    border-color: var(--dark-primary);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+body.dark-mode .submit-btn {
+    background-color: var(--dark-primary);
+    color: var(--bg-dark);
+}
+
+body.dark-mode .submit-btn:hover {
+    background-color: var(--dark-secondary);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.form-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+    display: none;
+}
+
+.form-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.form-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+body.dark-mode .form-message.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+body.dark-mode .form-message.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Form success message */
+.success-message {
+    display: none;
+    background-color: #4cd137;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    text-align: center;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+    
+    .countdown {
+        flex-wrap: wrap;
+    }
+    
+    .time-block {
+        min-width: 70px;
+    }
+    
+    #subscribe-form {
+        flex-direction: column;
+    }
+    
+    button {
+        width: 100%;
+    }
+    
+    .mode-toggle {
+        top: 15px;
+        right: 15px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+    
+    .loader-spinner {
+        width: 50px;
+        height: 50px;
+    }
+}

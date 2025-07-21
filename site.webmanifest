@@ -1,0 +1,20 @@
+{
+  "name": "PluggedIn.studio",
+  "short_name": "PluggedIn",
+  "icons": [
+    {
+      "src": "favicon/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "favicon/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#6c5ce7",
+  "background_color": "#000000",
+  "display": "standalone",
+  "start_url": "/"
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ko-fi Button</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="kofi-container"></div>
+    
+    <script type="text/javascript" src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                try {
+                    kofiwidget2.init('Buy us a coffee', '#000000', 'pluggedindotstudio');
+                    kofiwidget2.draw(document.getElementById('kofi-container'));
+                    
+                    // Send message to parent when loaded
+                    window.parent.postMessage('kofi-loaded', '*');
+                } catch (e) {
+                    console.error('Error initializing Ko-fi widget:', e);
+                }
+            }, 500);
+        });
+        
+        // Listen for theme change messages from parent
+        window.addEventListener('message', function(event) {
+            if (event.data === 'dark-mode') {
+                try {
+                    document.getElementById('kofi-container').innerHTML = '';
+                    kofiwidget2.init('Buy us a coffee', '#FFFFFF', 'pluggedindotstudio');
+                    kofiwidget2.draw(document.getElementById('kofi-container'));
+                } catch (e) {
+                    console.error('Error updating Ko-fi widget:', e);
+                }
+            } else if (event.data === 'light-mode') {
+                try {
+                    document.getElementById('kofi-container').innerHTML = '';
+                    kofiwidget2.init('Buy us a coffee', '#000000', 'pluggedindotstudio');
+                    kofiwidget2.draw(document.getElementById('kofi-container'));
+                } catch (e) {
+                    console.error('Error updating Ko-fi widget:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

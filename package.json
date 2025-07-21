@@ -1,0 +1,27 @@
+{
+  "name": "pluggedin.studio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheWaxSculptor/pluggedin.studio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheWaxSculptor/pluggedin.studio/issues"
+  },
+  "homepage": "https://github.com/TheWaxSculptor/pluggedin.studio#readme",
+  "funding": "https://coff.ee/yishay",
+  "description": "",
+  "devDependencies": {
+    "netlify-cli": "^21.5.2"
+  },
+  "dependencies": {
+    "emailjs-com": "^3.2.0"
+  }
+}

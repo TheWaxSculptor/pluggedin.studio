@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PluggedIn.studio Whitepaper</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/whitepaper.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+    <style>
+        .whitepaper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .dark-mode-toggle button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .dark-mode-toggle button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--dark-text);
+        }
+
+        .dark-mode-toggle button:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        body.dark-mode .dark-mode-toggle button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .whitepaper h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            letter-spacing: -0.03em;
+            color: var(--text-color);
+            text-align: left;
+        }
+        
+        .whitepaper h2 {
+            font-size: 1.8rem;
+            margin: 3rem 0 1.5rem;
+            letter-spacing: -0.02em;
+            color: var(--text-color);
+            text-align: left;
+        }
+        
+        body.dark-mode {
+            --text-color: rgba(255, 255, 255, 0.95);
+            --subtle-color: rgba(255, 255, 255, 0.7);
+            background-color: #121212;
+        }
+
+        .whitepaper p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            text-align: justify;
+            hyphens: auto;
+        }
+        
+        .whitepaper ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+        
+        .whitepaper li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .highlight {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        body.dark-mode .highlight {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        body.dark-mode .highlight {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-grid, .pricing-grid, .marketing-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pricing-note {
+            font-size: 1.1rem;
+            color: var(--subtle-color);
+            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+
+        body.dark-mode .pricing-note {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .feature, .pricing-tier, .benefit-item {
+            background: rgba(0, 0, 0, 0.03);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode .feature,
+        body.dark-mode .pricing-tier {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .pricing-tier {
+            text-align: center;
+        }
+
+        .price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0 1.5rem;
+            color: var(--text-color);
+        }
+
+        .pricing-tier ul {
+            text-align: left;
+            margin-top: auto;
+        }
+
+        .pricing-tier h4 {
+            font-size: 1.4rem;
+            margin: 0;
+        }
+
+        .feature:hover, .pricing-tier:hover {
+            transform: translateY(-2px);
+        }
+
+        body.dark-mode .feature,
+        body.dark-mode .pricing-tier {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .feature h4, .pricing-tier h4 {
+            margin-top: 0;
+            color: var(--text-color);
+        }
+
+        .feature ul, .pricing-tier ul {
+            margin: 1rem 0 0;
+            padding-left: 1.2rem;
+        }
+
+        .feature li, .pricing-tier li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .comparison-table {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+        }
+
+        .dark-mode-toggle button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .dark-mode-toggle button {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode-toggle button:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode .comparison-table::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .comparison-table {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 2rem 0;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+        }
+
+        .comparison-table::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .comparison-table::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        .comparison-table::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        body.dark-mode .comparison-table::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        table {
+            min-width: 800px;
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+            margin: 0;
+        }
+
+
+
+        .note {
+            font-size: 0.9rem;
+            color: var(--subtle-color);
+            margin-top: 0.5rem;
+        }
+
+        .check {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .x {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .partial {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .legend {
+            text-align: center;
+            margin: 1rem 0 2rem;
+            font-size: 0.9rem;
+            color: var(--subtle-color);
+        }
+
+        @media (max-width: 768px) {
+            .feature-grid, .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dark-mode-toggle">
+        <button onclick="document.body.classList.toggle('dark-mode')" aria-label="Toggle Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <div class="whitepaper">
+        <h1 class="whitepaper-title">PluggedIn.studio Whitepaper</h1>
+        
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>PluggedIn.studio is revolutionizing the music industry by creating a seamless connection between artists and recording spaces. Our platform democratizes access to quality recording environments while helping studio owners maximize their space utilization.</p>
+            <p>By bridging the gap between professional studios, home setups, and emerging artists, we're creating a more accessible and efficient music production ecosystem. Our platform combines booking automation, quality assurance, and community features to make studio recording more accessible than ever before.</p>
+        </div>
+        
+        <div class="section">
+            <h2>The Problem</h2>
+            <p>The current studio booking landscape faces several challenges:</p>
+            <ul>
+                <li>Lack of transparency in studio pricing and availability</li>
+                <li>Underutilized home studio setups</li>
+                <li>Difficulty in finding and booking professional recording spaces</li>
+                <li>Limited options for emerging artists with budget constraints</li>
+                <li>Inefficient booking and payment processes</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Our Solution</h2>
+            <div class="highlight">
+                <p>PluggedIn.studio provides a comprehensive platform that connects artists with recording spaces through:</p>
+                <ul>
+                    <li>Smart booking system for seamless scheduling</li>
+                    <li>Verified reviews and detailed studio profiles</li>
+                    <li>Transparent pricing and instant availability checks</li>
+                    <li>Secure payment processing</li>
+                    <li>Direct messaging between artists and studio owners</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Market Opportunity</h2>
+            <p>The global music recording market continues to grow, with:</p>
+            <ul>
+                <li>Increasing number of independent artists</li>
+                <li>Growing home studio segment</li>
+                <li>Rising demand for professional recording spaces</li>
+                <li>Shift towards digital distribution platforms</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Technology</h2>
+            <p>Our platform leverages cutting-edge technology to provide:</p>
+            <ul>
+                <li>Real-time availability and booking management</li>
+                <li>Secure payment processing</li>
+                <li>Rating and review system</li>
+                <li>Automated scheduling and confirmation</li>
+                <li>Mobile-responsive interface</li>
+            </ul>
+            
+            <h3>Key Technical Features</h3>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h4>Smart Booking System</h4>
+                    <ul>
+                        <li>Real-time calendar synchronization</li>
+                        <li>Automated conflict resolution</li>
+                        <li>Multi-timezone support</li>
+                        <li>Flexible session duration</li>
+                    </ul>
+                </div>
+                
+                <div class="feature">
+                    <h4>Studio Profiles</h4>
+                    <ul>
+                        <li>Equipment inventory management</li>
+                        <li>High-quality photo galleries</li>
+                        <li>Audio sample hosting</li>
+                        <li>Virtual tour capability</li>
+                    </ul>
+                </div>
+                
+                <div class="feature">
+                    <h4>Payment System</h4>
+                    <ul>
+                        <li>Secure payment processing</li>
+                        <li>Deposit handling</li>
+                        <li>Automated refund management</li>
+                        <li>Multiple currency support</li>
+                    </ul>
+                </div>
+                
+                <div class="feature">
+                    <h4>Quality Assurance</h4>
+                    <ul>
+                        <li>Verified studio reviews</li>
+                        <li>Equipment verification</li>
+                        <li>Acoustic environment assessment</li>
+                        <li>Professional certification tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Business Model</h2>
+            <div class="highlight">
+                <p>Revenue streams include:</p>
+                <ul>
+                    <li>Commission on bookings (5-15% based on volume)</li>
+                    <li>Premium studio listings with enhanced visibility</li>
+                    <li>Verified status for studios with quality assurance</li>
+                    <li>Enhanced profile features and analytics</li>
+                </ul>
+            </div>
+            
+            <h3>Optional Subscription Plans</h3>
+            <p class="pricing-note">All studios can list and accept bookings for free. Subscriptions are completely optional and designed to help high-volume studios save on commission fees.</p>
+            
+            <div class="pricing-grid">
+                <div class="pricing-tier">
+                    <h4>Free</h4>
+                    <p class="price">$0/month</p>
+                    <ul>
+                        <li>Full studio profile</li>
+                        <li>Instant booking system</li>
+                        <li>10% booking commission</li>
+                        <li>Basic analytics</li>
+                        <li>Standard support</li>
+                    </ul>
+                </div>
+                
+                <div class="pricing-tier">
+                    <h4>Pro</h4>
+                    <p class="price">$8.99/month</p>
+                    <ul>
+                        <li>Enhanced profile features</li>
+                        <li>Priority in search results</li>
+                        <li>7% booking commission</li>
+                        <li>Advanced analytics</li>
+                        <li>Priority support</li>
+                        <li>Social media promotion</li>
+                    </ul>
+                </div>
+                
+                <div class="pricing-tier">
+                    <h4>Studio</h4>
+                    <p class="price">$18.99/month</p>
+                    <ul>
+                        <li>Multi-room management</li>
+                        <li>Custom branding options</li>
+                        <li>4% booking commission</li>
+                        <li>Full analytics suite</li>
+                        <li>Dedicated support</li>
+                        <li>Featured studio status</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Competitive Analysis</h2>
+            <p>While there are various studio booking solutions in the market, PluggedIn.studio offers unique advantages that set us apart:</p>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>PluggedIn.studio</th>
+                            <th>Peerspace</th>
+                            <th>Soundbetter</th>
+                            <th>Studiotime</th>
+                            <th>Pirate Studios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base Fee</td>
+                            <td>Free</td>
+                            <td>Free</td>
+                            <td>$59/mo</td>
+                            <td>Free</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Optional Insurance</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Commission</td>
+                            <td>10%</td>
+                            <td>15%</td>
+                            <td>20%</td>
+                            <td>12%</td>
+                            <td>0%*</td>
+                        </tr>
+                        <tr>
+                            <td>Major City Coverage</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Suburban Coverage</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>24/7 Studio Access</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Public Transit Access</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Parking Available</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Real-time Availability</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Verification</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Reliability</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>On-site Support</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Instant Booking</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Audio Samples</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Virtual Tours</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Search</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Engineer Matching</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>DAW Integration</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Session Analytics</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Multi-room Calendar</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Rental</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Genre Specialization</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dedicated App</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                            <td><span class="partial">~</span></td>
+                        </tr>
+                        <tr>
+                            <td>Secure Payments</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>Booking Protection</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="x">✗</span></td>
+                            <td><span class="partial">~</span></td>
+                            <td><span class="x">✗</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="legend">
+                <p><span class="check">✓</span> Full Support &nbsp;&nbsp; <span class="partial">~</span> Partial Support &nbsp;&nbsp; <span class="x">✗</span> Not Supported</p>
+                <p class="note">* Pirate Studios owns their studios and charges hourly rates directly</p>
+            </div>
+
+            <h3>Marketing & Promotion</h3>
+            <p>Studios on our platform benefit from comprehensive marketing support:</p>
+            <div class="marketing-benefits">
+                <div class="benefit-item">
+                    <h4>Digital Presence</h4>
+                    <ul>
+                        <li>SEO-optimized studio profiles</li>
+                        <li>Integration with Google Business</li>
+                        <li>Social media sharing tools</li>
+                        <li>Automated content generation</li>
+                    </ul>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>Targeted Promotion</h4>
+                    <ul>
+                        <li>Genre-specific marketing</li>
+                        <li>Local artist outreach</li>
+                        <li>Event & showcase opportunities</li>
+                        <li>Email marketing campaigns</li>
+                    </ul>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4>Community Building</h4>
+                    <ul>
+                        <li>Featured studio spotlights</li>
+                        <li>Cross-promotion opportunities</li>
+                        <li>Industry partnerships</li>
+                        <li>Networking events</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Key Differentiators</h3>
+            <ul>
+                <li><strong>Specialized Focus:</strong> Built specifically for recording studios, unlike Peerspace's general space rental approach</li>
+                <li><strong>Quality Assurance:</strong> Verified equipment lists and acoustic environment assessments</li>
+                <li><strong>Community Features:</strong> Audio samples, virtual tours, and verified reviews from real musicians</li>
+                <li><strong>Technical Integration:</strong> DAW compatibility information and technical specifications</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Market Strategy</h2>
+            <p>Our go-to-market strategy focuses on:</p>
+            <ul>
+                <li>Building a strong initial presence in major music cities</li>
+                <li>Partnering with established studios</li>
+                <li>Engaging with music communities</li>
+                <li>Social media marketing</li>
+                <li>Industry event participation</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Roadmap</h2>
+            <p>Our development timeline includes:</p>
+            <ul>
+                <li>Q3 2025: Beta platform launch</li>
+                <li>Q4 2025: Mobile app release</li>
+                <li>Q1 2026: Payment system integration</li>
+                <li>Q2 2026: Advanced booking features</li>
+                <li>Q3 2026: International expansion</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

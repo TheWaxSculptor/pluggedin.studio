@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews & Ratings - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .review-card {
+            transition: all 0.2s ease;
+        }
+        .review-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .star-rating {
+            color: #fbbf24;
+        }
+        .star-empty {
+            color: #d1d5db;
+        }
+        .rating-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="app.html" class="flex items-center">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">P</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">PluggedIn</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="app.html" class="text-gray-600 hover:text-gray-900">Home</a>
+                    <a href="explore.html" class="text-gray-600 hover:text-gray-900">Explore</a>
+                    <a href="search.html" class="text-gray-600 hover:text-gray-900">Search</a>
+                    <a href="bookings.html" class="text-gray-600 hover:text-gray-900">Bookings</a>
+                    <a href="equipment.html" class="text-gray-600 hover:text-gray-900">Equipment</a>
+                    <a href="payments.html" class="text-gray-600 hover:text-gray-900">Payments</a>
+                    <a href="reviews.html" class="text-purple-600 font-medium">Reviews</a>
+                    <a href="profile.html" class="text-gray-600 hover:text-gray-900">Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Reviews & Ratings</h1>
+                <p class="text-gray-600">Manage your reviews and studio ratings</p>
+            </div>
+            <button id="writeReviewBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                Write a Review
+            </button>
+        </div>
+
+        <!-- Studio Selector -->
+        <div class="mb-8">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select Studio</label>
+            <select id="studioSelector" class="w-full max-w-md border border-gray-300 rounded-lg px-3 py-2 focus:ring-purple-500 focus:border-purple-500">
+                <option value="">Choose a studio...</option>
+            </select>
+        </div>
+
+        <!-- Rating Overview -->
+        <div id="ratingOverview" class="hidden bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Overall Rating</h3>
+                    <div class="flex items-center mt-2">
+                        <span class="text-3xl font-bold text-gray-900" id="overallRating">0.0</span>
+                        <div class="ml-3">
+                            <div class="flex items-center" id="overallStars"></div>
+                            <p class="text-sm text-gray-600 mt-1"><span id="totalReviews">0</span> reviews</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating Breakdown -->
+            <div class="space-y-3">
+                <h4 class="text-sm font-medium text-gray-700">Rating Breakdown</h4>
+                <div id="ratingBreakdown" class="space-y-2">
+                    <!-- Rating bars will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="bg-white rounded-lg shadow-sm border">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium text-gray-900">Reviews</h3>
+                    <select id="sortSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="highest">Highest Rating</option>
+                        <option value="lowest">Lowest Rating</option>
+                    </select>
+                </div>
+            </div>
+            <div id="reviewsList" class="divide-y divide-gray-200">
+                <!-- Reviews will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No reviews yet</h3>
+            <p class="mt-1 text-sm text-gray-500">Be the first to write a review for this studio.</p>
+        </div>
+    </main>
+
+    <!-- Write Review Modal -->
+    <div id="writeReviewModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-medium text-gray-900">Write a Review</h3>
+                    <button id="closeReviewModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="reviewForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Studio</label>
+                        <select id="reviewStudioSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            <option value="">Select a studio...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>
+                        <div class="flex items-center space-x-1" id="overallRatingInput">
+                            <!-- Stars will be generated here -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category Ratings</label>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Sound Quality</span>
+                                <div class="flex items-center space-x-1" data-category="sound">
+                                    <!-- Stars will be generated here -->
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Equipment</span>
+                                <div class="flex items-center space-x-1" data-category="equipment">
+                                    <!-- Stars will be generated here -->
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Staff</span>
+                                <div class="flex items-center space-x-1" data-category="staff">
+                                    <!-- Stars will be generated here -->
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Value</span>
+                                <div class="flex items-center space-x-1" data-category="value">
+                                    <!-- Stars will be generated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                        <textarea id="reviewComment" rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Share your experience..." required></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancelReview" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                            Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script>
+        // Reviews & Ratings functionality
+        class ReviewsManager {
+            constructor() {
+                this.reviews = [];
+                this.studios = [];
+                this.selectedStudio = null;
+                this.sortBy = 'newest';
+                this.currentReview = {
+                    overall: 0,
+                    categories: {
+                        sound: 0,
+                        equipment: 0,
+                        staff: 0,
+                        value: 0
+                    }
+                };
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                await this.loadStudios();
+                await this.loadReviews();
+                this.setupStarRatings();
+            }
+
+            setupEventListeners() {
+                // Studio selector
+                document.getElementById('studioSelector').addEventListener('change', (e) => {
+                    this.selectedStudio = e.target.value;
+                    this.renderReviews();
+                    this.updateRatingOverview();
+                });
+
+                // Sort selector
+                document.getElementById('sortSelect').addEventListener('change', (e) => {
+                    this.sortBy = e.target.value;
+                    this.renderReviews();
+                });
+
+                // Write review modal
+                document.getElementById('writeReviewBtn').addEventListener('click', () => {
+                    this.showWriteReviewModal();
+                });
+
+                document.getElementById('closeReviewModal').addEventListener('click', () => {
+                    this.hideWriteReviewModal();
+                });
+
+                document.getElementById('cancelReview').addEventListener('click', () => {
+                    this.hideWriteReviewModal();
+                });
+
+                document.getElementById('reviewForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitReview();
+                });
+            }
+
+            async loadStudios() {
+                // Simulate loading studios
+                this.studios = [
+                    { id: '1', name: 'Abbey Road Studios' },
+                    { id: '2', name: 'Electric Lady Studios' },
+                    { id: '3', name: 'Sound City Studios' },
+                    { id: '4', name: 'Blackbird Studio' }
+                ];
+
+                // Populate studio selectors
+                const selectors = ['studioSelector', 'reviewStudioSelect'];
+                selectors.forEach(selectorId => {
+                    const selector = document.getElementById(selectorId);
+                    selector.innerHTML = '<option value="">Choose a studio...</option>' +
+                        this.studios.map(studio => 
+                            `<option value="${studio.id}">${studio.name}</option>`
+                        ).join('');
+                });
+            }
+
+            async loadReviews() {
+                // Simulate loading reviews
+                this.reviews = [
+                    {
+                        id: '1',
+                        studioId: '1',
+                        studioName: 'Abbey Road Studios',
+                        userName: 'John Smith',
+                        userAvatar: 'https://via.placeholder.com/40x40?text=JS',
+                        overallRating: 5,
+                        categoryRatings: { sound: 5, equipment: 5, staff: 4, value: 4 },
+                        comment: 'Absolutely incredible experience! The sound quality is unmatched and the staff was extremely professional.',
+                        date: new Date('2024-01-20'),
+                        isVerified: true,
+                        studioResponse: null
+                    },
+                    {
+                        id: '2',
+                        studioId: '1',
+                        studioName: 'Abbey Road Studios',
+                        userName: 'Sarah Johnson',
+                        userAvatar: 'https://via.placeholder.com/40x40?text=SJ',
+                        overallRating: 4,
+                        categoryRatings: { sound: 5, equipment: 4, staff: 4, value: 3 },
+                        comment: 'Great studio with amazing history. Equipment is top-notch but quite expensive.',
+                        date: new Date('2024-01-15'),
+                        isVerified: true,
+                        studioResponse: 'Thank you for your review! We appreciate your feedback about pricing and will consider it for future improvements.'
+                    },
+                    {
+                        id: '3',
+                        studioId: '2',
+                        studioName: 'Electric Lady Studios',
+                        userName: 'Mike Davis',
+                        userAvatar: 'https://via.placeholder.com/40x40?text=MD',
+                        overallRating: 5,
+                        categoryRatings: { sound: 5, equipment: 5, staff: 5, value: 4 },
+                        comment: 'Perfect studio for recording. The vintage equipment gives such a unique sound character.',
+                        date: new Date('2024-01-10'),
+                        isVerified: true,
+                        studioResponse: null
+                    }
+                ];
+
+                this.renderReviews();
+                this.updateRatingOverview();
+            }
+
+            setupStarRatings() {
+                // Setup overall rating stars
+                this.createStarRating('overallRatingInput', (rating) => {
+                    this.currentReview.overall = rating;
+                });
+
+                // Setup category rating stars
+                const categories = ['sound', 'equipment', 'staff', 'value'];
+                categories.forEach(category => {
+                    const container = document.querySelector(`[data-category="${category}"]`);
+                    this.createStarRating(container, (rating) => {
+                        this.currentReview.categories[category] = rating;
+                    });
+                });
+            }
+
+            createStarRating(container, onRatingChange) {
+                if (typeof container === 'string') {
+                    container = document.getElementById(container);
+                }
+                
+                container.innerHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('button');
+                    star.type = 'button';
+                    star.className = 'text-2xl star-empty hover:text-yellow-400 transition-colors';
+                    star.innerHTML = '★';
+                    star.addEventListener('click', () => {
+                        onRatingChange(i);
+                        this.updateStarDisplay(container, i);
+                    });
+                    container.appendChild(star);
+                }
+            }
+
+            updateStarDisplay(container, rating) {
+                const stars = container.querySelectorAll('button');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.className = 'text-2xl star-rating hover:text-yellow-400 transition-colors';
+                    } else {
+                        star.className = 'text-2xl star-empty hover:text-yellow-400 transition-colors';
+                    }
+                });
+            }
+
+            getFilteredReviews() {
+                let filtered = this.reviews;
+                
+                if (this.selectedStudio) {
+                    filtered = filtered.filter(review => review.studioId === this.selectedStudio);
+                }
+
+                // Sort reviews
+                switch (this.sortBy) {
+                    case 'oldest':
+                        filtered.sort((a, b) => a.date - b.date);
+                        break;
+                    case 'highest':
+                        filtered.sort((a, b) => b.overallRating - a.overallRating);
+                        break;
+                    case 'lowest':
+                        filtered.sort((a, b) => a.overallRating - b.overallRating);
+                        break;
+                    default: // newest
+                        filtered.sort((a, b) => b.date - a.date);
+                }
+
+                return filtered;
+            }
+
+            renderReviews() {
+                const filteredReviews = this.getFilteredReviews();
+                const container = document.getElementById('reviewsList');
+                const emptyState = document.getElementById('emptyState');
+
+                if (filteredReviews.length === 0) {
+                    container.parentElement.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                container.parentElement.classList.remove('hidden');
+
+                container.innerHTML = filteredReviews.map(review => this.createReviewCard(review)).join('');
+            }
+
+            createReviewCard(review) {
+                const stars = '★'.repeat(review.overallRating) + '☆'.repeat(5 - review.overallRating);
+                const categoryRatings = Object.entries(review.categoryRatings)
+                    .map(([category, rating]) => 
+                        `<span class="px-2 py-1 bg-gray-100 rounded text-xs">${category}: ${rating}★</span>`
+                    ).join('');
+
+                return `
+                    <div class="review-card p-6">
+                        <div class="flex items-start space-x-4">
+                            <img src="${review.userAvatar}" alt="${review.userName}" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <h4 class="font-medium text-gray-900">${review.userName}</h4>
+                                        ${review.isVerified ? `
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Verified
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    <span class="text-sm text-gray-500">${this.formatDate(review.date)}</span>
+                                </div>
+                                
+                                <div class="flex items-center mb-3">
+                                    <span class="text-yellow-400 text-lg mr-2">${stars}</span>
+                                    <span class="text-sm text-gray-600">${review.overallRating}/5</span>
+                                </div>
+
+                                <p class="text-gray-700 mb-4">${review.comment}</p>
+
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    ${categoryRatings}
+                                </div>
+
+                                ${review.studioResponse ? `
+                                    <div class="bg-gray-50 rounded-lg p-4 mt-4">
+                                        <div class="flex items-center mb-2">
+                                            <span class="text-sm font-medium text-gray-900">Studio Response</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700">${review.studioResponse}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateRatingOverview() {
+                const filteredReviews = this.getFilteredReviews();
+                const overview = document.getElementById('ratingOverview');
+
+                if (filteredReviews.length === 0 || !this.selectedStudio) {
+                    overview.classList.add('hidden');
+                    return;
+                }
+
+                overview.classList.remove('hidden');
+
+                // Calculate overall rating
+                const totalRating = filteredReviews.reduce((sum, review) => sum + review.overallRating, 0);
+                const averageRating = totalRating / filteredReviews.length;
+
+                document.getElementById('overallRating').textContent = averageRating.toFixed(1);
+                document.getElementById('totalReviews').textContent = filteredReviews.length;
+
+                // Update stars
+                const starsContainer = document.getElementById('overallStars');
+                const fullStars = Math.floor(averageRating);
+                const hasHalfStar = averageRating % 1 >= 0.5;
+                
+                starsContainer.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'text-yellow-400';
+                    if (i < fullStars) {
+                        star.textContent = '★';
+                    } else if (i === fullStars && hasHalfStar) {
+                        star.textContent = '★';
+                        star.style.opacity = '0.5';
+                    } else {
+                        star.textContent = '☆';
+                    }
+                    starsContainer.appendChild(star);
+                }
+
+                // Update rating breakdown
+                this.updateRatingBreakdown(filteredReviews);
+            }
+
+            updateRatingBreakdown(reviews) {
+                const breakdown = document.getElementById('ratingBreakdown');
+                const ratingCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+                
+                reviews.forEach(review => {
+                    ratingCounts[review.overallRating]++;
+                });
+
+                breakdown.innerHTML = '';
+                for (let rating = 5; rating >= 1; rating--) {
+                    const count = ratingCounts[rating];
+                    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                    
+                    const ratingRow = document.createElement('div');
+                    ratingRow.className = 'flex items-center space-x-3';
+                    ratingRow.innerHTML = `
+                        <span class="text-sm text-gray-600 w-2">${rating}</span>
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="rating-bar bg-yellow-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="text-sm text-gray-600 w-8">${count}</span>
+                    `;
+                    breakdown.appendChild(ratingRow);
+                }
+            }
+
+            showWriteReviewModal() {
+                document.getElementById('writeReviewModal').classList.remove('hidden');
+                this.resetReviewForm();
+            }
+
+            hideWriteReviewModal() {
+                document.getElementById('writeReviewModal').classList.add('hidden');
+            }
+
+            resetReviewForm() {
+                document.getElementById('reviewForm').reset();
+                this.currentReview = {
+                    overall: 0,
+                    categories: { sound: 0, equipment: 0, staff: 0, value: 0 }
+                };
+                
+                // Reset star displays
+                const containers = ['overallRatingInput', '[data-category="sound"]', '[data-category="equipment"]', '[data-category="staff"]', '[data-category="value"]'];
+                containers.forEach(selector => {
+                    const container = selector.startsWith('[') ? 
+                        document.querySelector(selector) : 
+                        document.getElementById(selector);
+                    this.updateStarDisplay(container, 0);
+                });
+            }
+
+            submitReview() {
+                const studioId = document.getElementById('reviewStudioSelect').value;
+                const comment = document.getElementById('reviewComment').value;
+
+                if (!studioId || !comment || this.currentReview.overall === 0) {
+                    alert('Please fill in all required fields and provide a rating.');
+                    return;
+                }
+
+                const newReview = {
+                    id: Date.now().toString(),
+                    studioId,
+                    studioName: this.studios.find(s => s.id === studioId)?.name || '',
+                    userName: 'You',
+                    userAvatar: 'https://via.placeholder.com/40x40?text=U',
+                    overallRating: this.currentReview.overall,
+                    categoryRatings: this.currentReview.categories,
+                    comment,
+                    date: new Date(),
+                    isVerified: true,
+                    studioResponse: null
+                };
+
+                this.reviews.unshift(newReview);
+                this.renderReviews();
+                this.updateRatingOverview();
+                this.hideWriteReviewModal();
+                this.showNotification('Review submitted successfully!');
+            }
+
+            formatDate(date) {
+                return new Intl.DateTimeFormat('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }).format(date);
+            }
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Initialize reviews manager
+        document.addEventListener('DOMContentLoaded', () => {
+            window.reviewsManager = new ReviewsManager();
+        });
+    </script>
+</body>
+</html>

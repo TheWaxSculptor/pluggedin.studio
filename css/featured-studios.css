@@ -1,0 +1,76 @@
+/* Featured Studios Airbnb-style styling */
+
+/* Category Pills */
+#featuredCategoryFilters .category-pill {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background-color: #f3f4f6; /* gray-100 */
+    color: #374151; /* gray-700 */
+}
+
+#featuredCategoryFilters .category-pill:hover {
+    background-color: #e5e7eb; /* gray-200 */
+}
+
+#featuredCategoryFilters .category-pill.active {
+    background-color: #000000; /* black */
+    color: white;
+}
+
+/* Hide scrollbar but allow scrolling */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    overflow: auto; /* Standard property for compatibility */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* Studio Cards */
+.studio-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.studio-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Line clamp for text truncation */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1; /* Standard property for compatibility */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Standard property for compatibility */
+    white-space: normal; /* Allow wrapping */
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* Standard property for compatibility */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Standard property for compatibility */
+    white-space: normal; /* Allow wrapping */
+}
+
+/* Scroll buttons styling */
+#featuredScrollLeft,
+#featuredScrollRight {
+    width: 40px;
+    height: 40px;
+    opacity: 0.9;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#featuredScrollLeft:hover,
+#featuredScrollRight:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+}

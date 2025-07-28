@@ -1,0 +1,53 @@
+# PluggedIn.studio GitHub Pages Configuration
+title: "PluggedIn.studio - Beta"
+description: "Connecting artists with professional and home recording studios worldwide"
+url: "https://thewaxsculptor.github.io"
+baseurl: "/pluggedin.studio"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Exclude files from processing
+exclude:
+  - node_modules/
+  - package.json
+  - package-lock.json
+  - README.md
+  - .gitignore
+  - .github/
+  - js/webapp-supabase.js.backup*
+  - *.sql
+  - debug-*.html
+  - troubleshoot-*.html
+  - find-my-data.html
+  - discover-tables.html
+  - simple-test.html
+  - migrate-*.html
+  - equipment-*.sql
+
+# Include files
+include:
+  - _redirects
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO settings
+twitter:
+  username: PluggedFeed
+  card: summary_large_image
+
+social:
+  name: PluggedIn.studio
+  links:
+    - https://instagram.com/PluggedIn.StudioApp
+    - https://x.com/PluggedFeed
+
+# Site settings
+lang: en_US
+timezone: America/New_York

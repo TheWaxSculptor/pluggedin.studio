@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Migration - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">🔧 Fix Studio Data Migration</h1>
+            <p class="text-gray-600 mb-4">Let's check your table schema and import data correctly</p>
+            
+            <div class="flex space-x-4">
+                <button id="checkSchema" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    🔍 Check Table Schema
+                </button>
+                <button id="migrateFixed" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    📥 Import with Correct Schema
+                </button>
+            </div>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://fdkrfyzcxhnhanodxopj.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+        );
+
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border p-6';
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function checkTableSchema() {
+            document.getElementById('results').innerHTML = '';
+            showResult('🔍 Checking Database Schema', 'Discovering your table structure...', 'info');
+            
+            // Check studio_registrations table structure
+            try {
+                const { data, error } = await supabase
+                    .from('studio_registrations')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    showResult('❌ Schema Check Failed', `Error: ${error.message}`, 'error');
+                    return null;
+                }
+                
+                if (data && data.length > 0) {
+                    const columns = Object.keys(data[0]);
+                    showResult('✅ studio_registrations Schema', 
+                        `
+                            <p class="mb-2"><strong>Available columns:</strong></p>
+                            <div class="grid grid-cols-2 gap-2">
+                                ${columns.map(col => `<code class="bg-gray-100 px-2 py-1 rounded text-sm">${col}</code>`).join('')}
+                            </div>
+                        `, 
+                        'success'
+                    );
+                    return columns;
+                } else {
+                    // Table exists but is empty, try to get schema another way
+                    showResult('⚠️ Empty Table', 'studio_registrations table exists but is empty. Will use minimal schema.', 'warning');
+                    return ['id', 'name', 'location']; // Minimal assumed schema
+                }
+            } catch (error) {
+                showResult('❌ Schema Error', `Error checking schema: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        async function migrateWithCorrectSchema() {
+            const columns = await checkTableSchema();
+            if (!columns) return;
+            
+            showResult('📥 Migrating Studios', 'Using only available columns...', 'info');
+            
+            // Simplified studio data that matches common database schemas
+            const studioData = [
+                {
+                    name: "Soundwave Studios",
+                    location: "Brooklyn, NY"
+                },
+                {
+                    name: "Platinum Sound", 
+                    location: "Manhattan, NY"
+                },
+                {
+                    name: "Broadcast Hub",
+                    location: "Los Angeles, CA"
+                }
+            ];
+            
+            let successCount = 0;
+            
+            for (const studio of studioData) {
+                try {
+                    // Only use columns that exist in the table
+                    const insertData = {};
+                    
+                    // Add only the fields that exist in the schema
+                    if (columns.includes('name')) insertData.name = studio.name;
+                    if (columns.includes('location')) insertData.location = studio.location;
+                    if (columns.includes('studio_name')) insertData.studio_name = studio.name;
+                    if (columns.includes('city')) insertData.city = studio.location.split(',')[0];
+                    if (columns.includes('state')) insertData.state = studio.location.split(',')[1]?.trim();
+                    
+                    const { data, error } = await supabase
+                        .from('studio_registrations')
+                        .insert([insertData])
+                        .select();
+                    
+                    if (error) {
+                        showResult(`❌ ${studio.name}`, `Error: ${error.message}`, 'error');
+                    } else {
+                        successCount++;
+                        showResult(`✅ ${studio.name}`, 
+                            `Successfully added! Data: ${JSON.stringify(insertData, null, 2)}`, 
+                            'success'
+                        );
+                    }
+                    
+                } catch (error) {
+                    showResult(`❌ ${studio.name}`, `Exception: ${error.message}`, 'error');
+                }
+            }
+            
+            if (successCount > 0) {
+                showResult('🎉 Migration Success!', 
+                    `
+                        <p class="mb-3"><strong>Successfully imported ${successCount} studios!</strong></p>
+                        <p class="mb-3">Your admin dashboard should now show real data instead of mock data.</p>
+                        <p><a href="admin.html" class="text-blue-600 underline">Visit Admin Dashboard</a> to see your real studios!</p>
+                    `, 
+                    'success'
+                );
+            }
+        }
+
+        document.getElementById('checkSchema').addEventListener('click', checkTableSchema);
+        document.getElementById('migrateFixed').addEventListener('click', migrateWithCorrectSchema);
+        
+        // Auto-check schema on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkTableSchema, 1000);
+        });
+    </script>
+</body>
+</html>

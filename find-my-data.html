@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find My Data - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">🔍 Find Your Studios & Equipment Data</h1>
+            <p class="text-gray-600 mb-4">Let's locate your existing data in Supabase</p>
+            
+            <button id="findData" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                🚀 Find My Data
+            </button>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://fdkrfyzcxhnhanodxopj.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+        );
+
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border p-6';
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function findMyData() {
+            document.getElementById('results').innerHTML = '';
+            
+            showResult('🔍 Searching for your data...', 'Checking different table names and variations...', 'info');
+            
+            // Common table name variations
+            const tableVariations = [
+                // Studios variations
+                { name: 'studios', type: 'studios' },
+                { name: 'studio', type: 'studios' },
+                { name: 'Studio', type: 'studios' },
+                { name: 'STUDIOS', type: 'studios' },
+                { name: 'recording_studios', type: 'studios' },
+                { name: 'music_studios', type: 'studios' },
+                
+                // Equipment variations
+                { name: 'equipment', type: 'equipment' },
+                { name: 'equipments', type: 'equipment' },
+                { name: 'Equipment', type: 'equipment' },
+                { name: 'EQUIPMENT', type: 'equipment' },
+                { name: 'studio_equipment', type: 'equipment' },
+                { name: 'gear', type: 'equipment' },
+                { name: 'instruments', type: 'equipment' }
+            ];
+            
+            const foundData = {};
+            
+            for (const table of tableVariations) {
+                try {
+                    const { data, error, count } = await supabase
+                        .from(table.name)
+                        .select('*', { count: 'exact' })
+                        .limit(5);
+                    
+                    if (!error && count > 0) {
+                        if (!foundData[table.type]) {
+                            foundData[table.type] = [];
+                        }
+                        foundData[table.type].push({
+                            tableName: table.name,
+                            count: count,
+                            sampleData: data
+                        });
+                    }
+                } catch (e) {
+                    // Table doesn't exist, continue
+                }
+            }
+            
+            // Show results
+            if (Object.keys(foundData).length === 0) {
+                showResult(
+                    '❌ No Data Found', 
+                    `
+                        <p class="font-medium mb-2">Could not find studios or equipment data.</p>
+                        <p class="mb-3">This could be because:</p>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>Tables have different names than expected</li>
+                            <li>Row Level Security (RLS) is blocking access</li>
+                            <li>API key doesn't have the right permissions</li>
+                            <li>Data is in a different database/project</li>
+                        </ul>
+                        <p class="mt-3 text-sm"><strong>Next step:</strong> Check your Supabase dashboard to see the actual table names.</p>
+                    `, 
+                    'error'
+                );
+            } else {
+                // Found data! Show it
+                for (const [dataType, tables] of Object.entries(foundData)) {
+                    for (const tableInfo of tables) {
+                        const sampleDataHtml = tableInfo.sampleData.map(item => {
+                            const keys = Object.keys(item).slice(0, 4); // Show first 4 columns
+                            const preview = keys.map(key => `<strong>${key}:</strong> ${item[key] || 'null'}`).join('<br>');
+                            return `<div class="bg-white bg-opacity-50 p-2 rounded mb-2">${preview}</div>`;
+                        }).join('');
+                        
+                        showResult(
+                            `🎉 Found ${dataType.toUpperCase()} Data!`,
+                            `
+                                <p class="font-medium mb-2">Table: <code class="bg-gray-100 px-2 py-1 rounded">${tableInfo.tableName}</code></p>
+                                <p class="mb-3">Records found: <strong>${tableInfo.count}</strong></p>
+                                <p class="mb-2 font-medium">Sample data:</p>
+                                ${sampleDataHtml}
+                                <div class="mt-4 p-3 bg-blue-100 rounded">
+                                    <p class="text-sm"><strong>✅ Great!</strong> I can update the integration to use table name: <code>${tableInfo.tableName}</code></p>
+                                </div>
+                            `,
+                            'success'
+                        );
+                    }
+                }
+                
+                // Show next steps
+                showResult(
+                    '🔧 Next Steps',
+                    `
+                        <p class="mb-3">Now that we found your data, here's what I can do:</p>
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Update the web app integration to use your actual table names</li>
+                            <li>Map your column names to the web app fields</li>
+                            <li>Test the admin dashboard with your real data</li>
+                            <li>Update all web pages to show your studios and equipment</li>
+                        </ol>
+                        <p class="mt-3 text-sm text-blue-700">The integration will automatically detect and use these table names!</p>
+                    `,
+                    'info'
+                );
+            }
+        }
+
+        document.getElementById('findData').addEventListener('click', findMyData);
+    </script>
+</body>
+</html>

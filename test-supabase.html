@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Integration Test - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .test-result {
+            transition: all 0.3s ease;
+        }
+        .success { @apply bg-green-50 border-green-200 text-green-800; }
+        .error { @apply bg-red-50 border-red-200 text-red-800; }
+        .loading { @apply bg-blue-50 border-blue-200 text-blue-800; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">PluggedIn Supabase Integration Test</h1>
+            <p class="text-gray-600 mb-4">Testing connection to your Supabase database and existing data</p>
+            
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-gray-300" id="connectionStatus"></div>
+                    <span class="ml-2 text-sm font-medium" id="connectionText">Connecting...</span>
+                </div>
+                <button id="runAllTests" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    Run All Tests
+                </button>
+                <button id="clearResults" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Results
+                </button>
+            </div>
+        </div>
+
+        <!-- Database Connection Test -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Database Connection</h2>
+            <div id="connectionTest" class="test-result border rounded-lg p-4 mb-4 loading">
+                <div class="flex items-center">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span class="ml-2">Testing connection to Supabase...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables Structure Test -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Database Tables</h2>
+            <div id="tablesTest" class="space-y-3">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Data Queries Test -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Data Queries</h2>
+            <div id="queriesTest" class="space-y-3">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Sample Data Display -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Sample Data from Your Database</h2>
+            <div id="sampleData" class="space-y-4">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/supabase-config.js"></script>
+    <script src="js/webapp-supabase.js"></script>
+    <script>
+        class SupabaseIntegrationTest {
+            constructor() {
+                this.supabase = window.supabaseClient;
+                this.testResults = {};
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.testConnection();
+            }
+
+            setupEventListeners() {
+                document.getElementById('runAllTests').addEventListener('click', () => {
+                    this.runAllTests();
+                });
+
+                document.getElementById('clearResults').addEventListener('click', () => {
+                    this.clearResults();
+                });
+            }
+
+            async testConnection() {
+                const statusElement = document.getElementById('connectionStatus');
+                const textElement = document.getElementById('connectionText');
+                const testElement = document.getElementById('connectionTest');
+
+                try {
+                    // Test basic connection
+                    const { data, error } = await this.supabase.from('users').select('count').limit(1);
+                    
+                    if (error) throw error;
+
+                    // Connection successful
+                    statusElement.className = 'w-3 h-3 rounded-full bg-green-500';
+                    textElement.textContent = 'Connected to Supabase';
+                    testElement.className = 'test-result border rounded-lg p-4 mb-4 success';
+                    testElement.innerHTML = `
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="ml-2 font-medium">Successfully connected to your Supabase database!</span>
+                        </div>
+                        <p class="mt-2 text-sm">Database URL: ${window.SUPABASE_CONFIG?.url || 'Not configured'}</p>
+                    `;
+
+                    // Auto-run all tests after successful connection
+                    setTimeout(() => this.runAllTests(), 1000);
+
+                } catch (error) {
+                    console.error('Connection error:', error);
+                    statusElement.className = 'w-3 h-3 rounded-full bg-red-500';
+                    textElement.textContent = 'Connection failed';
+                    testElement.className = 'test-result border rounded-lg p-4 mb-4 error';
+                    testElement.innerHTML = `
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span class="ml-2 font-medium">Failed to connect to Supabase</span>
+                        </div>
+                        <p class="mt-2 text-sm text-red-700">Error: ${error.message}</p>
+                        <p class="mt-1 text-sm text-red-600">Check your Supabase configuration and database permissions.</p>
+                    `;
+                }
+            }
+
+            async runAllTests() {
+                await this.testTables();
+                await this.testQueries();
+                await this.displaySampleData();
+            }
+
+            async testTables() {
+                const container = document.getElementById('tablesTest');
+                const tables = ['users', 'studios', 'bookings', 'equipment', 'payments', 'reviews', 'messages', 'conversations'];
+                
+                container.innerHTML = '';
+
+                for (const table of tables) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test-result border rounded-lg p-3 loading';
+                    testDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span class="ml-2">Testing table: ${table}</span>
+                        </div>
+                    `;
+                    container.appendChild(testDiv);
+
+                    try {
+                        const { data, error, count } = await this.supabase
+                            .from(table)
+                            .select('*', { count: 'exact', head: true });
+
+                        if (error) throw error;
+
+                        testDiv.className = 'test-result border rounded-lg p-3 success';
+                        testDiv.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span class="ml-2 font-medium">${table}</span>
+                                </div>
+                                <span class="text-sm text-green-600">${count || 0} records</span>
+                            </div>
+                        `;
+
+                        this.testResults[table] = { success: true, count: count || 0 };
+
+                    } catch (error) {
+                        testDiv.className = 'test-result border rounded-lg p-3 error';
+                        testDiv.innerHTML = `
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span class="ml-2 font-medium">${table}</span>
+                                <span class="ml-2 text-sm text-red-600">- ${error.message}</span>
+                            </div>
+                        `;
+
+                        this.testResults[table] = { success: false, error: error.message };
+                    }
+
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
+            async testQueries() {
+                const container = document.getElementById('queriesTest');
+                const queries = [
+                    { name: 'Get Users', fn: () => window.db.getAdminUsers() },
+                    { name: 'Get Studios', fn: () => window.db.getAdminStudios() },
+                    { name: 'Get Admin Stats', fn: () => window.db.getAdminStats() },
+                    { name: 'Get Recent Activity', fn: () => window.db.getRecentActivity() }
+                ];
+
+                container.innerHTML = '';
+
+                for (const query of queries) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test-result border rounded-lg p-3 loading';
+                    testDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span class="ml-2">Testing: ${query.name}</span>
+                        </div>
+                    `;
+                    container.appendChild(testDiv);
+
+                    try {
+                        const result = await query.fn();
+                        
+                        testDiv.className = 'test-result border rounded-lg p-3 success';
+                        testDiv.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span class="ml-2 font-medium">${query.name}</span>
+                                </div>
+                                <span class="text-sm text-green-600">
+                                    ${Array.isArray(result) ? `${result.length} items` : 'Success'}
+                                </span>
+                            </div>
+                        `;
+
+                    } catch (error) {
+                        testDiv.className = 'test-result border rounded-lg p-3 error';
+                        testDiv.innerHTML = `
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span class="ml-2 font-medium">${query.name}</span>
+                                <span class="ml-2 text-sm text-red-600">- ${error.message}</span>
+                            </div>
+                        `;
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
+
+            async displaySampleData() {
+                const container = document.getElementById('sampleData');
+                
+                try {
+                    // Try to get some sample data from different tables
+                    const [users, studios, bookings] = await Promise.all([
+                        this.supabase.from('users').select('*').limit(3),
+                        this.supabase.from('studios').select('*').limit(3),
+                        this.supabase.from('bookings').select('*').limit(3)
+                    ]);
+
+                    let html = '';
+
+                    if (users.data && users.data.length > 0) {
+                        html += `
+                            <div class="border rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900 mb-3">Sample Users (${users.data.length})</h3>
+                                <div class="space-y-2">
+                                    ${users.data.map(user => `
+                                        <div class="text-sm">
+                                            <span class="font-medium">${user.name || user.email || 'Unnamed'}</span>
+                                            ${user.role ? `<span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">${user.role}</span>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (studios.data && studios.data.length > 0) {
+                        html += `
+                            <div class="border rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900 mb-3">Sample Studios (${studios.data.length})</h3>
+                                <div class="space-y-2">
+                                    ${studios.data.map(studio => `
+                                        <div class="text-sm">
+                                            <span class="font-medium">${studio.name || 'Unnamed Studio'}</span>
+                                            ${studio.location ? `<span class="ml-2 text-gray-600">${studio.location}</span>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (bookings.data && bookings.data.length > 0) {
+                        html += `
+                            <div class="border rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900 mb-3">Sample Bookings (${bookings.data.length})</h3>
+                                <div class="space-y-2">
+                                    ${bookings.data.map(booking => `
+                                        <div class="text-sm">
+                                            <span class="font-medium">Booking #${booking.id}</span>
+                                            ${booking.status ? `<span class="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded text-xs">${booking.status}</span>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (!html) {
+                        html = `
+                            <div class="border rounded-lg p-4 text-center text-gray-500">
+                                <p>No sample data found in your database tables.</p>
+                                <p class="text-sm mt-1">This could mean your tables are empty or have different column names.</p>
+                            </div>
+                        `;
+                    }
+
+                    container.innerHTML = html;
+
+                } catch (error) {
+                    container.innerHTML = `
+                        <div class="border rounded-lg p-4 bg-red-50 border-red-200">
+                            <p class="text-red-800 font-medium">Error loading sample data:</p>
+                            <p class="text-red-700 text-sm mt-1">${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            clearResults() {
+                document.getElementById('tablesTest').innerHTML = '';
+                document.getElementById('queriesTest').innerHTML = '';
+                document.getElementById('sampleData').innerHTML = '';
+                this.testResults = {};
+            }
+        }
+
+        // Initialize test when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.supabaseTest = new SupabaseIntegrationTest();
+        });
+    </script>
+</body>
+</html>

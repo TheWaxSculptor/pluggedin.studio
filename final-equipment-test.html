@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Equipment Test - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Final Equipment Diagnostic Test</h1>
+        
+        <!-- Status Messages -->
+        <div id="statusMessage" class="mb-6"></div>
+        
+        <!-- Test Results -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <pre id="results" class="bg-gray-100 p-4 rounded-lg text-sm overflow-auto max-h-96 whitespace-pre-wrap"></pre>
+        </div>
+        
+        <!-- Actions -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold mb-4">Diagnostic Tests</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <button id="testConnection" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                    Test Connection
+                </button>
+                <button id="testAuth" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm">
+                    Test Auth
+                </button>
+                <button id="testSchema" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-sm">
+                    Test Schema
+                </button>
+                <button id="testDirectQuery" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm">
+                    Direct Equipment Query
+                </button>
+                <button id="testRLS" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 text-sm">
+                    Test RLS Policies
+                </button>
+                <button id="runAllTests" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 text-sm">
+                    Run All Tests
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // DOM elements
+        const statusMessage = document.getElementById('statusMessage');
+        const results = document.getElementById('results');
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-200',
+                error: 'bg-red-100 text-red-800 border-red-200',
+                info: 'bg-blue-100 text-blue-800 border-blue-200',
+                warning: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+            };
+            
+            statusMessage.innerHTML = `
+                <div class="border rounded-lg p-4 ${colors[type]}">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        // Log to results
+        function logResult(message) {
+            results.textContent += message + '\n';
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        // Clear results
+        function clearResults() {
+            results.textContent = '';
+        }
+        
+        // Test 1: Basic connection
+        async function testConnection() {
+            logResult('=== TEST 1: Basic Connection ===');
+            try {
+                const response = await fetch(SUPABASE_URL + '/rest/v1/', {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                    }
+                });
+                
+                if (response.ok) {
+                    logResult('✅ Basic connection successful');
+                    logResult('Response status: ' + response.status);
+                } else {
+                    logResult('❌ Basic connection failed');
+                    logResult('Response status: ' + response.status);
+                    logResult('Response text: ' + await response.text());
+                }
+            } catch (error) {
+                logResult('❌ Connection error: ' + error.message);
+            }
+            logResult('');
+        }
+        
+        // Test 2: Auth state
+        async function testAuth() {
+            logResult('=== TEST 2: Auth State ===');
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    logResult('❌ Auth error: ' + error.message);
+                } else {
+                    logResult('✅ Auth check successful');
+                    logResult('Session: ' + (session ? 'Authenticated' : 'Anonymous'));
+                    if (session) {
+                        logResult('User ID: ' + session.user.id);
+                    }
+                }
+            } catch (error) {
+                logResult('❌ Auth exception: ' + error.message);
+            }
+            logResult('');
+        }
+        
+        // Test 3: Schema information
+        async function testSchema() {
+            logResult('=== TEST 3: Schema Information ===');
+            try {
+                // Test if we can access information_schema
+                const { data, error } = await supabase
+                    .from('information_schema.tables')
+                    .select('table_name')
+                    .eq('table_schema', 'public')
+                    .eq('table_name', 'equipment');
+                
+                if (error) {
+                    logResult('❌ Schema query failed: ' + error.message);
+                    logResult('Error code: ' + error.code);
+                } else {
+                    logResult('✅ Schema query successful');
+                    logResult('Equipment table found: ' + (data.length > 0 ? 'YES' : 'NO'));
+                    if (data.length > 0) {
+                        logResult('Table info: ' + JSON.stringify(data[0], null, 2));
+                    }
+                }
+            } catch (error) {
+                logResult('❌ Schema exception: ' + error.message);
+            }
+            logResult('');
+        }
+        
+        // Test 4: Direct equipment query
+        async function testDirectQuery() {
+            logResult('=== TEST 4: Direct Equipment Query ===');
+            
+            // Test multiple query approaches
+            const approaches = [
+                { name: 'Standard Query', fn: () => supabase.from('equipment').select('*') },
+                { name: 'Count Query', fn: () => supabase.from('equipment').select('*', { count: 'exact', head: true }) },
+                { name: 'Limited Query', fn: () => supabase.from('equipment').select('name, brand').limit(1) },
+                { name: 'Schema Qualified', fn: () => supabase.from('public.equipment').select('*') }
+            ];
+            
+            for (const approach of approaches) {
+                try {
+                    logResult(`--- ${approach.name} ---`);
+                    const { data, error, count } = await approach.fn();
+                    
+                    if (error) {
+                        logResult('❌ Failed: ' + error.message);
+                        logResult('Error code: ' + error.code);
+                        logResult('Error details: ' + JSON.stringify(error.details));
+                    } else {
+                        logResult('✅ Success!');
+                        if (count !== undefined) {
+                            logResult('Count: ' + count);
+                        }
+                        if (data && data.length > 0) {
+                            logResult('Data length: ' + data.length);
+                            logResult('First item: ' + JSON.stringify(data[0], null, 2));
+                        } else {
+                            logResult('No data returned');
+                        }
+                    }
+                } catch (error) {
+                    logResult('❌ Exception: ' + error.message);
+                }
+                logResult('');
+            }
+        }
+        
+        // Test 5: RLS policies
+        async function testRLS() {
+            logResult('=== TEST 5: RLS Policies ===');
+            try {
+                // Try to query pg_policies (might not work with anon key)
+                const { data, error } = await supabase
+                    .from('pg_policies')
+                    .select('*')
+                    .eq('tablename', 'equipment');
+                
+                if (error) {
+                    logResult('❌ RLS policy query failed: ' + error.message);
+                    logResult('This is expected with anonymous access');
+                } else {
+                    logResult('✅ RLS policies found:');
+                    data.forEach(policy => {
+                        logResult(`Policy: ${policy.policyname} - ${policy.cmd}`);
+                    });
+                }
+            } catch (error) {
+                logResult('❌ RLS exception: ' + error.message);
+            }
+            logResult('');
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            clearResults();
+            logResult('🔍 Running comprehensive equipment diagnostic...');
+            logResult('Timestamp: ' + new Date().toISOString());
+            logResult('Supabase URL: ' + SUPABASE_URL);
+            logResult('API Key (first 20 chars): ' + SUPABASE_ANON_KEY.substring(0, 20) + '...');
+            logResult('');
+            
+            await testConnection();
+            await testAuth();
+            await testSchema();
+            await testDirectQuery();
+            await testRLS();
+            
+            logResult('=== DIAGNOSTIC COMPLETE ===');
+            showStatus('Diagnostic complete! Check results above.', 'info');
+        }
+        
+        // Event listeners
+        document.getElementById('testConnection').addEventListener('click', async () => {
+            clearResults();
+            await testConnection();
+        });
+        
+        document.getElementById('testAuth').addEventListener('click', async () => {
+            clearResults();
+            await testAuth();
+        });
+        
+        document.getElementById('testSchema').addEventListener('click', async () => {
+            clearResults();
+            await testSchema();
+        });
+        
+        document.getElementById('testDirectQuery').addEventListener('click', async () => {
+            clearResults();
+            await testDirectQuery();
+        });
+        
+        document.getElementById('testRLS').addEventListener('click', async () => {
+            clearResults();
+            await testRLS();
+        });
+        
+        document.getElementById('runAllTests').addEventListener('click', runAllTests);
+        
+        // Auto-run all tests on load
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('Ready to run diagnostic tests. Click "Run All Tests" for comprehensive analysis.', 'info');
+            // Auto-run for immediate results
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

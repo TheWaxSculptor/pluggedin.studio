@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback - PluggedIn</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .callback-container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success {
+            color: #4ade80;
+        }
+        .error {
+            color: #f87171;
+        }
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="spinner" id="spinner"></div>
+        <h2 id="status">Processing OAuth callback...</h2>
+        <p id="message">Please wait while we complete the integration setup.</p>
+        <button class="close-btn" id="closeBtn" onclick="window.close()" style="display: none;">Close Window</button>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://your-project.supabase.co';
+        const supabaseKey = 'your-anon-key';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+
+            const statusEl = document.getElementById('status');
+            const messageEl = document.getElementById('message');
+            const spinnerEl = document.getElementById('spinner');
+            const closeBtnEl = document.getElementById('closeBtn');
+
+            try {
+                if (error) {
+                    throw new Error(urlParams.get('error_description') || error);
+                }
+
+                if (!code || !state) {
+                    throw new Error('Missing authorization code or state parameter');
+                }
+
+                // Validate state parameter
+                const stateData = localStorage.getItem(`oauth_state_${state}`);
+                if (!stateData) {
+                    throw new Error('Invalid or expired state parameter');
+                }
+
+                const { platform, studioId } = JSON.parse(stateData);
+
+                statusEl.textContent = `Connecting to ${platform}...`;
+                messageEl.textContent = 'Exchanging authorization code for access token...';
+
+                // Exchange code for access token using our backend service
+                const backendService = new CalendarBackendService();
+                const result = await backendService.exchangeOAuthCode(platform, code, state);
+
+                if (result.success) {
+                    spinnerEl.style.display = 'none';
+                    statusEl.textContent = 'Integration Successful!';
+                    statusEl.className = 'success';
+                    messageEl.textContent = `Your ${platform} calendar has been successfully connected to PluggedIn.`;
+                    
+                    // Store success result for parent window
+                    localStorage.setItem(`oauth_result_${state}`, JSON.stringify({
+                        success: true,
+                        platform: result.platform,
+                        studioId: result.studioId
+                    }));
+
+                    // Show close button
+                    closeBtnEl.style.display = 'inline-block';
+
+                    // Auto-close after 3 seconds
+                    setTimeout(() => {
+                        window.close();
+                    }, 3000);
+
+                } else {
+                    throw new Error('Token exchange failed');
+                }
+
+            } catch (error) {
+                console.error('OAuth callback error:', error);
+                
+                spinnerEl.style.display = 'none';
+                statusEl.textContent = 'Integration Failed';
+                statusEl.className = 'error';
+                messageEl.textContent = error.message || 'An error occurred during the integration process.';
+                
+                // Store error result for parent window
+                if (state) {
+                    localStorage.setItem(`oauth_result_${state}`, JSON.stringify({
+                        success: false,
+                        error: error.message
+                    }));
+                }
+
+                // Show close button
+                closeBtnEl.style.display = 'inline-block';
+            }
+        }
+
+        // Simple CalendarBackendService for this callback page
+        class CalendarBackendService {
+            constructor() {
+                this.supabase = supabase;
+            }
+
+            async exchangeOAuthCode(platform, code, state) {
+                try {
+                    // In a real implementation, this would call your backend API
+                    // For now, we'll simulate the token exchange
+                    
+                    const stateData = JSON.parse(localStorage.getItem(`oauth_state_${state}`) || '{}');
+                    
+                    // Simulate API call delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // For demo purposes, we'll just store a placeholder integration
+                    const { error } = await this.supabase
+                        .from('studio_integrations')
+                        .upsert({
+                            studio_id: stateData.studioId,
+                            platform: platform,
+                            status: 'active',
+                            connected_at: new Date().toISOString(),
+                            credentials: btoa(JSON.stringify({
+                                access_token: 'demo_token_' + Date.now(),
+                                refresh_token: 'demo_refresh_' + Date.now(),
+                                expires_at: new Date(Date.now() + 3600000).toISOString()
+                            }))
+                        });
+
+                    if (error) {
+                        console.error('Supabase error:', error);
+                        throw new Error('Failed to store integration credentials');
+                    }
+
+                    return {
+                        success: true,
+                        platform: platform,
+                        studioId: stateData.studioId
+                    };
+
+                } catch (error) {
+                    console.error('Token exchange error:', error);
+                    throw error;
+                }
+            }
+        }
+
+        // Handle the OAuth callback when page loads
+        document.addEventListener('DOMContentLoaded', handleOAuthCallback);
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Admin Data - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/webapp-supabase.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">🔧 Debug Admin Data Loading</h1>
+            <p class="text-gray-600 mb-4">Let's see exactly why the admin dashboard isn't loading your real data</p>
+            
+            <button id="debugAdmin" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                🚨 Debug Admin Loading
+            </button>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border p-6';
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function debugAdminLoading() {
+            document.getElementById('results').innerHTML = '';
+            
+            showResult('🔍 Step 1: Testing Direct Studio Query', 'Checking if we can load studios directly...', 'info');
+            
+            try {
+                // Test direct studio query
+                const { data: studios, error: studioError } = await supabase
+                    .from('studios')
+                    .select('*');
+                
+                if (studioError) {
+                    showResult('❌ Direct Studio Query Failed', `Error: ${studioError.message}`, 'error');
+                } else {
+                    showResult('✅ Direct Studio Query Success', 
+                        `Found ${studios.length} studios: ${studios.map(s => s.name).join(', ')}`, 
+                        'success'
+                    );
+                }
+                
+                // Test the webapp integration
+                showResult('🔍 Step 2: Testing Web App getStudios()', 'Using db.getStudios() function...', 'info');
+                
+                const webappStudios = await db.getStudios();
+                
+                if (webappStudios && webappStudios.length > 0) {
+                    showResult('✅ Web App getStudios() Works', 
+                        `Found ${webappStudios.length} studios via web app integration`, 
+                        'success'
+                    );
+                } else {
+                    showResult('❌ Web App getStudios() Failed', 
+                        'No studios returned from web app integration', 
+                        'error'
+                    );
+                }
+                
+                // Test the admin stats function specifically
+                showResult('🔍 Step 3: Testing getAdminStats()', 'This is what the admin dashboard calls...', 'info');
+                
+                try {
+                    const adminStats = await db.getAdminStats();
+                    
+                    showResult('✅ getAdminStats() Success!', 
+                        `
+                            <p class="mb-2"><strong>Admin stats returned:</strong></p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Total Users: ${adminStats.totalUsers}</li>
+                                <li>Total Studios: ${adminStats.totalStudios}</li>
+                                <li>Total Bookings: ${adminStats.totalBookings}</li>
+                                <li>Total Revenue: $${adminStats.totalRevenue}</li>
+                            </ul>
+                            <p class="mt-3 text-sm text-green-700">This should be showing in your admin dashboard!</p>
+                        `, 
+                        'success'
+                    );
+                    
+                    if (adminStats.totalStudios === 3) {
+                        showResult('🎉 Perfect!', 
+                            `
+                                <p class="mb-3"><strong>Your admin stats are working correctly!</strong></p>
+                                <p class="mb-3">The admin dashboard should show 3 studios, not 89. If it's still showing fallback data, there might be a caching issue.</p>
+                                <p><strong>Try:</strong></p>
+                                <ol class="list-decimal list-inside space-y-1">
+                                    <li>Hard refresh the admin page (Ctrl+Shift+R or Cmd+Shift+R)</li>
+                                    <li>Clear browser cache</li>
+                                    <li>Open admin page in incognito/private mode</li>
+                                </ol>
+                            `, 
+                            'success'
+                        );
+                    }
+                    
+                } catch (adminError) {
+                    showResult('❌ getAdminStats() Failed', 
+                        `
+                            <p class="mb-2"><strong>This is why the admin dashboard shows fallback data!</strong></p>
+                            <p class="text-sm">Error: ${adminError.message}</p>
+                            <p class="mt-3 text-sm">Check the browser console for more details.</p>
+                        `, 
+                        'error'
+                    );
+                    console.error('getAdminStats error:', adminError);
+                }
+                
+            } catch (error) {
+                showResult('❌ Debug Failed', 
+                    `
+                        <p class="mb-2"><strong>Error during debugging:</strong></p>
+                        <p class="text-sm">${error.message}</p>
+                    `, 
+                    'error'
+                );
+                console.error('Debug error:', error);
+            }
+        }
+
+        document.getElementById('debugAdmin').addEventListener('click', debugAdminLoading);
+        
+        // Auto-run debug on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(debugAdminLoading, 1000);
+        });
+    </script>
+</body>
+</html>

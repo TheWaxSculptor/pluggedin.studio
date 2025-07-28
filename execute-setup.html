@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execute Equipment Setup</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Executing Equipment Setup...</h1>
+    <div id="status">Starting...</div>
+    <div id="logs"></div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function log(message) {
+            console.log(message);
+            document.getElementById('logs').innerHTML += '<div>' + message + '</div>';
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        async function executeCompleteSetup() {
+            log('🚀 Starting complete equipment setup...');
+            updateStatus('Running setup...');
+
+            // Step 1: Test Connection
+            log('--- Step 1: Testing Connection ---');
+            try {
+                const { data, error } = await supabase.from('studios').select('count', { count: 'exact', head: true });
+                if (error) {
+                    log('❌ Connection failed: ' + error.message);
+                } else {
+                    log('✅ Connection successful!');
+                }
+            } catch (err) {
+                log('❌ Connection error: ' + err.message);
+            }
+
+            // Step 2: Create Equipment Table
+            log('--- Step 2: Creating Equipment Table ---');
+            const equipmentData = [
+                {
+                    name: "Neumann U87 Microphone",
+                    category: "Microphones",
+                    description: "Professional large-diaphragm condenser microphone, industry standard for vocals and instruments",
+                    price_per_hour: 25.00,
+                    availability_status: "available",
+                    studio_id: 1,
+                    image_url: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400",
+                    specifications: {
+                        "type": "Condenser",
+                        "polar_pattern": "Cardioid/Omnidirectional/Figure-8",
+                        "frequency_response": "20Hz-20kHz",
+                        "max_spl": "127dB"
+                    }
+                },
+                {
+                    name: "SSL 4000 E Console",
+                    category: "Mixing Consoles",
+                    description: "Legendary analog mixing console used on countless hit records",
+                    price_per_hour: 150.00,
+                    availability_status: "available",
+                    studio_id: 1,
+                    image_url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
+                    specifications: {
+                        "channels": "48",
+                        "eq_bands": "4",
+                        "dynamics": "Compressor/Gate",
+                        "automation": "G+ Automation"
+                    }
+                },
+                {
+                    name: "Yamaha NS-10M Monitors",
+                    category: "Studio Monitors",
+                    description: "Near-field reference monitors, the industry standard for mixing",
+                    price_per_hour: 15.00,
+                    availability_status: "available",
+                    studio_id: 2,
+                    image_url: "https://images.unsplash.com/photo-1545127398-14699f92334b?w=400",
+                    specifications: {
+                        "type": "2-way",
+                        "woofer": "6.5 inch",
+                        "tweeter": "1 inch dome",
+                        "frequency_response": "60Hz-20kHz"
+                    }
+                },
+                {
+                    name: "Pro Tools HDX System",
+                    category: "Digital Audio Workstations",
+                    description: "Professional digital audio workstation with HDX DSP processing",
+                    price_per_hour: 75.00,
+                    availability_status: "available",
+                    studio_id: 2,
+                    image_url: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
+                    specifications: {
+                        "tracks": "Unlimited",
+                        "sample_rate": "Up to 192kHz",
+                        "bit_depth": "Up to 32-bit",
+                        "dsp_cards": "2x HDX"
+                    }
+                },
+                {
+                    name: "Fender Stratocaster",
+                    category: "Instruments",
+                    description: "Classic electric guitar, perfect for recording sessions",
+                    price_per_hour: 20.00,
+                    availability_status: "available",
+                    studio_id: 3,
+                    image_url: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400",
+                    specifications: {
+                        "type": "Electric Guitar",
+                        "pickups": "3x Single Coil",
+                        "neck": "Maple",
+                        "body": "Alder"
+                    }
+                }
+            ];
+
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .insert(equipmentData);
+                
+                if (error) {
+                    log('❌ Data insertion failed: ' + error.message);
+                    // Try to create table first if it doesn't exist
+                    log('Attempting to create equipment table...');
+                    
+                    // Since we can't execute DDL directly, let's try a different approach
+                    // Check if we can query the table to see if it exists
+                    const { data: testData, error: testError } = await supabase
+                        .from('equipment')
+                        .select('*')
+                        .limit(1);
+                    
+                    if (testError && testError.code === '42P01') {
+                        log('❌ Equipment table does not exist. Need to create it manually in Supabase dashboard.');
+                        log('Please create the equipment table with the following schema:');
+                        log('CREATE TABLE equipment (');
+                        log('  id SERIAL PRIMARY KEY,');
+                        log('  name VARCHAR(255) NOT NULL,');
+                        log('  category VARCHAR(100) NOT NULL,');
+                        log('  description TEXT,');
+                        log('  price_per_hour DECIMAL(10,2),');
+                        log('  availability_status VARCHAR(50) DEFAULT \'available\',');
+                        log('  studio_id INTEGER,');
+                        log('  image_url VARCHAR(500),');
+                        log('  specifications JSONB,');
+                        log('  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),');
+                        log('  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()');
+                        log(');');
+                        updateStatus('❌ Equipment table needs to be created manually');
+                        return;
+                    }
+                } else {
+                    log('✅ Successfully inserted ' + equipmentData.length + ' equipment items!');
+                }
+            } catch (err) {
+                log('❌ Data insertion error: ' + err.message);
+            }
+
+            // Step 3: Test Equipment Query
+            log('--- Step 3: Testing Equipment Query ---');
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .limit(5);
+                
+                if (error) {
+                    log('❌ Equipment query failed: ' + error.message);
+                } else {
+                    log('✅ Equipment query successful! Found ' + data.length + ' items:');
+                    data.forEach((item, index) => {
+                        log('  ' + (index + 1) + '. ' + item.name + ' (' + item.category + ') - $' + item.price_per_hour + '/hr');
+                    });
+                    updateStatus('✅ Setup completed successfully!');
+                }
+            } catch (err) {
+                log('❌ Equipment query error: ' + err.message);
+                updateStatus('❌ Setup failed');
+            }
+
+            log('🎉 Setup process completed!');
+        }
+
+        // Execute setup immediately when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            executeCompleteSetup();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Supabase Test - PluggedIn</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Direct Supabase Connection Test</h1>
+    <p>Testing direct connection to Supabase without any wrapper functions.</p>
+    
+    <button onclick="testConnection()">🧪 Test Supabase Connection</button>
+    <button onclick="testEquipmentQuery()">📦 Test Equipment Query</button>
+    <button onclick="testAllTables()">📋 Test All Tables</button>
+    
+    <div id="results">
+        <div class="result info">🎵 Direct Supabase test page loaded</div>
+    </div>
+
+    <script>
+        // Direct Supabase configuration - same as web app
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+            console.log(`[${type}] ${message}`);
+        }
+        
+        async function testConnection() {
+            try {
+                addResult('🔍 Testing Supabase connection...', 'info');
+                
+                // Test basic connection
+                const { data, error } = await supabase.auth.getSession();
+                if (error) {
+                    addResult(`❌ Auth connection error: ${error.message}`, 'error');
+                } else {
+                    addResult('✅ Supabase connection successful!', 'success');
+                }
+                
+                // Test a simple query to any table
+                const { data: testData, error: testError } = await supabase
+                    .from('studios')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (testError) {
+                    addResult(`❌ Studios query error: ${testError.message}`, 'error');
+                } else {
+                    addResult('✅ Basic query test successful!', 'success');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Connection test exception: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testEquipmentQuery() {
+            try {
+                addResult('🔍 Testing equipment table query...', 'info');
+                
+                // Test equipment table existence
+                const { data: countData, error: countError } = await supabase
+                    .from('equipment')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (countError) {
+                    addResult(`❌ Equipment count error: ${countError.message}`, 'error');
+                    addResult(`Error code: ${countError.code}`, 'error');
+                    addResult(`Error details: ${countError.details}`, 'error');
+                } else {
+                    addResult('✅ Equipment table exists!', 'success');
+                }
+                
+                // Test actual data query
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .limit(5);
+                
+                if (error) {
+                    addResult(`❌ Equipment data error: ${error.message}`, 'error');
+                    addResult(`Error code: ${error.code}`, 'error');
+                } else {
+                    addResult(`✅ Equipment data loaded: ${data?.length || 0} items`, 'success');
+                    if (data && data.length > 0) {
+                        data.forEach((item, index) => {
+                            addResult(`📦 Item ${index + 1}: ${item.name} (${item.brand} ${item.model})`, 'success');
+                        });
+                    }
+                }
+                
+            } catch (error) {
+                addResult(`❌ Equipment query exception: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAllTables() {
+            const tables = ['studios', 'equipment', 'users', 'bookings', 'payments'];
+            
+            for (const table of tables) {
+                try {
+                    addResult(`🔍 Testing ${table} table...`, 'info');
+                    
+                    const { data, error } = await supabase
+                        .from(table)
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (error) {
+                        addResult(`❌ ${table}: ${error.message}`, 'error');
+                    } else {
+                        addResult(`✅ ${table}: Table exists`, 'success');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${table}: Exception - ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Auto-run connection test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

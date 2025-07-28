@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Data Migration - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Equipment Data Migration</h1>
+            <p class="text-gray-600 mb-8">Import real equipment data from your iOS project into Supabase.</p>
+            
+            <div id="status" class="mb-6"></div>
+            
+            <button id="migrateBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                Start Equipment Migration
+            </button>
+            
+            <div id="results" class="mt-8"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+        // Real equipment data from iOS project
+        const equipmentData = [
+            // Soundwave Studios Equipment
+            { name: "Condenser Microphone", brand: "Neumann", model: "TLM 103", category: "Condenser Microphone", studio_id: "soundwave", room: "Main Room" },
+            { name: "Audio Interface", brand: "Universal Audio", model: "Apollo x8", category: "Audio Interface", studio_id: "soundwave", room: "Main Room" },
+            { name: "Studio Monitors", brand: "Adam Audio", model: "A7V", category: "Studio Monitors", studio_id: "soundwave", room: "Main Room" },
+            
+            // Platinum Sound Equipment
+            { name: "Mixing Console", brand: "SSL", model: "AWS 900+", category: "Mixing Console", studio_id: "platinum", room: "SSL Suite" },
+            { name: "Condenser Microphone", brand: "Neumann", model: "U87", category: "Condenser Microphone", studio_id: "platinum", room: "SSL Suite" },
+            { name: "Compressor", brand: "Universal Audio", model: "1176", category: "Compressor", studio_id: "platinum", room: "SSL Suite" },
+            
+            // Broadcast Hub Equipment
+            { name: "Microphone", brand: "Shure", model: "SM7B", category: "Microphone", studio_id: "broadcast", room: "Podcast Studio A" },
+            { name: "Audio Interface", brand: "Universal Audio", model: "Apollo Twin X", category: "Audio Interface", studio_id: "broadcast", room: "Podcast Studio A" },
+            { name: "Headphones", brand: "Sony", model: "MDR-7506", category: "Headphones", studio_id: "broadcast", room: "Podcast Studio A" }
+        ];
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const bgColor = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 
+                           type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 
+                           'bg-blue-100 border-blue-400 text-blue-700';
+            
+            statusDiv.innerHTML = `
+                <div class="border-l-4 ${bgColor} p-4 rounded">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        async function createEquipmentTable() {
+            try {
+                showStatus('Creating equipment table...', 'info');
+                
+                // Check if table exists first
+                const { data: tables, error: listError } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .limit(1);
+                
+                if (!listError) {
+                    showStatus('Equipment table already exists', 'success');
+                    return true;
+                }
+                
+                showStatus('Equipment table needs to be created. Please run this SQL in your Supabase SQL Editor:', 'info');
+                
+                const createTableSQL = `
+CREATE TABLE IF NOT EXISTS equipment (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT,
+    model TEXT,
+    category TEXT,
+    studio_id TEXT,
+    room TEXT,
+    description TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE equipment ENABLE ROW LEVEL SECURITY;
+
+-- Create policy to allow public read access
+CREATE POLICY "Allow public read access" ON equipment
+FOR SELECT USING (true);
+
+-- Create policy to allow public insert access (for migration)
+CREATE POLICY "Allow public insert access" ON equipment
+FOR INSERT WITH CHECK (true);
+                `;
+                
+                document.getElementById('results').innerHTML = `
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <h3 class="font-bold mb-2">SQL to run in Supabase:</h3>
+                        <pre class="text-sm overflow-x-auto">${createTableSQL}</pre>
+                        <button onclick="copyToClipboard(\`${createTableSQL.replace(/`/g, '\\`')}\`)" 
+                                class="mt-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm">
+                            Copy SQL
+                        </button>
+                    </div>
+                `;
+                
+                return false;
+            } catch (error) {
+                console.error('Error checking equipment table:', error);
+                showStatus(`Error checking equipment table: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function migrateEquipment() {
+            try {
+                showStatus('Starting equipment migration...', 'info');
+                
+                // Check if table exists and create if needed
+                const tableReady = await createEquipmentTable();
+                if (!tableReady) {
+                    showStatus('Please create the equipment table first using the SQL above, then try again.', 'error');
+                    return;
+                }
+                
+                let successCount = 0;
+                let errorCount = 0;
+                const results = [];
+                
+                for (const equipment of equipmentData) {
+                    try {
+                        const { data, error } = await supabase
+                            .from('equipment')
+                            .insert({
+                                name: equipment.name,
+                                brand: equipment.brand,
+                                model: equipment.model,
+                                category: equipment.category,
+                                studio_id: equipment.studio_id,
+                                room: equipment.room,
+                                description: `${equipment.brand} ${equipment.model} - Professional ${equipment.category.toLowerCase()}`,
+                                image_url: `https://via.placeholder.com/300x200?text=${encodeURIComponent(equipment.model)}`
+                            })
+                            .select()
+                            .single();
+                        
+                        if (error) throw error;
+                        
+                        successCount++;
+                        results.push({ success: true, equipment: equipment.name, data });
+                    } catch (error) {
+                        errorCount++;
+                        results.push({ success: false, equipment: equipment.name, error: error.message });
+                        console.error(`Error inserting ${equipment.name}:`, error);
+                    }
+                }
+                
+                // Show results
+                showStatus(`Migration completed! ${successCount} equipment items added, ${errorCount} errors.`, 
+                          errorCount === 0 ? 'success' : 'info');
+                
+                displayResults(results);
+                
+            } catch (error) {
+                console.error('Migration error:', error);
+                showStatus(`Migration failed: ${error.message}`, 'error');
+            }
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            const successItems = results.filter(r => r.success);
+            const errorItems = results.filter(r => !r.success);
+            
+            resultsDiv.innerHTML = `
+                <div class="space-y-4">
+                    ${successItems.length > 0 ? `
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h3 class="font-bold text-green-800 mb-2">✅ Successfully Added (${successItems.length})</h3>
+                            <ul class="text-sm text-green-700 space-y-1">
+                                ${successItems.map(item => `<li>• ${item.equipment}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${errorItems.length > 0 ? `
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <h3 class="font-bold text-red-800 mb-2">❌ Errors (${errorItems.length})</h3>
+                            <ul class="text-sm text-red-700 space-y-1">
+                                ${errorItems.map(item => `<li>• ${item.equipment}: ${item.error}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="font-bold text-blue-800 mb-2">📊 Equipment Summary</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                            <div><strong>Microphones:</strong> 3</div>
+                            <div><strong>Audio Interfaces:</strong> 2</div>
+                            <div><strong>Studio Monitors:</strong> 1</div>
+                            <div><strong>Mixing Console:</strong> 1</div>
+                            <div><strong>Compressor:</strong> 1</div>
+                            <div><strong>Headphones:</strong> 1</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('SQL copied to clipboard!', 'success');
+            });
+        }
+
+        // Event listeners
+        document.getElementById('migrateBtn').addEventListener('click', migrateEquipment);
+    </script>
+</body>
+</html>

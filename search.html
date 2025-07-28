@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Studios - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black shadow-sm border-b border-gray-800 sticky top-0 z-40" role="navigation" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-24 w-auto">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4" role="menubar">
+                    <a href="app.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Home</a>
+                    <a href="explore.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Explore</a>
+                    <a href="search.html" class="text-white font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem" aria-current="page">Search</a>
+                    <a href="bookings.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Bookings</a>
+                    <a href="messages.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Messages</a>
+                    <a href="equipment.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Equipment</a>
+                    <a href="profile.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Search Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Search Studios</h1>
+            <p class="text-lg text-gray-600">Find the perfect recording space for your needs - from professional studios to home setups</p>
+        </div>
+
+        <!-- Search Bar -->
+        <section class="mb-6" aria-labelledby="search-heading">
+            <h2 id="search-heading" class="sr-only">Search for studios</h2>
+            <!-- Piano Key Search Bar -->
+            <div class="relative">
+                <label for="searchInput" class="sr-only">Search studios, locations, equipment</label>
+                <!-- Piano Keys Styled Search Bar -->
+                <div class="flex relative mx-auto max-w-3xl piano-keyboard shadow-lg">
+                    <!-- White Piano Key (Search Input) -->
+                    <div class="piano-key white-key flex-1 bg-white rounded-l-md border-l border-t border-b border-gray-300 overflow-hidden">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input type="text" id="searchInput" class="block w-full pl-12 pr-12 py-4 border-none leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-gray-500 text-lg" 
+                                   placeholder="Search studios, home setups, locations, equipment..."
+                                   aria-describedby="search-help"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <!-- Black Piano Key (Search Button) - Narrower like a real piano key -->
+                    <button type="button" id="searchButton" class="piano-key black-key bg-black hover:bg-gray-800 text-white transition-all duration-200 h-full w-16 rounded-r-md flex items-center justify-center" aria-label="Search">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Add piano key styling -->
+                <style>
+                    .piano-keyboard {
+                        border-radius: 6px;
+                        overflow: hidden;
+                    }
+                    .white-key {
+                        position: relative;
+                        background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+                        box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+                    }
+                    .black-key {
+                        position: relative;
+                        background: linear-gradient(to bottom, #333333 0%, #000000 100%);
+                        height: 100%;
+                        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+                    }
+                    .black-key:active, .black-key:focus {
+                        background: linear-gradient(to bottom, #000000 0%, #333333 100%);
+                    }
+                </style>
+            </div>
+            <div id="search-help" class="sr-only">Enter keywords to search for recording studios and home setups by name, location, or available equipment</div>
+        </section>
+
+        <!-- Quick Filters -->
+        <section class="mb-6" aria-labelledby="quick-filters-heading">
+            <h3 id="quick-filters-heading" class="text-sm font-medium text-gray-700 mb-3">Quick Filters</h3>
+            <div class="flex flex-wrap gap-2" id="quickFilters" role="group" aria-labelledby="quick-filters-heading">
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="all" type="button" aria-pressed="true">All</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="professional" type="button" aria-pressed="false">Professional Studios</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="home-studio" type="button" aria-pressed="false">Home Studios</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="available-today" type="button" aria-pressed="false">Available Today</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="under-50" type="button" aria-pressed="false">Under $50/hr</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="vocal-booth" type="button" aria-pressed="false">Vocal Booth</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="24-7-access" type="button" aria-pressed="false">24/7 Access</button>
+                <button class="filter-chip px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-gray-700 bg-white" data-filter="parking" type="button" aria-pressed="false">Parking Available</button>
+            </div>
+        </section>
+
+        <!-- Search Results -->
+        <section class="mb-8" aria-labelledby="search-results-heading">
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="search-results-heading" class="text-xl font-semibold text-gray-900">
+                    Search Results <span id="resultsCount" class="text-gray-500 text-base font-normal" aria-live="polite">(0)</span>
+                </h2>
+                <label for="sortResults" class="sr-only">Sort search results by</label>
+                <select id="sortResults" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" aria-label="Sort search results by">
+                    <option value="relevance">Most Relevant</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                </select>
+            </div>
+
+            <div id="resultsContainer" class="space-y-4">
+                <!-- Search results will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script>
+        // Search page functionality
+        class SearchManager {
+            constructor() {
+                this.studios = [];
+                this.searchTerm = '';
+                this.activeFilters = new Set();
+                this.sortBy = 'relevance';
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                await this.loadStudios();
+                this.performSearch();
+            }
+
+            setupEventListeners() {
+                // Search input
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value;
+                    this.debounceSearch();
+                });
+
+                // Quick filters
+                document.querySelectorAll('#quickFilters .filter-chip').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.toggleQuickFilter(e.target.dataset.filter, e.target);
+                    });
+                });
+
+                // Sort
+                document.getElementById('sortResults').addEventListener('change', (e) => {
+                    this.sortBy = e.target.value;
+                    this.performSearch();
+                });
+            }
+
+            async loadStudios() {
+                try {
+                    // Load studios from Supabase
+                    const studiosData = await window.db.getStudios();
+                    
+                    // Transform Supabase data to match expected format
+                    this.studios = studiosData.map(studio => ({
+                        id: studio.id.toString(),
+                        name: studio.name || 'Unnamed Studio',
+                        location: studio.location || 'Location TBD',
+                        rating: studio.rating || 4.5,
+                        reviewCount: studio.review_count || 0,
+                        price: studio.price_per_hour || 100,
+                        image: studio.image_url || 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(studio.name || 'Studio'),
+                        tags: this.extractTags(studio),
+                        amenities: this.extractAmenities(studio),
+                        equipment: this.extractEquipment(studio)
+                    }));
+                    
+                    // Show success message if we have real data
+                    if (this.studios.length > 0) {
+                        this.showNotification(`✅ Loaded ${this.studios.length} studios for search!`, 'success');
+                    } else {
+                        this.showNotification('ℹ️ No studios found. Sample studios will be shown.', 'info');
+                        this.loadFallbackData();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading studios:', error);
+                    this.showNotification('⚠️ Could not load studios from database. Showing sample data.', 'error');
+                    this.loadFallbackData();
+                }
+            }
+
+            debounceSearch() {
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(() => {
+                    this.performSearch();
+                }, 300);
+            }
+
+            toggleQuickFilter(filter, button) {
+                if (this.activeFilters.has(filter)) {
+                    this.activeFilters.delete(filter);
+                    button.classList.remove('bg-purple-600', 'text-white');
+                    button.classList.add('text-gray-700', 'bg-white');
+                } else {
+                    this.activeFilters.add(filter);
+                    button.classList.add('bg-purple-600', 'text-white');
+                    button.classList.remove('text-gray-700', 'bg-white');
+                }
+                this.performSearch();
+            }
+
+            performSearch() {
+                const results = this.getFilteredStudios();
+                this.renderResults(results);
+            }
+
+            getFilteredStudios() {
+                return this.studios.filter(studio => {
+                    if (this.searchTerm) {
+                        const term = this.searchTerm.toLowerCase();
+                        const matches = studio.name.toLowerCase().includes(term) ||
+                                      studio.location.toLowerCase().includes(term) ||
+                                      studio.equipment.some(eq => eq.toLowerCase().includes(term));
+                        if (!matches) return false;
+                    }
+                    
+                    if (this.activeFilters.has('under-50') && studio.price >= 50) return false;
+                    if (this.activeFilters.has('vocal-booth') && !studio.amenities.some(a => a.includes('Vocal'))) return false;
+                    
+                    return true;
+                });
+            }
+
+            renderResults(results) {
+                document.getElementById('resultsCount').textContent = `(${results.length})`;
+                const container = document.getElementById('resultsContainer');
+                
+                if (results.length === 0) {
+                    container.innerHTML = '<p class="text-center text-gray-500 py-8">No studios found matching your criteria.</p>';
+                    return;
+                }
+                
+                const sortedResults = this.sortResults(results);
+                container.innerHTML = sortedResults.map(studio => `
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <div class="flex items-start space-x-4">
+                            <img src="${studio.image}" alt="${studio.name}" class="w-24 h-24 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900">${studio.name}</h3>
+                                <p class="text-gray-600 text-sm">${studio.location}</p>
+                                <div class="flex items-center space-x-1 mt-2">
+                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span class="text-sm text-gray-600">${studio.rating} (${studio.reviewCount})</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1 mt-2">
+                                    ${studio.tags.map(tag => `<span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-semibold text-gray-900">$${studio.price}/hr</div>
+                                <button class="mt-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            sortResults(results) {
+                switch (this.sortBy) {
+                    case 'rating':
+                        return [...results].sort((a, b) => b.rating - a.rating);
+                    case 'price-low':
+                        return [...results].sort((a, b) => a.price - b.price);
+                    case 'price-high':
+                        return [...results].sort((a, b) => b.price - a.price);
+                    default:
+                        return results;
+                }
+            }
+
+            extractTags(studio) {
+                // Extract tags from studio data
+                const tags = [];
+                if (studio.category) tags.push(studio.category);
+                if (studio.type) tags.push(studio.type === 'home' ? 'Home' : 'Professional');
+                if (studio.specialties) {
+                    const specialties = typeof studio.specialties === 'string' 
+                        ? studio.specialties.split(',').map(s => s.trim())
+                        : studio.specialties || [];
+                    tags.push(...specialties);
+                }
+                return tags.length > 0 ? tags : ['Studio'];
+            }
+
+            extractAmenities(studio) {
+                // Extract amenities from studio data
+                const amenities = [];
+                if (studio.amenities) {
+                    const studioAmenities = typeof studio.amenities === 'string'
+                        ? studio.amenities.split(',').map(a => a.trim())
+                        : studio.amenities || [];
+                    amenities.push(...studioAmenities);
+                }
+                if (studio.has_parking) amenities.push('Free Parking');
+                if (studio.has_wifi) amenities.push('WiFi');
+                if (studio.has_kitchen) amenities.push('Kitchen');
+                if (studio.has_vocal_booth) amenities.push('Vocal Booth');
+                return amenities.length > 0 ? amenities : ['Basic Amenities'];
+            }
+
+            extractEquipment(studio) {
+                // Extract equipment from studio data or related equipment table
+                const equipment = [];
+                if (studio.equipment) {
+                    const studioEquipment = typeof studio.equipment === 'string'
+                        ? studio.equipment.split(',').map(e => e.trim())
+                        : studio.equipment || [];
+                    equipment.push(...studioEquipment);
+                }
+                // Add some default equipment based on studio type
+                if (studio.type === 'professional') {
+                    equipment.push('Professional Microphones', 'Mixing Console');
+                } else if (studio.type === 'home') {
+                    equipment.push('Audio Interface', 'Studio Monitors');
+                }
+                return equipment.length > 0 ? equipment : ['Basic Equipment'];
+            }
+
+            loadFallbackData() {
+                // Fallback data when Supabase is unavailable
+                this.studios = [
+                    {
+                        id: '1',
+                        name: 'Abbey Road Studios',
+                        location: 'London, UK',
+                        rating: 5.0,
+                        reviewCount: 127,
+                        price: 200,
+                        image: 'https://via.placeholder.com/300x200?text=Abbey+Road',
+                        tags: ['Professional', 'Historic', 'Mixing'],
+                        amenities: ['24/7 Access', 'Vocal Booth', 'Kitchen'],
+                        equipment: ['Neumann U87', 'SSL Console', 'Pro Tools HDX']
+                    },
+                    {
+                        id: '2',
+                        name: 'Home Studio Pro',
+                        location: 'Nashville, TN',
+                        rating: 4.7,
+                        reviewCount: 43,
+                        price: 45,
+                        image: 'https://via.placeholder.com/300x200?text=Home+Studio',
+                        tags: ['Home', 'Podcast', 'Vocal'],
+                        amenities: ['Vocal Booth', 'WiFi', 'Free Parking'],
+                        equipment: ['Shure SM7B', 'Focusrite Interface']
+                    }
+                ];
+            }
+
+            showNotification(message, type = 'info') {
+                const colors = {
+                    success: 'bg-green-100 border-green-400 text-green-700',
+                    error: 'bg-red-100 border-red-400 text-red-700',
+                    info: 'bg-blue-100 border-blue-400 text-blue-700'
+                };
+                
+                const notificationDiv = document.createElement('div');
+                notificationDiv.className = `${colors[type]} px-4 py-3 rounded mb-4 border-l-4`;
+                notificationDiv.innerHTML = `<span>${message}</span>`;
+                
+                const container = document.querySelector('main');
+                container.insertBefore(notificationDiv, container.firstChild);
+                
+                setTimeout(() => {
+                    notificationDiv.remove();
+                }, 5000);
+            }
+        }
+
+        // Initialize search manager
+        document.addEventListener('DOMContentLoaded', () => {
+            new SearchManager();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Diagnostic - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Database Diagnostic Tool</h1>
+            <p class="text-gray-600 mb-4">Let's find your studios and equipment data!</p>
+            
+            <button id="runDiagnostic" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                Run Diagnostic
+            </button>
+        </div>
+
+        <div id="results" class="space-y-6">
+            <!-- Results will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        // Your Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function addResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200',
+                error: 'bg-red-50 border-red-200',
+                info: 'bg-blue-50 border-blue-200',
+                warning: 'bg-yellow-50 border-yellow-200'
+            };
+            
+            const div = document.createElement('div');
+            div.className = `bg-white rounded-lg shadow-sm border p-6`;
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function runDiagnostic() {
+            document.getElementById('results').innerHTML = '';
+            
+            // Test 1: Check what tables exist by trying different variations
+            addResult('🔍 Step 1: Testing Table Variations', 'Checking different possible table names...', 'info');
+            
+            const tableVariations = [
+                'studios', 'studio', 'Studio', 'STUDIOS',
+                'equipment', 'equipments', 'Equipment', 'EQUIPMENT',
+                'users', 'user', 'User', 'USERS',
+                'bookings', 'booking', 'Booking', 'BOOKINGS'
+            ];
+            
+            const foundTables = {};
+            
+            for (const table of tableVariations) {
+                try {
+                    const { data, error, count } = await supabase
+                        .from(table)
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (!error) {
+                        foundTables[table] = count || 0;
+                    }
+                } catch (e) {
+                    // Table doesn't exist or no access
+                }
+            }
+            
+            if (Object.keys(foundTables).length > 0) {
+                const tableList = Object.entries(foundTables)
+                    .map(([table, count]) => `<strong>${table}</strong>: ${count} records`)
+                    .join('<br>');
+                addResult('✅ Found Tables', tableList, 'success');
+            } else {
+                addResult('❌ No Tables Found', 'Could not access any tables. This might be due to RLS policies or permissions.', 'error');
+            }
+            
+            // Test 2: Try to get actual data from found tables
+            for (const [tableName, count] of Object.entries(foundTables)) {
+                if (count > 0) {
+                    try {
+                        const { data, error } = await supabase
+                            .from(tableName)
+                            .select('*')
+                            .limit(3);
+                        
+                        if (!error && data && data.length > 0) {
+                            // Show the structure of the data
+                            const columns = Object.keys(data[0]);
+                            const sampleData = data.map(row => {
+                                const preview = {};
+                                columns.slice(0, 5).forEach(col => {
+                                    preview[col] = row[col];
+                                });
+                                return preview;
+                            });
+                            
+                            addResult(
+                                `📊 Sample Data from "${tableName}"`,
+                                `
+                                    <p class="mb-2"><strong>Columns:</strong> ${columns.join(', ')}</p>
+                                    <p class="mb-2"><strong>Sample Records:</strong></p>
+                                    <pre class="bg-gray-100 p-2 rounded text-sm overflow-x-auto">${JSON.stringify(sampleData, null, 2)}</pre>
+                                `,
+                                'success'
+                            );
+                        }
+                    } catch (error) {
+                        addResult(`❌ Error reading "${tableName}"`, error.message, 'error');
+                    }
+                }
+            }
+            
+            // Test 3: Check RLS policies
+            addResult('🔒 Step 3: Checking Access Permissions', 'Testing if RLS policies are blocking access...', 'info');
+            
+            try {
+                // Try a simple query that should work if RLS allows it
+                const { data, error } = await supabase.rpc('get_schema', {});
+                
+                if (error) {
+                    addResult(
+                        '⚠️ Permissions Issue Detected',
+                        `
+                            <p>Error: ${error.message}</p>
+                            <p class="mt-2"><strong>Possible solutions:</strong></p>
+                            <ul class="list-disc list-inside mt-1">
+                                <li>Check Row Level Security (RLS) policies in Supabase</li>
+                                <li>Ensure your API key has the right permissions</li>
+                                <li>Verify table access permissions</li>
+                            </ul>
+                        `,
+                        'warning'
+                    );
+                }
+            } catch (e) {
+                // RPC might not exist, that's okay
+            }
+            
+            // Test 4: Provide recommendations
+            const recommendations = [];
+            
+            if (Object.keys(foundTables).length === 0) {
+                recommendations.push('No tables found - check if your database has been set up');
+                recommendations.push('Verify your Supabase URL and API key are correct');
+                recommendations.push('Check if Row Level Security is enabled and configured properly');
+            } else {
+                if (foundTables.studios || foundTables.studio) {
+                    recommendations.push('✅ Studios table found! We can integrate this.');
+                }
+                if (foundTables.equipment || foundTables.equipments) {
+                    recommendations.push('✅ Equipment table found! We can integrate this.');
+                }
+                
+                recommendations.push('Update the webapp-supabase.js file to use the correct table names');
+                recommendations.push('Adjust column names in the integration code to match your schema');
+            }
+            
+            addResult(
+                '💡 Recommendations',
+                `<ul class="list-disc list-inside space-y-1">${recommendations.map(r => `<li>${r}</li>`).join('')}</ul>`,
+                'info'
+            );
+        }
+
+        document.getElementById('runDiagnostic').addEventListener('click', runDiagnostic);
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Studio Insert - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">🎯 Simple Studio Data Insert</h1>
+            <p class="text-gray-600 mb-4">Let's try different approaches to get your studio data in</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button id="tryMinimal" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    🟢 Try Minimal Data
+                </button>
+                <button id="tryAlternative" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    🔵 Try Alternative Columns
+                </button>
+                <button id="showSQL" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    🟣 Show SQL Commands
+                </button>
+            </div>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://fdkrfyzcxhnhanodxopj.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+        );
+
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border p-6';
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function tryMinimalData() {
+            document.getElementById('results').innerHTML = '';
+            showResult('🟢 Trying Minimal Data', 'Inserting with just the most basic fields...', 'info');
+            
+            // Try with absolutely minimal data
+            const studios = [
+                { name: "Soundwave Studios" },
+                { name: "Platinum Sound" },
+                { name: "Broadcast Hub" }
+            ];
+            
+            let successCount = 0;
+            
+            for (const studio of studios) {
+                try {
+                    const { data, error } = await supabase
+                        .from('studio_registrations')
+                        .insert([studio])
+                        .select();
+                    
+                    if (error) {
+                        showResult(`❌ ${studio.name}`, `Error: ${error.message}`, 'error');
+                    } else {
+                        successCount++;
+                        showResult(`✅ ${studio.name}`, 'Successfully inserted!', 'success');
+                    }
+                } catch (error) {
+                    showResult(`❌ ${studio.name}`, `Exception: ${error.message}`, 'error');
+                }
+            }
+            
+            if (successCount > 0) {
+                showResult('🎉 Success!', 
+                    `Inserted ${successCount} studios! Check your admin dashboard now.`, 
+                    'success'
+                );
+            }
+        }
+
+        async function tryAlternativeColumns() {
+            document.getElementById('results').innerHTML = '';
+            showResult('🔵 Trying Alternative Column Names', 'Testing different possible column names...', 'info');
+            
+            const studios = [
+                {
+                    // Try various possible column names
+                    name: "Soundwave Studios",
+                    studio_name: "Soundwave Studios",
+                    title: "Soundwave Studios",
+                    location: "Brooklyn, NY",
+                    address: "Brooklyn, NY",
+                    city: "Brooklyn",
+                    state: "NY"
+                }
+            ];
+            
+            // Try one studio with different column combinations
+            const variations = [
+                { name: "Soundwave Studios" },
+                { studio_name: "Soundwave Studios" },
+                { title: "Soundwave Studios" },
+                { name: "Soundwave Studios", location: "Brooklyn, NY" },
+                { name: "Soundwave Studios", address: "Brooklyn, NY" },
+                { name: "Soundwave Studios", city: "Brooklyn", state: "NY" }
+            ];
+            
+            for (let i = 0; i < variations.length; i++) {
+                try {
+                    const { data, error } = await supabase
+                        .from('studio_registrations')
+                        .insert([variations[i]])
+                        .select();
+                    
+                    if (!error) {
+                        showResult(`✅ Variation ${i + 1} Works!`, 
+                            `Successfully inserted with: ${JSON.stringify(variations[i])}`, 
+                            'success'
+                        );
+                        
+                        // If this variation works, insert the other studios
+                        const otherStudios = [
+                            { ...variations[i], name: "Platinum Sound" },
+                            { ...variations[i], name: "Broadcast Hub" }
+                        ];
+                        
+                        for (const studio of otherStudios) {
+                            await supabase.from('studio_registrations').insert([studio]);
+                        }
+                        
+                        showResult('🎉 All Studios Added!', 
+                            'Successfully added all 3 studios using the working schema!', 
+                            'success'
+                        );
+                        return;
+                    }
+                } catch (error) {
+                    // Continue to next variation
+                }
+            }
+            
+            showResult('❌ No Variations Worked', 
+                'None of the column variations worked. Check the SQL commands option.', 
+                'error'
+            );
+        }
+
+        function showSQLCommands() {
+            document.getElementById('results').innerHTML = '';
+            showResult('🟣 SQL Commands to Run in Supabase', 
+                `
+                    <p class="mb-4"><strong>Go to your Supabase Dashboard → SQL Editor and run:</strong></p>
+                    
+                    <h4 class="font-semibold mb-2">Option 1: Add columns to existing table</h4>
+                    <pre class="bg-gray-100 p-3 rounded text-sm mb-4">-- Add missing columns to studio_registrations
+ALTER TABLE studio_registrations 
+ADD COLUMN IF NOT EXISTS name TEXT,
+ADD COLUMN IF NOT EXISTS location TEXT,
+ADD COLUMN IF NOT EXISTS description TEXT,
+ADD COLUMN IF NOT EXISTS hourly_rate DECIMAL;</pre>
+
+                    <h4 class="font-semibold mb-2">Option 2: Create a new studios table</h4>
+                    <pre class="bg-gray-100 p-3 rounded text-sm mb-4">-- Create a proper studios table
+CREATE TABLE IF NOT EXISTS studios (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    location TEXT,
+    description TEXT,
+    hourly_rate DECIMAL,
+    rating DECIMAL,
+    created_at TIMESTAMP DEFAULT NOW()
+);</pre>
+
+                    <h4 class="font-semibold mb-2">Option 3: Insert data directly</h4>
+                    <pre class="bg-gray-100 p-3 rounded text-sm mb-4">-- Insert your studios directly
+INSERT INTO studio_registrations (name) VALUES 
+('Soundwave Studios'),
+('Platinum Sound'), 
+('Broadcast Hub');</pre>
+
+                    <p class="mt-4 text-sm text-blue-700">
+                        <strong>After running the SQL:</strong> Refresh this page and try the migration again!
+                    </p>
+                `, 
+                'info'
+            );
+        }
+
+        document.getElementById('tryMinimal').addEventListener('click', tryMinimalData);
+        document.getElementById('tryAlternative').addEventListener('click', tryAlternativeColumns);
+        document.getElementById('showSQL').addEventListener('click', showSQLCommands);
+    </script>
+</body>
+</html>

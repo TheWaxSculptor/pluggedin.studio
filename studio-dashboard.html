@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Owner Dashboard - PluggedIn</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="h-8 w-auto">
+                    <span class="ml-2 text-xl font-bold text-gray-900">PluggedIn Studio</span>
+                    <span class="ml-4 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Studio Owner</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="webapp.html" class="text-gray-600 hover:text-gray-900">Back to App</a>
+                    <div id="userMenu" class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900" title="User menu" aria-label="User menu">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                <span id="userInitials" class="text-white text-sm font-medium">SO</span>
+                            </div>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                            <a href="#" id="profileLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <a href="#" id="signOutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Studio Owner Dashboard</h1>
+            <p class="mt-2 text-gray-600">Manage your studio, bookings, and calendar integrations</p>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="lg:col-span-1">
+                <nav class="bg-white rounded-lg shadow p-6">
+                    <ul class="space-y-2">
+                        <li>
+                            <button id="overviewTab" class="dashboard-tab active w-full text-left px-3 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-700">
+                                Overview
+                            </button>
+                        </li>
+                        <li>
+                            <button id="studioTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Studio Details
+                            </button>
+                        </li>
+                        <li>
+                            <button id="bookingsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Bookings
+                            </button>
+                        </li>
+                        <li>
+                            <button id="integrationsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Calendar Integrations
+                            </button>
+                        </li>
+                        <li>
+                            <button id="analyticsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Analytics
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-2">
+                <!-- Overview Tab -->
+                <div id="overviewContent" class="dashboard-content">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-6">Studio Overview</h2>
+                        
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-blue-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-gray-600">This Month</p>
+                                        <p class="text-2xl font-semibold text-gray-900" id="monthlyBookings">12</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-green-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-gray-600">Revenue</p>
+                                        <p class="text-2xl font-semibold text-gray-900" id="monthlyRevenue">$2,400</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-yellow-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-gray-600">Integrations</p>
+                                        <p class="text-2xl font-semibold text-gray-900" id="activeIntegrations">2</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="border-t pt-6">
+                            <h3 class="text-lg font-medium mb-4">Quick Actions</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left">
+                                    <div class="flex items-center">
+                                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        <div class="ml-3">
+                                            <p class="font-medium">Add Integration</p>
+                                            <p class="text-sm text-gray-600">Connect a calendar service</p>
+                                        </div>
+                                    </div>
+                                </button>
+                                
+                                <button class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left">
+                                    <div class="flex items-center">
+                                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div class="ml-3">
+                                            <p class="font-medium">Update Availability</p>
+                                            <p class="text-sm text-gray-600">Manage your schedule</p>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Integrations Tab -->
+                <div id="integrationsContent" class="dashboard-content hidden">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Calendar Integrations</h2>
+                            <button id="addIntegrationBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                Add Integration
+                            </button>
+                        </div>
+
+                        <!-- Integration Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="integrationsList">
+                            <!-- Integration cards will be loaded here -->
+                        </div>
+
+                        <!-- Available Integrations -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-medium mb-4">Available Integrations</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="availableIntegrations">
+                                <!-- Available integrations will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other tabs content will be added here -->
+                <div id="studioContent" class="dashboard-content hidden">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-6">Studio Details</h2>
+                        <p class="text-gray-600">Studio management features coming soon...</p>
+                    </div>
+                </div>
+
+                <div id="bookingsContent" class="dashboard-content hidden">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-6">Bookings Management</h2>
+                        <p class="text-gray-600">Booking management features coming soon...</p>
+                    </div>
+                </div>
+
+                <div id="analyticsContent" class="dashboard-content hidden">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-6">Analytics</h2>
+                        <p class="text-gray-600">Analytics dashboard coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration Setup Modal -->
+    <div id="integrationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900">Setup Calendar Integration</h3>
+                    <button id="closeIntegrationModal" class="text-gray-400 hover:text-gray-600" title="Close modal" aria-label="Close modal">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="integrationModalContent">
+                    <!-- Integration setup content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script src="js/studio-dashboard.js"></script>
+    <script src="js/calendar-backend.js"></script>
+    <script src="js/calendar-integrations.js"></script>
+</body>
+</html>

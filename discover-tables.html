@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Tables - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">🔍 Discover Your Database Tables</h1>
+            <p class="text-gray-600 mb-4">Let's find out what tables actually exist in your Supabase database</p>
+            
+            <button id="discoverTables" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                🚀 Discover Tables
+            </button>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://fdkrfyzcxhnhanodxopj.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+        );
+
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border p-6';
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function discoverTables() {
+            document.getElementById('results').innerHTML = '';
+            
+            showResult('🔍 Discovering Tables', 'Checking what tables exist in your database...', 'info');
+            
+            // Try a comprehensive list of possible table names
+            const possibleTables = [
+                // Studio variations
+                'studios', 'studio', 'Studio', 'STUDIOS', 'recording_studios', 'music_studios', 'sound_studios',
+                
+                // Equipment variations  
+                'equipment', 'equipments', 'Equipment', 'EQUIPMENT', 'gear', 'instruments', 'studio_equipment',
+                
+                // User variations
+                'users', 'user', 'User', 'profiles', 'accounts',
+                
+                // Booking variations
+                'bookings', 'booking', 'reservations', 'appointments', 'sessions',
+                
+                // Other common tables
+                'payments', 'reviews', 'messages', 'conversations', 'availability',
+                
+                // With schema prefix
+                'public.studios', 'public.equipment', 'public.users', 'public.bookings'
+            ];
+            
+            const foundTables = [];
+            const errors = [];
+            
+            for (const tableName of possibleTables) {
+                try {
+                    const { data, error, count } = await supabase
+                        .from(tableName)
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (!error) {
+                        foundTables.push({
+                            name: tableName,
+                            count: count || 0
+                        });
+                    } else {
+                        errors.push({
+                            table: tableName,
+                            error: error.message
+                        });
+                    }
+                } catch (e) {
+                    errors.push({
+                        table: tableName,
+                        error: e.message
+                    });
+                }
+            }
+            
+            // Show found tables
+            if (foundTables.length > 0) {
+                const tableList = foundTables
+                    .map(t => `<li class="flex justify-between"><span><strong>${t.name}</strong></span><span class="text-sm text-gray-600">${t.count} records</span></li>`)
+                    .join('');
+                
+                showResult('🎉 Found Tables!', 
+                    `<ul class="space-y-2">${tableList}</ul>`, 
+                    'success'
+                );
+                
+                // Now get sample data from found tables
+                for (const table of foundTables) {
+                    if (table.count > 0) {
+                        try {
+                            const { data, error } = await supabase
+                                .from(table.name)
+                                .select('*')
+                                .limit(3);
+                            
+                            if (!error && data && data.length > 0) {
+                                const columns = Object.keys(data[0]);
+                                const sampleHtml = data.map(row => {
+                                    const preview = columns.slice(0, 4).map(col => 
+                                        `<strong>${col}:</strong> ${row[col] || 'null'}`
+                                    ).join('<br>');
+                                    return `<div class="bg-gray-50 p-2 rounded mb-2 text-sm">${preview}</div>`;
+                                }).join('');
+                                
+                                showResult(`📊 Sample Data: ${table.name}`, 
+                                    `
+                                        <p class="mb-2"><strong>Columns:</strong> ${columns.join(', ')}</p>
+                                        <div class="mb-2"><strong>Sample Records:</strong></div>
+                                        ${sampleHtml}
+                                    `, 
+                                    'success'
+                                );
+                            }
+                        } catch (e) {
+                            // Skip sample data if error
+                        }
+                    }
+                }
+                
+                // Provide integration instructions
+                showResult('🔧 Integration Update Needed', 
+                    `
+                        <p class="mb-3">Great! I found your tables. Now I need to update the web app integration to use these exact table names:</p>
+                        <ul class="list-disc list-inside space-y-1 mb-3">
+                            ${foundTables.map(t => `<li><code class="bg-gray-100 px-2 py-1 rounded">${t.name}</code> (${t.count} records)</li>`).join('')}
+                        </ul>
+                        <p class="text-sm text-blue-700">I'll update the webapp-supabase.js file to use these table names automatically!</p>
+                    `, 
+                    'info'
+                );
+                
+            } else {
+                showResult('❌ No Tables Found', 
+                    `
+                        <p class="mb-3">Could not find any accessible tables. This could mean:</p>
+                        <ul class="list-disc list-inside space-y-1 mb-3">
+                            <li>Your database is empty (no tables created yet)</li>
+                            <li>All tables have RLS enabled with restrictive policies</li>
+                            <li>You're looking at the wrong database/project</li>
+                        </ul>
+                        <p class="text-sm"><strong>Next step:</strong> Check your Supabase dashboard Table Editor to see what tables actually exist.</p>
+                    `, 
+                    'error'
+                );
+                
+                // Show some common errors for debugging
+                const commonErrors = errors.slice(0, 5);
+                if (commonErrors.length > 0) {
+                    const errorList = commonErrors.map(e => 
+                        `<li><code>${e.table}</code>: ${e.error}</li>`
+                    ).join('');
+                    
+                    showResult('🔍 Sample Errors', 
+                        `<ul class="text-sm space-y-1">${errorList}</ul>`, 
+                        'warning'
+                    );
+                }
+            }
+        }
+
+        document.getElementById('discoverTables').addEventListener('click', discoverTables);
+        
+        // Auto-run on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(discoverTables, 1000);
+        });
+    </script>
+</body>
+</html>

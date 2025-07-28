@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Database - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">P</div>
+                        <span class="text-xl font-bold text-gray-900">PluggedIn</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-500 hover:text-gray-900">Home</a>
+                    <a href="explore.html" class="text-gray-500 hover:text-gray-900">Explore</a>
+                    <a href="search.html" class="text-gray-500 hover:text-gray-900">Search</a>
+                    <a href="bookings.html" class="text-gray-500 hover:text-gray-900">Bookings</a>
+                    <a href="equipment.html" class="text-purple-600 font-medium">Equipment</a>
+                    <a href="profile.html" class="text-gray-500 hover:text-gray-900">Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Equipment Database</h1>
+                <p class="text-gray-600 mt-2">Browse and manage studio equipment</p>
+            </div>
+            <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                Add Equipment
+            </button>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="mb-6"></div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" id="searchInput" placeholder="Search equipment..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div>
+                    <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Grid -->
+        <div id="equipmentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Equipment items will be loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <p class="text-gray-600 mt-4">Loading equipment...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <div class="text-6xl mb-4">🎵</div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No equipment found</h3>
+            <p class="text-gray-600">Try adjusting your search or filters.</p>
+        </div>
+    </div>
+
+    <script>
+        // Direct Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let allEquipment = [];
+        let filteredEquipment = [];
+        
+        // DOM elements
+        const equipmentGrid = document.getElementById('equipmentGrid');
+        const loadingState = document.getElementById('loadingState');
+        const emptyState = document.getElementById('emptyState');
+        const statusMessage = document.getElementById('statusMessage');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-200',
+                error: 'bg-red-100 text-red-800 border-red-200',
+                info: 'bg-blue-100 text-blue-800 border-blue-200'
+            };
+            
+            statusMessage.innerHTML = `
+                <div class="border rounded-lg p-4 ${colors[type]}">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        // Load equipment from Supabase
+        async function loadEquipment() {
+            try {
+                console.log('🎵 Loading equipment from Supabase...');
+                
+                // Show loading state
+                loadingState.classList.remove('hidden');
+                equipmentGrid.classList.add('hidden');
+                emptyState.classList.add('hidden');
+                
+                // Query equipment table directly
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .order('name');
+                
+                if (error) {
+                    console.error('❌ Equipment loading error:', error);
+                    throw error;
+                }
+                
+                console.log('✅ Equipment loaded:', data);
+                allEquipment = data || [];
+                filteredEquipment = [...allEquipment];
+                
+                // Hide loading state
+                loadingState.classList.add('hidden');
+                
+                if (allEquipment.length > 0) {
+                    showStatus(`✅ Loaded ${allEquipment.length} equipment items successfully!`, 'success');
+                    updateCategories();
+                    renderEquipment();
+                } else {
+                    showStatus('ℹ️ No equipment found in database.', 'info');
+                    showEmptyState();
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading equipment:', error);
+                loadingState.classList.add('hidden');
+                showStatus(`❌ Error loading equipment: ${error.message}`, 'error');
+                showEmptyState();
+            }
+        }
+        
+        // Update categories dropdown
+        function updateCategories() {
+            const categories = [...new Set(allEquipment.map(item => item.category))].filter(Boolean);
+            
+            categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+        
+        // Render equipment grid
+        function renderEquipment() {
+            if (filteredEquipment.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            equipmentGrid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            equipmentGrid.innerHTML = filteredEquipment.map(item => `
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-t-lg">
+                        <img src="${item.image_url || 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(item.name)}" 
+                             alt="${item.name}" 
+                             class="w-full h-48 object-cover rounded-t-lg">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-1">${item.name}</h3>
+                        <p class="text-sm text-gray-600 mb-2">${item.brand} ${item.model || ''}</p>
+                        <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mb-2">
+                            ${item.category || 'Uncategorized'}
+                        </span>
+                        <p class="text-sm text-gray-600">${item.description || 'No description available'}</p>
+                        ${item.room ? `<p class="text-xs text-gray-500 mt-2">📍 ${item.room}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Show empty state
+        function showEmptyState() {
+            equipmentGrid.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+        }
+        
+        // Filter equipment
+        function filterEquipment() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+            
+            filteredEquipment = allEquipment.filter(item => {
+                const matchesSearch = !searchTerm || 
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    (item.brand && item.brand.toLowerCase().includes(searchTerm)) ||
+                    (item.model && item.model.toLowerCase().includes(searchTerm)) ||
+                    (item.description && item.description.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            renderEquipment();
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', filterEquipment);
+        categoryFilter.addEventListener('change', filterEquipment);
+        
+        // Load equipment on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎵 Equipment page loaded');
+            loadEquipment();
+        });
+    </script>
+</body>
+</html>

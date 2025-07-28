@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct SQL Executor - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Direct SQL Executor</h1>
+        
+        <!-- Status Messages -->
+        <div id="statusMessage" class="mb-6"></div>
+        
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button id="createEquipmentTable" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm">
+                    Create Equipment Table
+                </button>
+                <button id="insertSampleData" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                    Insert Sample Data
+                </button>
+                <button id="checkEquipmentTable" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-sm">
+                    Check Equipment Table
+                </button>
+                <button id="testEquipmentQuery" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm">
+                    Test Equipment Query
+                </button>
+            </div>
+        </div>
+        
+        <!-- Manual SQL Execution -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Manual SQL Execution</h2>
+            <textarea id="sqlInput" class="w-full h-32 p-4 border border-gray-300 rounded-lg font-mono text-sm" 
+                      placeholder="Enter your SQL query here..."></textarea>
+            <div class="mt-4">
+                <button id="executeSql" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                    Execute SQL
+                </button>
+                <button id="clearSql" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 ml-2">
+                    Clear
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold mb-4">Results</h2>
+            <pre id="results" class="bg-gray-100 p-4 rounded-lg text-sm overflow-auto max-h-96 whitespace-pre-wrap"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // DOM elements
+        const statusMessage = document.getElementById('statusMessage');
+        const results = document.getElementById('results');
+        const sqlInput = document.getElementById('sqlInput');
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-200',
+                error: 'bg-red-100 text-red-800 border-red-200',
+                info: 'bg-blue-100 text-blue-800 border-blue-200',
+                warning: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+            };
+            
+            statusMessage.innerHTML = `
+                <div class="border rounded-lg p-4 ${colors[type]}">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        // Log to results
+        function logResult(message) {
+            results.textContent += message + '\n';
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        // Clear results
+        function clearResults() {
+            results.textContent = '';
+        }
+        
+        // Execute SQL using Supabase RPC
+        async function executeSQL(sql) {
+            try {
+                logResult('🔍 Executing SQL...');
+                logResult('SQL: ' + sql);
+                logResult('---');
+                
+                // Try to execute using RPC
+                const { data, error } = await supabase.rpc('execute_sql', { sql_query: sql });
+                
+                if (error) {
+                    logResult('❌ SQL execution failed: ' + error.message);
+                    showStatus('❌ SQL execution failed: ' + error.message, 'error');
+                    return false;
+                } else {
+                    logResult('✅ SQL executed successfully!');
+                    if (data) {
+                        logResult('Result: ' + JSON.stringify(data, null, 2));
+                    }
+                    showStatus('✅ SQL executed successfully!', 'success');
+                    return true;
+                }
+            } catch (err) {
+                logResult('❌ Error executing SQL: ' + err.message);
+                showStatus('❌ Error executing SQL: ' + err.message, 'error');
+                return false;
+            }
+        }
+        
+        // Create equipment table using direct insert approach
+        async function createEquipmentTable() {
+            clearResults();
+            logResult('🔨 Creating equipment table using direct approach...');
+            
+            try {
+                // First, try to insert a test record to see if table exists
+                const testData = {
+                    name: 'Test Equipment',
+                    brand: 'Test Brand',
+                    category: 'Test'
+                };
+                
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .insert([testData])
+                    .select();
+                
+                if (error) {
+                    if (error.code === '42P01') {
+                        logResult('❌ Equipment table does not exist (as expected)');
+                        logResult('⚠️ You need to create the table manually in Supabase SQL Editor');
+                        logResult('');
+                        logResult('📋 Copy and paste this SQL in your Supabase SQL Editor:');
+                        logResult('');
+                        
+                        const createTableSQL = `-- Create equipment table
+CREATE TABLE IF NOT EXISTS equipment (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT,
+    model TEXT,
+    category TEXT,
+    studio_id TEXT,
+    room TEXT,
+    description TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE equipment ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Allow public read access" ON equipment
+FOR SELECT USING (true);
+
+CREATE POLICY "Allow public insert access" ON equipment
+FOR INSERT WITH CHECK (true);`;
+                        
+                        logResult(createTableSQL);
+                        showStatus('⚠️ Equipment table does not exist. Please run the SQL shown in results in your Supabase SQL Editor.', 'warning');
+                    } else {
+                        logResult('❌ Unexpected error: ' + error.message);
+                        showStatus('❌ Unexpected error: ' + error.message, 'error');
+                    }
+                } else {
+                    logResult('✅ Equipment table already exists!');
+                    logResult('🗑️ Cleaning up test data...');
+                    
+                    // Clean up test data
+                    await supabase
+                        .from('equipment')
+                        .delete()
+                        .eq('name', 'Test Equipment');
+                    
+                    showStatus('✅ Equipment table already exists!', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Error checking equipment table: ' + err.message);
+                showStatus('❌ Error checking equipment table: ' + err.message, 'error');
+            }
+        }
+        
+        // Insert sample data
+        async function insertSampleData() {
+            clearResults();
+            logResult('📝 Inserting sample equipment data...');
+            
+            const sampleData = [
+                {
+                    name: 'Yamaha Grand Piano',
+                    brand: 'Yamaha',
+                    model: 'C7X',
+                    category: 'Piano',
+                    studio_id: 'studio_1',
+                    room: 'Main Room',
+                    description: 'Professional 7-foot grand piano with exceptional sound quality',
+                    image_url: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400'
+                },
+                {
+                    name: 'Neumann U87 Microphone',
+                    brand: 'Neumann',
+                    model: 'U87',
+                    category: 'Microphone',
+                    studio_id: 'studio_1',
+                    room: 'Vocal Booth',
+                    description: 'Industry-standard large-diaphragm condenser microphone',
+                    image_url: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400'
+                },
+                {
+                    name: 'SSL 4000 Series Console',
+                    brand: 'SSL',
+                    model: '4000E',
+                    category: 'Mixing Console',
+                    studio_id: 'studio_1',
+                    room: 'Control Room',
+                    description: 'Legendary analog mixing console used on countless hit records',
+                    image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400'
+                },
+                {
+                    name: 'Fender Stratocaster',
+                    brand: 'Fender',
+                    model: 'American Professional II',
+                    category: 'Guitar',
+                    studio_id: 'studio_2',
+                    room: 'Live Room',
+                    description: 'Classic electric guitar with versatile tone options',
+                    image_url: 'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400'
+                },
+                {
+                    name: 'Roland TR-808 Drum Machine',
+                    brand: 'Roland',
+                    model: 'TR-808',
+                    category: 'Drum Machine',
+                    studio_id: 'studio_2',
+                    room: 'Production Room',
+                    description: 'Iconic drum machine that shaped modern music production',
+                    image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400'
+                }
+            ];
+            
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .insert(sampleData)
+                    .select();
+                
+                if (error) {
+                    logResult('❌ Failed to insert data: ' + error.message);
+                    showStatus('❌ Failed to insert data: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Sample data inserted successfully!');
+                    logResult('📊 Inserted ' + sampleData.length + ' equipment items');
+                    showStatus('✅ Sample data inserted successfully!', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Error inserting data: ' + err.message);
+                showStatus('❌ Error inserting data: ' + err.message, 'error');
+            }
+        }
+        
+        // Check equipment table
+        async function checkEquipmentTable() {
+            clearResults();
+            logResult('🔍 Checking equipment table...');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .select('count(*)', { count: 'exact' });
+                
+                if (error) {
+                    logResult('❌ Equipment table check failed: ' + error.message);
+                    showStatus('❌ Equipment table check failed: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Equipment table exists!');
+                    logResult('📊 Equipment count: ' + (data?.[0]?.count || 0));
+                    showStatus('✅ Equipment table exists!', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Error checking equipment table: ' + err.message);
+                showStatus('❌ Error checking equipment table: ' + err.message, 'error');
+            }
+        }
+        
+        // Test equipment query
+        async function testEquipmentQuery() {
+            clearResults();
+            logResult('🔍 Testing equipment query...');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .order('name');
+                
+                if (error) {
+                    logResult('❌ Query failed: ' + error.message);
+                    showStatus('❌ Query failed: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Query successful!');
+                    logResult('📊 Found ' + data.length + ' equipment items:');
+                    data.forEach((item, index) => {
+                        logResult(`  ${index + 1}. ${item.name} (${item.brand} ${item.model || ''})`);
+                    });
+                    showStatus('✅ Query successful! Found ' + data.length + ' items', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Query error: ' + err.message);
+                showStatus('❌ Query error: ' + err.message, 'error');
+            }
+        }
+        
+        // Execute manual SQL
+        async function executeManualSQL() {
+            const sql = sqlInput.value.trim();
+            if (!sql) {
+                showStatus('⚠️ Please enter a SQL query', 'warning');
+                return;
+            }
+            
+            clearResults();
+            await executeSQL(sql);
+        }
+        
+        // Clear SQL input
+        function clearSQL() {
+            sqlInput.value = '';
+        }
+        
+        // Event listeners
+        document.getElementById('createEquipmentTable').addEventListener('click', createEquipmentTable);
+        document.getElementById('insertSampleData').addEventListener('click', insertSampleData);
+        document.getElementById('checkEquipmentTable').addEventListener('click', checkEquipmentTable);
+        document.getElementById('testEquipmentQuery').addEventListener('click', testEquipmentQuery);
+        document.getElementById('executeSql').addEventListener('click', executeManualSQL);
+        document.getElementById('clearSql').addEventListener('click', clearSQL);
+        
+        // Initial status
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('Ready to manage equipment table. Click "Create Equipment Table" to start.', 'info');
+        });
+    </script>
+</body>
+</html>

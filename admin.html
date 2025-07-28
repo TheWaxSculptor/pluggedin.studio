@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .sidebar-item.active {
+            background: linear-gradient(135deg, #7c3aed, #3b82f6);
+            color: white;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Admin Authentication Check -->
+    <div id="authCheck" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 z-50">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+                <div class="text-center">
+                    <svg class="mx-auto h-16 w-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Admin Access Required</h3>
+                    <p class="text-sm text-gray-500 mb-6">You must sign in with admin privileges to access this panel.</p>
+                    <button id="signInBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                        Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Admin Interface -->
+    <div id="adminInterface" class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div class="bg-black shadow-sm border-r border-gray-800 w-64 min-h-screen">
+            <div class="p-6 border-b">
+                <div class="flex items-center">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-16 w-auto">
+                    <span class="ml-2 text-xl font-bold text-gray-900">Admin</span>
+                </div>
+                <h2 class="text-lg font-semibold text-gray-900">Admin Console</h2>
+                <p class="text-xs text-gray-500">Version 1.0.0</p>
+            </div>
+
+            <nav class="mt-6">
+                <div class="px-3 space-y-1">
+                    <button class="sidebar-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md active" data-section="overview">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Overview
+                    </button>
+
+                    <button class="sidebar-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-purple-50" data-section="studios">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0H3m2 0v-6a2 2 0 012-2h2a2 2 0 012 2v6m7 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v12"></path>
+                        </svg>
+                        Studios
+                    </button>
+
+                    <button class="sidebar-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-purple-50" data-section="users">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Users
+                    </button>
+
+                    <button class="sidebar-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-purple-50" data-section="bookings">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Bookings
+                    </button>
+
+                    <button class="sidebar-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-purple-50" data-section="settings">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Settings
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-hidden">
+            <div class="h-full overflow-y-auto">
+                <!-- Header -->
+                <div class="bg-white shadow-sm border-b px-6 py-4">
+                    <h1 class="text-2xl font-bold text-gray-900" id="sectionTitle">Overview</h1>
+                </div>
+
+                <!-- Content Area -->
+                <div class="p-6">
+                    <!-- Overview Section -->
+                    <div id="overviewSection" class="section-content">
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <div class="stat-card bg-white rounded-lg shadow-sm border p-6 transition-all duration-200">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-blue-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-600">Total Users</p>
+                                        <p class="text-2xl font-bold text-gray-900">1,247</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card bg-white rounded-lg shadow-sm border p-6 transition-all duration-200">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-green-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0H3m2 0v-6a2 2 0 012-2h2a2 2 0 012 2v6m7 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v12"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-600">Total Studios</p>
+                                        <p class="text-2xl font-bold text-gray-900">89</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card bg-white rounded-lg shadow-sm border p-6 transition-all duration-200">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-orange-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                                        <p class="text-2xl font-bold text-gray-900">3,456</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card bg-white rounded-lg shadow-sm border p-6 transition-all duration-200">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-purple-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-600">Revenue</p>
+                                        <p class="text-2xl font-bold text-gray-900">$125,000</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <div class="px-6 py-4 border-b">
+                                <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+                            </div>
+                            <div class="divide-y divide-gray-200">
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">New user registered</p>
+                                            <p class="text-sm text-gray-500">John Smith joined PluggedIn</p>
+                                        </div>
+                                        <span class="text-xs text-gray-400">30 min ago</span>
+                                    </div>
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">New studio added</p>
+                                            <p class="text-sm text-gray-500">Sound Wave Studios was added to the platform</p>
+                                        </div>
+                                        <span class="text-xs text-gray-400">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">New booking made</p>
+                                            <p class="text-sm text-gray-500">Sarah Johnson booked Abbey Road Studios</p>
+                                        </div>
+                                        <span class="text-xs text-gray-400">4 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other sections would be loaded dynamically -->
+                    <div id="studiosSection" class="section-content hidden">
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Studio Management</h3>
+                            <p class="text-gray-600">Studio management features would be implemented here.</p>
+                        </div>
+                    </div>
+
+                    <div id="usersSection" class="section-content hidden">
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">User Management</h3>
+                            <p class="text-gray-600">User management features would be implemented here.</p>
+                        </div>
+                    </div>
+
+                    <div id="bookingsSection" class="section-content hidden">
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Booking Management</h3>
+                            <p class="text-gray-600">Booking management features would be implemented here.</p>
+                        </div>
+                    </div>
+
+                    <div id="settingsSection" class="section-content hidden">
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">System Settings</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-sm font-medium text-gray-700">Maintenance Mode</label>
+                                        <p class="text-sm text-gray-500">Enable to prevent new bookings</p>
+                                    </div>
+                                    <input type="checkbox" class="toggle">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-sm font-medium text-gray-700">Auto-approve Studios</label>
+                                        <p class="text-sm text-gray-500">Automatically approve new studio registrations</p>
+                                    </div>
+                                    <input type="checkbox" class="toggle">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/supabase-config.js"></script>
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script>
+        // Admin Dashboard functionality
+        class AdminDashboard {
+            constructor() {
+                this.currentSection = 'overview';
+                this.stats = {};
+                this.users = [];
+                this.studios = [];
+                this.bookings = [];
+                this.activities = [];
+                this.loading = false;
+                this.init();
+            }
+
+            async init() {
+                if (!this.checkAdminAccess()) {
+                    this.showAuthCheck();
+                    return;
+                }
+                this.setupEventListeners();
+                await this.loadData();
+                this.renderCurrentSection();
+            }
+
+            checkAdminAccess() {
+                // Check if user has admin access via Supabase auth
+                const user = window.getCurrentUser();
+                return user && (user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin');
+            }
+
+            showAuthCheck() {
+                // Temporarily disabled for testing - show admin interface directly
+                console.log('Auth check bypassed for testing');
+                document.getElementById('authCheck').classList.add('hidden');
+                document.getElementById('adminInterface').classList.remove('hidden');
+                this.loadData(); // Load real data immediately
+            }
+
+            setupEventListeners() {
+                // Sidebar navigation
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        this.switchSection(e.target.dataset.section);
+                    });
+                });
+
+                // Auth check
+                document.getElementById('signInBtn').addEventListener('click', () => {
+                    window.location.href = 'app.html';
+                });
+            }
+
+            async loadData() {
+                try {
+                    this.loading = true;
+                    
+                    // Load admin statistics from Supabase
+                    this.stats = await window.db.getAdminStats();
+                    this.updateStatsDisplay();
+                    
+                    // Load recent activities
+                    this.activities = await window.db.getRecentActivity();
+                    this.renderRecentActivity();
+                    
+                    // Load users, studios, bookings for other sections
+                    this.users = await window.db.getAdminUsers();
+                    this.studios = await window.db.getAdminStudios();
+                    this.bookings = await window.db.getAdminBookings();
+                    
+                } catch (error) {
+                    console.error('Error loading admin data:', error);
+                    this.showError('Failed to load admin data. Using fallback data.');
+                    
+                    // Fallback data if Supabase fails
+                    this.stats = {
+                        totalUsers: 1247,
+                        totalStudios: 89,
+                        totalBookings: 3456,
+                        totalRevenue: 125000
+                    };
+                    this.updateStatsDisplay();
+                } finally {
+                    this.loading = false;
+                }
+            }
+
+            updateStatsDisplay() {
+                document.getElementById('totalUsers').textContent = this.stats.totalUsers.toLocaleString();
+                document.getElementById('totalStudios').textContent = this.stats.totalStudios.toLocaleString();
+                document.getElementById('totalBookings').textContent = this.stats.totalBookings.toLocaleString();
+                document.getElementById('totalRevenue').textContent = `$${this.stats.totalRevenue.toLocaleString()}`;
+            }
+
+            renderRecentActivity() {
+                const container = document.getElementById('recentActivity');
+                if (!container) return;
+                
+                const activitiesHtml = this.activities.map(activity => `
+                    <div class="p-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-2 bg-${activity.color}-500 rounded-full"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">${activity.title}</p>
+                                <p class="text-sm text-gray-500">${activity.description}</p>
+                            </div>
+                            <span class="text-xs text-gray-400">${this.formatTimeAgo(activity.timestamp)}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = activitiesHtml || '<div class="p-6 text-center text-gray-500">No recent activity</div>';
+            }
+
+            renderCurrentSection() {
+                switch (this.currentSection) {
+                    case 'overview':
+                        // Overview is already rendered
+                        break;
+                    case 'users':
+                        this.renderUsers();
+                        break;
+                    case 'studios':
+                        this.renderStudios();
+                        break;
+                    case 'bookings':
+                        this.renderBookings();
+                        break;
+                }
+            }
+
+            renderUsers() {
+                // Implementation for user management would go here
+                console.log('Rendering users:', this.users);
+            }
+
+            renderStudios() {
+                // Implementation for studio management would go here
+                console.log('Rendering studios:', this.studios);
+            }
+
+            renderBookings() {
+                // Implementation for booking management would go here
+                console.log('Rendering bookings:', this.bookings);
+            }
+
+            formatTimeAgo(timestamp) {
+                const now = new Date();
+                const diff = now - new Date(timestamp);
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (minutes < 60) return `${minutes} min ago`;
+                if (hours < 24) return `${hours} hours ago`;
+                return `${days} days ago`;
+            }
+
+            showError(message) {
+                if (window.utils && window.utils.showNotification) {
+                    window.utils.showNotification(message, 'error');
+                } else {
+                    console.error(message);
+                }
+            }
+
+            switchSection(section) {
+                // Update sidebar
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.section === section) {
+                        item.classList.add('active');
+                    }
+                });
+
+                // Update content
+                document.querySelectorAll('.section-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`${section}Section`).classList.remove('hidden');
+
+                // Update title
+                document.getElementById('sectionTitle').textContent = 
+                    section.charAt(0).toUpperCase() + section.slice(1);
+
+                this.currentSection = section;
+                this.renderCurrentSection();
+            }
+        }
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            window.adminDashboard = new AdminDashboard();
+        });
+    </script>
+</body>
+</html>

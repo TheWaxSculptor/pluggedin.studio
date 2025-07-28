@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PluggedIn Studio - Book Your Perfect Recording Space</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/featured-studios.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/script.js" defer></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black shadow-sm border-b border-gray-800" aria-label="Main Navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-24 w-auto">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="searchBtn" class="text-white hover:text-gray-300" title="Search studios" aria-label="Search for recording studios">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="bg-transparent text-white px-4 py-2 rounded-lg border border-white hover:bg-white hover:bg-opacity-10 transition-colors" onclick="showRegisterModal()" title="Register">
+                        Register
+                    </button>
+                    <button class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors" onclick="showSignInModal()" title="Sign In">
+                        Sign In
+                    </button>
+                    <div id="userMenu" class="hidden relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-white hover:text-gray-300">
+                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                                <span id="userInitials" class="text-black text-sm font-medium"></span>
+                                <span id="userInitials" class="text-white text-sm font-medium"></span>
+                            </div>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                            <a href="#" id="profileLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <a href="#" id="bookingsLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Bookings</a>
+                            <a href="#" id="signOutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Section with Airbnb-style Search -->
+        <div class="bg-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Main Heading -->
+                <div class="text-center mb-12">
+                    <h1 class="text-5xl font-bold text-gray-900 mb-4">Find Your Perfect Recording Space</h1>
+                    <p class="text-xl text-gray-600">Discover professional studios and home setups for your next session</p>
+                </div>
+                
+                <!-- Airbnb-style Search Bar -->
+                <div class="max-w-4xl mx-auto">
+                    <!-- Piano Key Search Bar -->
+                    <div class="relative max-w-4xl mx-auto">
+                        <!-- Piano Keyboard Container -->
+                        <div class="flex items-end bg-black rounded-lg shadow-2xl p-1 relative">
+                            <!-- White Piano Keys (Main Inputs) -->
+                            <div class="flex flex-1">
+                                <!-- Where Key -->
+                                <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 border-r border-gray-200 rounded-l-lg">
+                                    <div class="px-4 py-6">
+                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Where</label>
+                                        <input type="text" placeholder="Search studios" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                    </div>
+                                </div>
+                                
+                                <!-- Check In Key -->
+                                <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 border-r border-gray-200">
+                                    <div class="px-4 py-6">
+                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Check in</label>
+                                        <input type="text" placeholder="Add dates" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                    </div>
+                                </div>
+                                
+                                <!-- Check Out Key -->
+                                <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 border-r border-gray-200">
+                                    <div class="px-4 py-6">
+                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Check out</label>
+                                        <input type="text" placeholder="Add dates" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                    </div>
+                                </div>
+                                
+                                <!-- Who Key -->
+                                <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 rounded-r-lg">
+                                    <div class="px-4 py-6">
+                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Who</label>
+                                        <input type="text" placeholder="Add guests" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Black Piano Key (Search Button) - Narrower like a real piano key -->
+                            <div class="absolute right-2 top-1 bottom-1/3">
+                                <button class="piano-key black-key bg-black hover:bg-gray-800 text-white transition-all duration-200 rounded-b-lg shadow-lg h-full flex items-center justify-center w-16" onclick="window.location.href='search.html'">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="flex flex-wrap justify-center gap-3 mt-8">
+                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Professional Studios</button>
+                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Home Studios</button>
+                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">24/7 Access</button>
+                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Parking Available</button>
+                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Live Room</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Tags Section -->
+        <section class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Popular Categories</h2>
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <button class="tag-btn" data-tag="vocal-recording">Vocal Recording</button>
+                    <button class="tag-btn" data-tag="mixing">Mixing</button>
+                    <button class="tag-btn" data-tag="mastering">Mastering</button>
+                    <button class="tag-btn" data-tag="podcast">Podcast</button>
+                    <button class="tag-btn" data-tag="live-room">Live Room</button>
+                    <button class="tag-btn" data-tag="piano">Piano</button>
+                    <button class="tag-btn" data-tag="drums">Drums</button>
+                    <button class="tag-btn" data-tag="vintage-gear">Vintage Gear</button>
+                    <button class="tag-btn" data-tag="production">Production</button>
+                    <button class="tag-btn" data-tag="rehearsal">Rehearsal</button>
+                </div>
+                
+                <!-- Active Tags Display -->
+                <div id="activeTagsContainer" class="hidden mb-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Active Filters:</h3>
+                    <div id="activeTags" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Studios Section - Airbnb Style -->
+        <section class="py-12">
+            <div class="container mx-auto px-4">
+                <!-- Heading and View All -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Featured Studios</h2>
+                    <a href="explore.html" class="text-gray-900 hover:text-black font-medium flex items-center">
+                        View All
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Category Pills - Airbnb style filter tabs -->
+                <div class="mb-8 overflow-x-auto hide-scrollbar">
+                    <div class="flex space-x-4 pb-2" id="categoryFilters">
+                        <button class="category-filter flex flex-col items-center focus:outline-none active-category" data-category="all">
+                            <div class="w-12 h-12 mb-1 rounded-full flex items-center justify-center bg-black text-white">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">All</span>
+                        </button>
+                        <button class="category-filter flex flex-col items-center focus:outline-none" data-category="professional">
+                            <div class="w-12 h-12 mb-1 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">Professional</span>
+                        </button>
+                        <button class="category-filter flex flex-col items-center focus:outline-none" data-category="home">
+                            <div class="w-12 h-12 mb-1 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">Home</span>
+                        </button>
+                        <button class="category-filter flex flex-col items-center focus:outline-none" data-category="mixing">
+                            <div class="w-12 h-12 mb-1 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11l7-7 7 7M5 19l7-7 7 7"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">Mixing</span>
+                        </button>
+                        <button class="category-filter flex flex-col items-center focus:outline-none" data-category="mastering">
+                            <div class="w-12 h-12 mb-1 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11l7-7 7 7M5 19l7-7 7 7"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">Mastering</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Studio Cards with Horizontal Scroll -->
+                <div class="relative">
+                    <!-- Left scroll button -->
+                    <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-lg z-10 flex items-center justify-center" 
+                        id="featuredScrollLeft"
+                        aria-label="Scroll left to view more studios"
+                        title="Scroll left">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span class="sr-only">Scroll left</span>
+                    </button>
+                    
+                    <!-- Scrollable container -->
+                    <div class="flex overflow-x-auto space-x-4 pb-6 hide-scrollbar scroll-smooth" id="featuredStudiosCarousel">
+                        <!-- Studio cards will be populated by JavaScript -->
+                        <div class="w-full flex justify-center items-center py-8">
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right scroll button -->
+                    <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-lg z-10 flex items-center justify-center" 
+                        id="featuredScrollRight"
+                        aria-label="Scroll right to view more studios"
+                        title="Scroll right">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        <span class="sr-only">Scroll right</span>
+                    </button>
+                </div>
+                
+                <!-- Studio Promotion Banner -->
+                <div class="mt-12 mb-6 bg-gradient-to-r from-gray-900 to-black rounded-xl overflow-hidden shadow-xl">
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Left content with equipment highlights -->
+                        <div class="p-8 md:w-2/3">
+                            <h3 class="text-2xl font-bold text-white mb-4">Premium Recording Equipment</h3>
+                            <p class="text-gray-300 mb-6">Discover studios with professional-grade equipment:</p>
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                                <!-- Equipment Badges -->
+                                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-3 flex items-center space-x-2">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">SSL</div>
+                                    <span class="text-white">SSL Consoles</span>
+                                </div>
+                                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-3 flex items-center space-x-2">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">SM7</div>
+                                    <span class="text-white">Shure SM7B</span>
+                                </div>
+                                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-3 flex items-center space-x-2">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">AP</div>
+                                    <span class="text-white">Apollo Interfaces</span>
+                                </div>
+                                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-3 flex items-center space-x-2">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">NE</div>
+                                    <span class="text-white">Neumann Mics</span>
+                                </div>
+                                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-3 flex items-center space-x-2">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">AKG</div>
+                                    <span class="text-white">AKG Classics</span>
+                                </div>
+                                <div class="bg-gray-800 bg-opacity-50 rounded-lg p-3 flex items-center space-x-2">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">1176</div>
+                                    <span class="text-white">1176 Compressors</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right content with CTA -->
+                        <div class="bg-gradient-to-r from-gray-800 to-gray-900 p-8 md:w-1/3 flex flex-col justify-center">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-yellow-400 mb-2">Featured Studio Opportunity</span>
+                            <h3 class="text-xl font-bold text-white mb-3">Pro Studios Get Featured</h3>
+                            <p class="text-gray-300 mb-4">Showcase your professional studio equipment and get priority placement in our featured section!</p>
+                            <div class="flex space-x-3">
+                                <a href="#" class="px-5 py-2 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors">Get Featured</a>
+                                <a href="#" class="px-5 py-2 border border-white text-white font-bold rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">Learn More</a>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-3">Both professional and home studios welcome on PluggedIn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recently Added Section -->
+        <section class="py-12">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900">Recently Added</h2>
+                <a href="explore.html" class="text-gray-900 hover:underline font-medium">Show all</a>
+            </div>
+            <div id="recentlyAddedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Airbnb-style Studio Cards will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Booking and Availability Section -->
+        <section class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900">Quick Booking</h2>
+                    <a href="bookings.html" class="text-gray-900 hover:underline font-medium">View All Bookings</a>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Featured Studio for Quick Booking -->
+                    <div class="bg-white rounded-lg overflow-hidden shadow-md" id="featuredBookingStudio">
+                        <div class="relative pb-48 overflow-hidden">
+                            <img id="featuredStudioImg" class="absolute inset-0 h-full w-full object-cover" src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" alt="Featured recording studio">
+                        </div>
+                        <div class="p-6">
+                            <h3 id="featuredStudioName" class="text-xl font-semibold text-gray-900 mb-2">Loading Featured Studio...</h3>
+                            <p id="featuredStudioDesc" class="text-gray-600 text-sm mb-4">Professional recording space with top equipment</p>
+                            <div class="flex items-center mb-4">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span id="featuredStudioRating" class="text-gray-700 text-sm ml-1">4.9 (120 reviews)</span>
+                                </div>
+                                <span class="mx-2 text-gray-500">•</span>
+                                <span id="featuredStudioPrice" class="text-gray-700 text-sm">From $45/hour</span>
+                            </div>
+                            <button id="viewAvailabilityBtn" class="w-full bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+                                View Availability
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Availability Calendar Container -->
+                    <div id="availabilityCalendarContainer" class="bg-white rounded-lg shadow-md p-6">
+                        <div class="text-center py-8" id="calendarPlaceholder">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No studio selected</h3>
+                            <p class="mt-1 text-sm text-gray-500">Select a studio to view availability and book.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top Booked Studios -->
+                <div class="mt-12">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Most Booked Studios</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="topBookedStudios">
+                        <!-- Top booked studios will be loaded here -->
+                        <div class="animate-pulse bg-white rounded-lg shadow p-4">
+                            <div class="h-24 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                        <div class="animate-pulse bg-white rounded-lg shadow p-4">
+                            <div class="h-24 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                        <div class="animate-pulse bg-white rounded-lg shadow p-4">
+                            <div class="h-24 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Studio Grid -->
+        <div id="studioGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <!-- Studios will be loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden text-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading studios...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No studios found</h3>
+            <p class="mt-1 text-sm text-gray-500">Try adjusting your search criteria.</p>
+        </div>
+    </main>
+
+    <!-- Studio Detail Modal -->
+    <div id="studioModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="modalStudioName" class="text-lg font-medium text-gray-900"></h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600" title="Close modal" aria-label="Close studio details modal">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="modalContent">
+                    <!-- Studio details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Sign In to PluggedIn</h3>
+                    <button id="closeAuthModal" class="text-gray-400 hover:text-gray-600" title="Close sign in modal" aria-label="Close sign in modal">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="authContent">
+                    <!-- Google Sign In Button -->
+                    <div class="mb-6">
+                        <button type="button" id="googleSignInBtn" 
+                                class="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Continue with Google
+                        </button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="relative mb-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+                        </div>
+                    </div>
+
+                    <!-- Email/Password Form -->
+                    <form id="authForm" class="space-y-4">
+                        <!-- Name field (only shown for sign up) -->
+                        <div id="nameField" class="hidden">
+                            <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" id="fullName" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" required 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" id="password" required 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
+                            <p id="passwordHelp" class="mt-1 text-xs text-gray-500 hidden">Password must be at least 6 characters long</p>
+                        </div>
+                        
+                        <!-- Confirm Password field (only shown for sign up) -->
+                        <div id="confirmPasswordField" class="hidden">
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                            <input type="password" id="confirmPassword" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
+                        </div>
+                        
+                        <!-- User Type Selection (only shown for sign up) -->
+                        <div id="userTypeField" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="userType" value="artist" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300" checked>
+                                    <span class="ml-2 text-sm text-gray-700">Artist/Musician looking for studios</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="userType" value="studio_owner" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300">
+                                    <span class="ml-2 text-sm text-gray-700">Studio owner wanting to list my space</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Remember Me / Terms (conditional) -->
+                        <div id="signInOptions" class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember" type="checkbox" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300 rounded">
+                                <label for="remember" class="ml-2 block text-sm text-gray-900">Remember me</label>
+                            </div>
+                            <div class="text-sm">
+                                <a href="#" id="forgotPasswordLink" class="font-medium text-gray-900 hover:text-black">Forgot password?</a>
+                            </div>
+                        </div>
+                        
+                        <div id="signUpOptions" class="hidden">
+                            <div class="flex items-center">
+                                <input id="agreeTerms" type="checkbox" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300 rounded" required>
+                                <label for="agreeTerms" class="ml-2 block text-sm text-gray-700">
+                                    I agree to the <a href="#" class="text-gray-900 hover:text-black underline">Terms of Service</a> and <a href="#" class="text-gray-900 hover:text-black underline">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <button type="submit" id="signInSubmit" 
+                                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                                <span id="submitBtnText">Sign In</span>
+                                <svg id="submitBtnSpinner" class="hidden animate-spin -mr-1 ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <span id="switchText" class="text-sm text-gray-600">Don't have an account? </span>
+                            <button type="button" id="switchToSignUp" class="text-sm font-medium text-gray-900 hover:text-black underline">Sign up</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="md:col-span-1">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="h-16 w-auto mb-4">
+                    <p class="text-gray-300 text-sm mb-4">Connecting artists with professional and home recording studios worldwide.</p>
+                    <div class="flex space-x-4">
+                        <a href="https://instagram.com/PluggedIn.StudioApp" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors" aria-label="Follow us on Instagram">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="https://x.com/PluggedFeed" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors" aria-label="Follow us on X">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- For Studios -->
+                <div>
+                    <h3 class="text-white font-semibold mb-4">For Studios</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">List Your Studio</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Studio Resources</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Equipment Management</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Booking Calendar</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Professional Tools</a></li>
+                    </ul>
+                </div>
+
+                <!-- For Artists -->
+                <div>
+                    <h3 class="text-white font-semibold mb-4">For Artists</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Find Studios</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Book Sessions</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Home Studios</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Equipment Rental</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Recording Tips</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Safety & Trust</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Community Guidelines</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Report Issue</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Trust & Safety Badges -->
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <h3 class="text-white text-center font-semibold mb-6">Trusted By Professional and Home Studios</h3>
+                
+                <!-- Professional Credibility Badges -->
+                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
+                    <!-- SSL Security Badge -->
+                    <div class="bg-gray-800 rounded-lg p-3 flex items-center space-x-2 text-gray-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="font-bold text-sm">SSL Secure</p>
+                            <p class="text-xs text-gray-400">256-bit encryption</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Verified Studios Badge -->
+                    <div class="bg-gray-800 rounded-lg p-3 flex items-center space-x-2 text-gray-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <div>
+                            <p class="font-bold text-sm">Verified Studios</p>
+                            <p class="text-xs text-gray-400">Quality Assurance</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Secure Payment Badge -->
+                    <div class="bg-gray-800 rounded-lg p-3 flex items-center space-x-2 text-gray-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="font-bold text-sm">Secure Payments</p>
+                            <p class="text-xs text-gray-400">Stripe Protection</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 24/7 Support Badge -->
+                    <div class="bg-gray-800 rounded-lg p-3 flex items-center space-x-2 text-gray-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                        <div>
+                            <p class="font-bold text-sm">24/7 Support</p>
+                            <p class="text-xs text-gray-400">Always Available</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Methods -->
+                <div class="flex justify-center space-x-4 mb-6">
+                    <span class="text-gray-300 font-medium text-sm">Accepted Payment Methods:</span>
+                    <div class="flex space-x-3">
+                        <span class="text-gray-300 font-semibold">Visa</span>
+                        <span class="text-gray-300 font-semibold">Mastercard</span>
+                        <span class="text-gray-300 font-semibold">Amex</span>
+                        <span class="text-gray-300 font-semibold">Apple Pay</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Bar -->
+                <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                    <div class="flex space-x-6 mb-4 md:mb-0">
+                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>
+                    </div>
+                    <div>
+                        <p>&copy; 2025 Electatech - PluggedIn.studio. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script src="js/webapp-studios.js"></script>
+    <script src="js/webapp-booking.js"></script>
+    <script src="js/availability-calendar.js"></script>
+    <script src="js/webapp-calendar-integration.js"></script>
+    <script src="js/external-calendar-integration.js"></script>
+    <script src="js/webapp-featured-studios.js"></script>
+    <script src="js/webapp-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Database - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .equipment-card {
+            transition: all 0.2s ease;
+        }
+        .equipment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .category-button.active {
+            background: linear-gradient(135deg, #7c3aed, #3b82f6);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black shadow-sm border-b border-gray-800 sticky top-0 z-40" role="navigation" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-24 w-auto">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4" role="menubar">
+                    <a href="app.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Home</a>
+                    <a href="explore.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Explore</a>
+                    <a href="search.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Search</a>
+                    <a href="bookings.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Bookings</a>
+                    <a href="equipment.html" class="text-white font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem" aria-current="page">Equipment</a>
+                    <a href="profile.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Equipment Database</h1>
+                <p class="text-gray-600">Browse and manage studio equipment</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="equipmentGuideBtn" class="flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Guide</span>
+                </button>
+                <button id="addEquipmentBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    Add Equipment
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500" 
+                       placeholder="Search equipment...">
+            </div>
+        </div>
+
+        <!-- Category Selector -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
+            <div class="flex overflow-x-auto space-x-2 pb-2" id="categorySelector">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Results Count -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between">
+                <p class="text-gray-600">
+                    <span id="resultsCount">0</span> equipment items found
+                </p>
+                <select id="sortSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="name">Sort by Name</option>
+                    <option value="brand">Sort by Brand</option>
+                    <option value="category">Sort by Category</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Equipment Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="equipmentGrid">
+            <!-- Equipment cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No equipment found</h3>
+            <p class="mt-1 text-sm text-gray-500">Try adjusting your search or category filters.</p>
+        </div>
+    </main>
+
+    <!-- Add Equipment Modal -->
+    <div id="addEquipmentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-medium text-gray-900">Add Equipment</h3>
+                    <button id="closeAddModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="addEquipmentForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="equipmentCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            <option value="">Select Category</option>
+                            <option value="Microphone">Microphone</option>
+                            <option value="Audio Interface">Audio Interface</option>
+                            <option value="Studio Monitors">Studio Monitors</option>
+                            <option value="Headphones">Headphones</option>
+                            <option value="Synthesizer">Synthesizer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                        <input type="text" id="equipmentBrand" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="e.g., Shure, Neumann" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                        <input type="text" id="equipmentModel" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="e.g., SM7B, U87" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="equipmentDescription" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Brief description"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancelAdd" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                            Add Equipment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/supabase-config.js"></script>
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script>
+        // Equipment Management functionality
+        class EquipmentManager {
+            constructor() {
+                this.equipment = [];
+                this.filteredEquipment = [];
+                this.categories = ['Microphones', 'Instruments', 'Audio Interfaces', 'Monitors', 'Accessories'];
+                this.currentFilter = 'all';
+                this.currentSort = 'name';
+                this.loading = false;
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                await this.loadEquipment();
+                this.renderEquipment();
+                this.updateCategoryCounts();
+            }
+
+            setupEventListeners() {
+                // Search
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value;
+                    this.debounceSearch();
+                });
+
+                // Sort
+                document.getElementById('sortSelect').addEventListener('change', (e) => {
+                    this.sortBy = e.target.value;
+                    this.renderEquipment();
+                });
+
+                // Add Equipment Modal
+                document.getElementById('addEquipmentBtn').addEventListener('click', () => {
+                    this.showAddEquipmentModal();
+                });
+
+                document.getElementById('closeAddModal').addEventListener('click', () => {
+                    this.hideAddEquipmentModal();
+                });
+
+                document.getElementById('cancelAdd').addEventListener('click', () => {
+                    this.hideAddEquipmentModal();
+                });
+
+                document.getElementById('addEquipmentForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addEquipment();
+                });
+
+                // Equipment Guide
+                document.getElementById('equipmentGuideBtn').addEventListener('click', () => {
+                    this.showEquipmentGuide();
+                });
+            }
+
+            async loadEquipment() {
+                try {
+                    this.loading = true;
+                    this.showLoadingState();
+                    
+                    console.log('🎵 Starting equipment loading...');
+                    
+                    // Ensure Supabase and table detection are ready
+                    if (!window.db || !window.supabaseClient) {
+                        throw new Error('Supabase not initialized');
+                    }
+                    
+                    // Wait a moment for table detection to complete
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Load equipment from Supabase with explicit table name
+                    const filters = {
+                        category: this.currentFilter !== 'all' ? this.currentFilter : null,
+                        search: this.searchTerm || null
+                    };
+                    
+                    console.log('🔍 Loading equipment with filters:', filters);
+                    this.equipment = await window.db.getEquipment(filters);
+                    this.filteredEquipment = [...this.equipment];
+                    
+                    console.log('📦 Equipment loaded:', this.equipment.length, 'items');
+                    
+                    this.hideLoadingState();
+                    this.updateCategories();
+                    this.renderEquipment();
+                    
+                    // Show success message if we have real data
+                    if (this.equipment.length > 0) {
+                        this.showSuccess(`✅ Loaded ${this.equipment.length} equipment items from your database!`);
+                    } else {
+                        console.warn('⚠️ No equipment data found');
+                        this.showMigrationInstructions();
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Error loading equipment:', error);
+                    this.hideLoadingState();
+                    this.showError('Failed to load equipment from database. Please ensure equipment data has been migrated.');
+                    
+                    // Show migration instructions instead of fallback data
+                    this.showMigrationInstructions();
+                    this.equipment = [];
+                    this.updateCategories();
+                    this.renderEquipment();
+                }
+            }
+
+            updateCategories() {
+                this.categories = { 'All': this.equipment.length };
+                this.equipment.forEach(item => {
+                    if (item.category) {
+                        this.categories[item.category] = (this.categories[item.category] || 0) + 1;
+                    }
+                });
+            }
+
+            renderCategories() {
+                const container = document.getElementById('categorySelector');
+                container.innerHTML = Object.entries(this.categories).map(([category, count]) => `
+                    <button class="category-button px-4 py-2 rounded-full border border-gray-300 text-sm font-medium whitespace-nowrap ${category === this.selectedCategory ? 'active' : 'text-gray-700 bg-white hover:border-purple-300'}" 
+                            data-category="${category}">
+                        ${category} (${count})
+                    </button>
+                `).join('');
+
+                container.querySelectorAll('.category-button').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.selectedCategory = e.target.dataset.category;
+                        this.renderCategories();
+                        this.renderEquipment();
+                    });
+                });
+            }
+
+            renderEquipment() {
+                const filteredEquipment = this.getFilteredEquipment();
+                const sortedEquipment = this.sortEquipment(filteredEquipment);
+                
+                document.getElementById('resultsCount').textContent = sortedEquipment.length;
+                
+                const container = document.getElementById('equipmentGrid');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (sortedEquipment.length === 0) {
+                    container.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                emptyState.classList.add('hidden');
+                container.classList.remove('hidden');
+                
+                container.innerHTML = sortedEquipment.map(item => this.createEquipmentCard(item)).join('');
+            }
+
+            getFilteredEquipment() {
+                return this.equipment.filter(item => {
+                    if (this.selectedCategory !== 'All' && item.category !== this.selectedCategory) {
+                        return false;
+                    }
+                    
+                    if (this.searchTerm) {
+                        const term = this.searchTerm.toLowerCase();
+                        return item.name.toLowerCase().includes(term) ||
+                               item.brand.toLowerCase().includes(term) ||
+                               item.model.toLowerCase().includes(term) ||
+                               item.description.toLowerCase().includes(term);
+                    }
+                    
+                    return true;
+                });
+            }
+
+            sortEquipment(equipment) {
+                switch (this.sortBy) {
+                    case 'brand':
+                        return [...equipment].sort((a, b) => a.brand.localeCompare(b.brand));
+                    case 'category':
+                        return [...equipment].sort((a, b) => a.category.localeCompare(b.category));
+                    default:
+                        return [...equipment].sort((a, b) => `${a.brand} ${a.model}`.localeCompare(`${b.brand} ${b.model}`));
+                }
+            }
+
+            createEquipmentCard(item) {
+                return `
+                    <div class="equipment-card bg-white rounded-lg shadow-sm border overflow-hidden">
+                        <img src="${item.image}" alt="${item.brand} ${item.model}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900">${item.brand} ${item.model}</h3>
+                                <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">${item.category}</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${item.description}</p>
+                            <button class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            debounceSearch() {
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(() => {
+                    this.renderEquipment();
+                }, 300);
+            }
+
+            showAddEquipmentModal() {
+                document.getElementById('addEquipmentModal').classList.remove('hidden');
+            }
+
+            hideAddEquipmentModal() {
+                document.getElementById('addEquipmentModal').classList.add('hidden');
+                document.getElementById('addEquipmentForm').reset();
+            }
+
+            addEquipment() {
+                const category = document.getElementById('equipmentCategory').value;
+                const brand = document.getElementById('equipmentBrand').value;
+                const model = document.getElementById('equipmentModel').value;
+                const description = document.getElementById('equipmentDescription').value;
+
+                const newEquipment = {
+                    id: Date.now().toString(),
+                    name: category,
+                    brand,
+                    model,
+                    category,
+                    description,
+                    image: `https://via.placeholder.com/300x200?text=${encodeURIComponent(model)}`
+                };
+
+                this.equipment.push(newEquipment);
+                this.updateCategories();
+                this.renderCategories();
+                this.renderEquipment();
+                this.hideAddEquipmentModal();
+
+                // Show success message
+                this.showNotification('Equipment added successfully!');
+            }
+
+            showEquipmentGuide() {
+                alert('Equipment Guide: Learn about different types of studio equipment, their uses, and best practices for setup and maintenance.');
+            }
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+                errorDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                const container = document.querySelector('main');
+                container.insertBefore(errorDiv, container.firstChild);
+                
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
+            }
+
+            showSuccess(message) {
+                const successDiv = document.createElement('div');
+                successDiv.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4';
+                successDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                const container = document.querySelector('main');
+                container.insertBefore(successDiv, container.firstChild);
+                
+                setTimeout(() => {
+                    successDiv.remove();
+                }, 5000);
+            }
+
+            showMigrationInstructions() {
+                const instructionsDiv = document.createElement('div');
+                instructionsDiv.className = 'bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4';
+                instructionsDiv.innerHTML = `
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <p class="font-medium mb-2">No equipment data found in your database.</p>
+                            <p class="text-sm mb-2">To see your real equipment data here:</p>
+                            <ol class="text-sm list-decimal list-inside space-y-1 ml-4">
+                                <li>Open <a href="migrate-equipment-data.html" class="underline font-medium">Equipment Migration Tool</a></li>
+                                <li>Click "Start Equipment Migration" to import your iOS project equipment data</li>
+                                <li>Refresh this page to see your real equipment</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+                
+                const container = document.querySelector('main');
+                container.insertBefore(instructionsDiv, container.firstChild);
+            }
+
+            showLoadingState() {
+                const equipmentGrid = document.getElementById('equipmentGrid');
+                if (equipmentGrid) {
+                    equipmentGrid.innerHTML = `
+                        <div class="col-span-full flex items-center justify-center py-12">
+                            <div class="text-center">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                                <p class="text-gray-600">Loading equipment...</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            hideLoadingState() {
+                // Loading state will be replaced by renderEquipment()
+                this.loading = false;
+            }
+        }
+
+        // Load equipment on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Supabase integration
+            if (typeof window.db === 'undefined') {
+                console.log('Loading Supabase integration...');
+                const script = document.createElement('script');
+                script.src = 'js/webapp-supabase.js';
+                script.onload = () => {
+                    new EquipmentManager();
+                };
+                document.head.appendChild(script);
+            } else {
+                new EquipmentManager();
+            }
+        });
+    </script>
+</body>
+</html>

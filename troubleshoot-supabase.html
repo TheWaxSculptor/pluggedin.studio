@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Troubleshooter - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">🔧 Supabase Troubleshooter</h1>
+            <p class="text-gray-600 mb-4">Let's diagnose why we can't access your studios and equipment data</p>
+            
+            <div class="flex space-x-4">
+                <button id="runDiagnostic" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    🔍 Run Full Diagnostic
+                </button>
+                <button id="testRLS" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    🔒 Test RLS Policies
+                </button>
+                <button id="showSolution" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    💡 Show Solutions
+                </button>
+            </div>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://fdkrfyzcxhnhanodxopj.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+        );
+
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border p-6';
+            div.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">${title}</h3>
+                <div class="p-4 border rounded-lg ${colors[type]}">
+                    ${content}
+                </div>
+            `;
+            results.appendChild(div);
+        }
+
+        async function runFullDiagnostic() {
+            document.getElementById('results').innerHTML = '';
+            
+            // Test 1: Basic Connection
+            showResult('🔍 Step 1: Testing Basic Connection', 'Checking if we can connect to Supabase...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                showResult('✅ Connection Test', 'Successfully connected to Supabase!', 'success');
+            } catch (error) {
+                showResult('❌ Connection Failed', `Error: ${error.message}`, 'error');
+                return;
+            }
+            
+            // Test 2: Check if any tables are accessible
+            showResult('🔍 Step 2: Testing Table Access', 'Trying to access any table...', 'info');
+            
+            const commonTables = [
+                'users', 'profiles', 'auth.users',
+                'studios', 'studio', 'recording_studios', 'music_studios',
+                'equipment', 'equipments', 'gear', 'instruments',
+                'bookings', 'booking', 'reservations',
+                'public.users', 'public.studios', 'public.equipment'
+            ];
+            
+            let accessibleTables = [];
+            
+            for (const tableName of commonTables) {
+                try {
+                    const { data, error, count } = await supabase
+                        .from(tableName)
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (!error) {
+                        accessibleTables.push({ name: tableName, count: count || 0 });
+                    }
+                } catch (e) {
+                    // Continue
+                }
+            }
+            
+            if (accessibleTables.length > 0) {
+                const tableList = accessibleTables
+                    .map(t => `<li><strong>${t.name}</strong>: ${t.count} records</li>`)
+                    .join('');
+                showResult('✅ Found Accessible Tables', `<ul class="list-disc list-inside">${tableList}</ul>`, 'success');
+            } else {
+                showResult('❌ No Tables Accessible', 'Cannot access any tables. This is likely an RLS or permissions issue.', 'error');
+            }
+            
+            // Test 3: Check RLS Status
+            showResult('🔍 Step 3: Checking RLS Policies', 'Testing Row Level Security...', 'info');
+            
+            try {
+                // Try to get information about RLS
+                const { data, error } = await supabase.rpc('check_rls_status');
+                if (error && error.message.includes('function check_rls_status() does not exist')) {
+                    showResult('⚠️ RLS Check', 'Cannot check RLS status directly. This is normal.', 'warning');
+                }
+            } catch (e) {
+                // Expected
+            }
+            
+            // Test 4: Test with different approaches
+            showResult('🔍 Step 4: Testing Alternative Approaches', 'Trying different query methods...', 'info');
+            
+            // Try auth.users table (should always be accessible)
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    showResult('✅ Auth Working', `Authenticated as: ${user.email}`, 'success');
+                } else {
+                    showResult('⚠️ Not Authenticated', 'You are not signed in. This might be why tables are not accessible.', 'warning');
+                }
+            } catch (error) {
+                showResult('❌ Auth Error', `Authentication error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRLSPolicies() {
+            document.getElementById('results').innerHTML = '';
+            
+            showResult('🔒 RLS Policy Test', 'Testing if Row Level Security is blocking access...', 'info');
+            
+            const testTables = ['studios', 'studio', 'equipment', 'equipments'];
+            
+            for (const tableName of testTables) {
+                try {
+                    // Try to select without any conditions
+                    const { data, error } = await supabase
+                        .from(tableName)
+                        .select('*')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('RLS')) {
+                            showResult(`🔒 RLS Blocking: ${tableName}`, 
+                                `Row Level Security is preventing access to table "${tableName}". Error: ${error.message}`, 
+                                'error'
+                            );
+                        } else if (error.message.includes('does not exist')) {
+                            showResult(`❓ Table Missing: ${tableName}`, 
+                                `Table "${tableName}" does not exist in your database.`, 
+                                'warning'
+                            );
+                        } else {
+                            showResult(`❌ Access Error: ${tableName}`, 
+                                `Error accessing "${tableName}": ${error.message}`, 
+                                'error'
+                            );
+                        }
+                    } else {
+                        showResult(`✅ Accessible: ${tableName}`, 
+                            `Successfully accessed table "${tableName}" with ${data?.length || 0} records.`, 
+                            'success'
+                        );
+                    }
+                } catch (e) {
+                    showResult(`❌ Exception: ${tableName}`, 
+                        `Exception when accessing "${tableName}": ${e.message}`, 
+                        'error'
+                    );
+                }
+            }
+        }
+
+        function showSolutions() {
+            document.getElementById('results').innerHTML = '';
+            
+            showResult('💡 Solution 1: Check Your Supabase Dashboard', 
+                `
+                    <p class="mb-3"><strong>Go to your Supabase dashboard and check:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Go to <a href="https://supabase.com/dashboard/project/fdkrfyzcxhnhanodxopj" target="_blank" class="text-blue-600 underline">your Supabase project</a></li>
+                        <li>Click on "Table Editor" in the sidebar</li>
+                        <li>Look for tables named: studios, studio, equipment, equipments, gear, etc.</li>
+                        <li>Note the exact table names you see</li>
+                    </ol>
+                `, 
+                'info'
+            );
+            
+            showResult('💡 Solution 2: Fix RLS Policies', 
+                `
+                    <p class="mb-3"><strong>If you have tables but can't access them:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Go to "Authentication" → "Policies" in your Supabase dashboard</li>
+                        <li>For each table (studios, equipment), create a policy:</li>
+                        <li>Policy name: "Allow anonymous read access"</li>
+                        <li>Policy type: "SELECT"</li>
+                        <li>Target roles: "anon"</li>
+                        <li>Policy definition: <code class="bg-gray-100 px-2 py-1 rounded">true</code></li>
+                    </ol>
+                    <p class="mt-3 text-sm"><strong>Or temporarily disable RLS:</strong> In Table Editor, click on your table → Settings → "Enable RLS" (turn it off for testing)</p>
+                `, 
+                'warning'
+            );
+            
+            showResult('💡 Solution 3: Check API Key Permissions', 
+                `
+                    <p class="mb-3"><strong>Verify your API key:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Go to "Settings" → "API" in your Supabase dashboard</li>
+                        <li>Make sure you're using the "anon/public" key (not the service role key)</li>
+                        <li>Current key starts with: <code class="bg-gray-100 px-2 py-1 rounded text-xs">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</code></li>
+                        <li>If different, update the key in your supabase-config.js file</li>
+                    </ol>
+                `, 
+                'info'
+            );
+            
+            showResult('💡 Solution 4: Create Test Data', 
+                `
+                    <p class="mb-3"><strong>If tables don't exist, create them:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Go to "Table Editor" → "New Table"</li>
+                        <li>Create a "studios" table with columns: id, name, location, description</li>
+                        <li>Create an "equipment" table with columns: id, name, brand, category, description</li>
+                        <li>Add some sample data to test</li>
+                        <li>Make sure RLS is disabled or has proper policies</li>
+                    </ol>
+                `, 
+                'success'
+            );
+            
+            showResult('🚀 Quick Fix Command', 
+                `
+                    <p class="mb-3"><strong>SQL to run in Supabase SQL Editor:</strong></p>
+                    <pre class="bg-gray-100 p-3 rounded text-sm overflow-x-auto">-- Disable RLS temporarily for testing
+ALTER TABLE IF EXISTS studios DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS equipment DISABLE ROW LEVEL SECURITY;
+
+-- Or create policies for anonymous access
+CREATE POLICY "Allow anonymous read" ON studios FOR SELECT TO anon USING (true);
+CREATE POLICY "Allow anonymous read" ON equipment FOR SELECT TO anon USING (true);</pre>
+                    <p class="mt-3 text-sm text-red-600"><strong>Warning:</strong> Only disable RLS for testing. Re-enable it for production!</p>
+                `, 
+                'warning'
+            );
+        }
+
+        document.getElementById('runDiagnostic').addEventListener('click', runFullDiagnostic);
+        document.getElementById('testRLS').addEventListener('click', testRLSPolicies);
+        document.getElementById('showSolution').addEventListener('click', showSolutions);
+        
+        // Auto-run diagnostic on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runFullDiagnostic, 1000);
+        });
+    </script>
+</body>
+</html>

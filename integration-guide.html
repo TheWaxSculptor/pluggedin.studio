@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Integration Guide - PluggedIn Studio</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="h-8 w-auto">
+                    <span class="ml-2 text-xl font-bold text-gray-900">PluggedIn Studio</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="webapp.html" class="text-gray-600 hover:text-gray-900">Back to App</a>
+                    <a href="studio-dashboard.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Calendar Integration Guide</h1>
+            <p class="text-xl text-gray-600">Connect your existing booking systems with PluggedIn for seamless studio management</p>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6">Why Integrate Your Calendar?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-gray-900">Prevent Double Bookings</h3>
+                        <p class="text-gray-600">Automatically sync availability across all platforms to avoid scheduling conflicts.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-gray-900">Real-Time Updates</h3>
+                        <p class="text-gray-600">Changes in your external calendar instantly reflect on PluggedIn.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-gray-900">Unified Dashboard</h3>
+                        <p class="text-gray-600">Manage all your bookings from one central location.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-gray-900">Increased Visibility</h3>
+                        <p class="text-gray-600">Reach more customers while keeping your existing booking workflow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Platforms -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6">Supported Platforms</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                    <div class="text-3xl mb-2">📅</div>
+                    <h3 class="font-medium">Calendly</h3>
+                    <p class="text-xs text-gray-500 mt-1">OAuth + Webhooks</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-gray-400 transition-colors">
+                    <div class="text-3xl mb-2">⬜</div>
+                    <h3 class="font-medium">Square</h3>
+                    <p class="text-xs text-gray-500 mt-1">API Key</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-purple-300 transition-colors">
+                    <div class="text-3xl mb-2">🎯</div>
+                    <h3 class="font-medium">Acuity</h3>
+                    <p class="text-xs text-gray-500 mt-1">API Key</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-red-300 transition-colors">
+                    <div class="text-3xl mb-2">📊</div>
+                    <h3 class="font-medium">Google Calendar</h3>
+                    <p class="text-xs text-gray-500 mt-1">OAuth</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
+                    <div class="text-3xl mb-2">⏰</div>
+                    <h3 class="font-medium">Setmore</h3>
+                    <p class="text-xs text-gray-500 mt-1">API Key</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
+                    <div class="text-3xl mb-2">🕐</div>
+                    <h3 class="font-medium">Picktime</h3>
+                    <p class="text-xs text-gray-500 mt-1">API Key</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                    <div class="text-3xl mb-2">📋</div>
+                    <h3 class="font-medium">Zoho</h3>
+                    <p class="text-xs text-gray-500 mt-1">OAuth</p>
+                </div>
+                
+                <div class="text-center p-4 border border-gray-200 rounded-lg hover:border-teal-300 transition-colors">
+                    <div class="text-3xl mb-2">📖</div>
+                    <h3 class="font-medium">SimplyBook.me</h3>
+                    <p class="text-xs text-gray-500 mt-1">API Key</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Steps -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6">How to Set Up Integrations</h2>
+            
+            <div class="space-y-8">
+                <!-- Step 1 -->
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">1</div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Access Your Studio Dashboard</h3>
+                        <p class="text-gray-600 mb-3">Navigate to your studio owner dashboard and click on the "Calendar Integrations" tab.</p>
+                        <a href="studio-dashboard.html" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                            Go to Dashboard
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">2</div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Choose Your Platform</h3>
+                        <p class="text-gray-600 mb-3">Select the calendar or booking system you want to integrate from the available options.</p>
+                        <div class="bg-gray-50 p-3 rounded-md">
+                            <p class="text-sm text-gray-700"><strong>Tip:</strong> You can integrate multiple platforms simultaneously for maximum flexibility.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">3</div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Provide Authentication</h3>
+                        <p class="text-gray-600 mb-3">Depending on the platform, you'll either:</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
+                            <li><strong>OAuth:</strong> Click "Connect Account" and authorize PluggedIn to access your calendar</li>
+                            <li><strong>API Key:</strong> Enter your API credentials from your platform's settings</li>
+                        </ul>
+                        <div class="bg-yellow-50 p-3 rounded-md">
+                            <p class="text-sm text-yellow-800"><strong>Security:</strong> All credentials are encrypted and stored securely. We never store your passwords.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">4</div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Configure Sync Settings</h3>
+                        <p class="text-gray-600 mb-3">Choose what data to sync:</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Sync availability to PluggedIn</li>
+                            <li>Sync bookings from external system</li>
+                            <li>Prevent double bookings</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-semibold">✓</div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Test & Go Live</h3>
+                        <p class="text-gray-600">Test the integration to ensure everything works correctly, then start accepting bookings from both platforms!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform-Specific Guides -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6">Platform-Specific Setup Guides</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Calendly -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <span class="text-2xl mr-3">📅</span>
+                        <h3 class="text-lg font-medium">Calendly</h3>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p><strong>Required:</strong> Calendly username</p>
+                        <p><strong>Authentication:</strong> OAuth (automatic)</p>
+                        <p><strong>Features:</strong> Availability sync, booking sync, webhooks</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">View detailed guide →</a>
+                    </div>
+                </div>
+
+                <!-- Google Calendar -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <span class="text-2xl mr-3">📊</span>
+                        <h3 class="text-lg font-medium">Google Calendar</h3>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p><strong>Required:</strong> Google account</p>
+                        <p><strong>Authentication:</strong> OAuth (automatic)</p>
+                        <p><strong>Features:</strong> Availability sync, real-time updates</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">View detailed guide →</a>
+                    </div>
+                </div>
+
+                <!-- Square Appointments -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <span class="text-2xl mr-3">⬜</span>
+                        <h3 class="text-lg font-medium">Square Appointments</h3>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p><strong>Required:</strong> Application ID, Access Token</p>
+                        <p><strong>Authentication:</strong> API Key</p>
+                        <p><strong>Features:</strong> Booking sync, payment integration</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">View detailed guide →</a>
+                    </div>
+                </div>
+
+                <!-- Acuity -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <span class="text-2xl mr-3">🎯</span>
+                        <h3 class="text-lg font-medium">Acuity Scheduling</h3>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p><strong>Required:</strong> User ID, API Key</p>
+                        <p><strong>Authentication:</strong> API Key</p>
+                        <p><strong>Features:</strong> Booking sync, client management</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">View detailed guide →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6">Frequently Asked Questions</h2>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">How often does the sync happen?</h3>
+                    <p class="text-gray-600">Most integrations sync in real-time using webhooks. For platforms without webhook support, we sync every 15 minutes.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">What happens if there's a conflict?</h3>
+                    <p class="text-gray-600">Our system prevents double bookings by checking availability across all connected platforms before confirming any booking.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Can I use multiple calendar systems?</h3>
+                    <p class="text-gray-600">Yes! You can integrate as many calendar systems as you need. All will be synchronized to prevent conflicts.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Is my data secure?</h3>
+                    <p class="text-gray-600">Absolutely. All API keys and tokens are encrypted and stored securely. We follow industry best practices for data protection.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">What if I need help?</h3>
+                    <p class="text-gray-600">Our support team is here to help! Contact us through the dashboard or email support@pluggedin.studio.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="text-center bg-blue-50 rounded-lg p-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Ready to Get Started?</h2>
+            <p class="text-gray-600 mb-6">Set up your first calendar integration in just a few minutes.</p>
+            <a href="studio-dashboard.html" class="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 inline-flex items-center">
+                Go to Dashboard
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

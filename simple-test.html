@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Supabase Test - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">PluggedIn Supabase Test</h1>
+            <div id="results" class="space-y-4">
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-blue-800">Testing connection to your Supabase database...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const colors = {
+                success: 'bg-green-50 border-green-200 text-green-800',
+                error: 'bg-red-50 border-red-200 text-red-800',
+                info: 'bg-blue-50 border-blue-200 text-blue-800'
+            };
+            
+            const div = document.createElement('div');
+            div.className = `p-4 border rounded-lg ${colors[type]}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        async function testSupabase() {
+            try {
+                addResult('🔍 Testing database connection...');
+                
+                // Test basic connection
+                const { data, error } = await supabase.from('users').select('count').limit(1);
+                
+                if (error) throw error;
+                
+                addResult('✅ Successfully connected to Supabase!', 'success');
+                
+                // Test getting table info
+                addResult('📊 Testing database tables...');
+                
+                const tables = ['users', 'studios', 'bookings', 'equipment'];
+                
+                for (const table of tables) {
+                    try {
+                        const { data, error, count } = await supabase
+                            .from(table)
+                            .select('*', { count: 'exact', head: true });
+                        
+                        if (error) throw error;
+                        
+                        addResult(`✅ Table "${table}": ${count || 0} records`, 'success');
+                        
+                    } catch (error) {
+                        addResult(`❌ Table "${table}": ${error.message}`, 'error');
+                    }
+                }
+                
+                // Test sample data
+                addResult('📋 Getting sample data...');
+                
+                try {
+                    const { data: users } = await supabase
+                        .from('users')
+                        .select('id, name, email, role')
+                        .limit(3);
+                    
+                    if (users && users.length > 0) {
+                        const userList = users.map(u => `${u.name || u.email || 'Unnamed'} ${u.role ? `(${u.role})` : ''}`).join('<br>');
+                        addResult(`👥 Sample Users:<br>${userList}`, 'success');
+                    } else {
+                        addResult('👥 No users found in database', 'info');
+                    }
+                    
+                } catch (error) {
+                    addResult(`❌ Error getting users: ${error.message}`, 'error');
+                }
+                
+                try {
+                    const { data: studios } = await supabase
+                        .from('studios')
+                        .select('id, name, location')
+                        .limit(3);
+                    
+                    if (studios && studios.length > 0) {
+                        const studioList = studios.map(s => `${s.name || 'Unnamed Studio'} ${s.location ? `- ${s.location}` : ''}`).join('<br>');
+                        addResult(`🏢 Sample Studios:<br>${studioList}`, 'success');
+                    } else {
+                        addResult('🏢 No studios found in database', 'info');
+                    }
+                    
+                } catch (error) {
+                    addResult(`❌ Error getting studios: ${error.message}`, 'error');
+                }
+                
+                addResult('🎉 Test completed! Your Supabase integration is working.', 'success');
+                addResult('🚀 You can now use the admin dashboard and other pages with real data.', 'success');
+                
+            } catch (error) {
+                addResult(`❌ Connection failed: ${error.message}`, 'error');
+                addResult('💡 Check your Supabase URL, API key, and database permissions.', 'info');
+            }
+        }
+
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            testSupabase();
+        });
+    </script>
+</body>
+</html>

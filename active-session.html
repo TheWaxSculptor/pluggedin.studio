@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Session - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .session-timer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .quick-action-btn {
+            transition: all 0.2s ease;
+        }
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="app.html" class="flex items-center">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">P</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">PluggedIn</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium pulse-animation">
+                        Session Active
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Studio Header -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <div class="text-center mb-4">
+                <h1 class="text-2xl font-bold text-gray-900" id="studioName">Abbey Road Studios</h1>
+                <p class="text-gray-600" id="roomName">Room: Studio One</p>
+            </div>
+            
+            <div class="flex items-center justify-center mb-4">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-gray-600 text-sm" id="studioAddress">123 Studio Street, Brooklyn NY</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-gray-600">Check-in</span>
+                    </div>
+                    <span class="font-medium" id="checkInTime">2:00 PM</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-gray-600">End time</span>
+                    </div>
+                    <span class="font-medium" id="endTime">5:00 PM</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Timer -->
+        <div class="session-timer rounded-lg p-8 mb-8 text-white text-center">
+            <h2 class="text-xl font-semibold mb-4">Session Timer</h2>
+            <div class="text-6xl font-bold mb-2" id="sessionTimer">01:23:45</div>
+            <p class="text-lg opacity-90">Time Remaining</p>
+            <div class="mt-4">
+                <div class="bg-white bg-opacity-20 rounded-full h-2">
+                    <div class="bg-white rounded-full h-2 transition-all duration-1000" id="progressBar" style="width: 45%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button class="quick-action-btn flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="showEquipment()">
+                    <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-sm font-medium">Equipment</span>
+                </button>
+                
+                <button class="quick-action-btn flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="getHelp()">
+                    <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-sm font-medium">Help</span>
+                </button>
+                
+                <button class="quick-action-btn flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="rateStudio()">
+                    <svg class="w-8 h-8 text-yellow-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    <span class="text-sm font-medium">Rate</span>
+                </button>
+                
+                <button class="quick-action-btn flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="reportIssue()">
+                    <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <span class="text-sm font-medium">Report</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Studio Etiquette -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-blue-600 mt-1 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h4 class="text-lg font-semibold text-blue-900 mb-2">Studio Etiquette</h4>
+                    <p class="text-blue-800 text-sm leading-relaxed">
+                        Please remember to follow studio rules and clean up after your session. 
+                        Leave the space as you found it. Keep noise levels appropriate and 
+                        respect other users' sessions.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Session Button -->
+        <div class="text-center">
+            <button id="endSessionBtn" class="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                End Session
+            </button>
+        </div>
+    </main>
+
+    <!-- End Session Confirmation Modal -->
+    <div id="endSessionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">End Session</h3>
+                    <p class="text-sm text-gray-500 mb-6">
+                        Are you sure you want to end your current session? The studio may still charge you for the full booked time.
+                    </p>
+                    <div class="flex justify-center space-x-3">
+                        <button id="cancelEndSession" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button id="confirmEndSession" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                            End Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script>
+        // Active Session Management functionality
+        class ActiveSessionManager {
+            constructor() {
+                this.sessionData = null;
+                this.timerInterval = null;
+                this.startTime = null;
+                this.endTime = null;
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                await this.loadSessionData();
+                this.startTimer();
+            }
+
+            setupEventListeners() {
+                // End session button
+                document.getElementById('endSessionBtn').addEventListener('click', () => {
+                    this.showEndSessionModal();
+                });
+
+                // Modal controls
+                document.getElementById('cancelEndSession').addEventListener('click', () => {
+                    this.hideEndSessionModal();
+                });
+
+                document.getElementById('confirmEndSession').addEventListener('click', () => {
+                    this.endSession();
+                });
+
+                // Close modal when clicking outside
+                document.getElementById('endSessionModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'endSessionModal') {
+                        this.hideEndSessionModal();
+                    }
+                });
+            }
+
+            async loadSessionData() {
+                // Simulate loading active session data
+                this.sessionData = {
+                    id: 'session-001',
+                    studioName: 'Abbey Road Studios',
+                    roomName: 'Studio One',
+                    address: '123 Studio Street, Brooklyn NY',
+                    startTime: new Date(Date.now() - (2 * 60 * 60 * 1000)), // 2 hours ago
+                    endTime: new Date(Date.now() + (1 * 60 * 60 * 1000)), // 1 hour from now
+                    totalDuration: 3 * 60 * 60 * 1000 // 3 hours total
+                };
+
+                this.startTime = this.sessionData.startTime;
+                this.endTime = this.sessionData.endTime;
+
+                // Update UI with session data
+                document.getElementById('studioName').textContent = this.sessionData.studioName;
+                document.getElementById('roomName').textContent = `Room: ${this.sessionData.roomName}`;
+                document.getElementById('studioAddress').textContent = this.sessionData.address;
+                document.getElementById('checkInTime').textContent = this.formatTime(this.sessionData.startTime);
+                document.getElementById('endTime').textContent = this.formatTime(this.sessionData.endTime);
+            }
+
+            startTimer() {
+                this.updateTimer();
+                this.timerInterval = setInterval(() => {
+                    this.updateTimer();
+                }, 1000);
+            }
+
+            updateTimer() {
+                const now = new Date();
+                const timeRemaining = this.endTime - now;
+
+                if (timeRemaining <= 0) {
+                    this.handleSessionExpired();
+                    return;
+                }
+
+                // Calculate hours, minutes, seconds
+                const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                // Format timer display
+                const timerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('sessionTimer').textContent = timerText;
+
+                // Update progress bar
+                const totalDuration = this.sessionData.totalDuration;
+                const elapsed = now - this.startTime;
+                const progress = Math.min((elapsed / totalDuration) * 100, 100);
+                document.getElementById('progressBar').style.width = `${progress}%`;
+
+                // Change colors based on time remaining
+                const timerElement = document.getElementById('sessionTimer');
+                if (timeRemaining < 15 * 60 * 1000) { // Less than 15 minutes
+                    timerElement.style.color = '#ef4444'; // Red
+                } else if (timeRemaining < 30 * 60 * 1000) { // Less than 30 minutes
+                    timerElement.style.color = '#f59e0b'; // Yellow
+                } else {
+                    timerElement.style.color = '#ffffff'; // White
+                }
+            }
+
+            handleSessionExpired() {
+                clearInterval(this.timerInterval);
+                document.getElementById('sessionTimer').textContent = '00:00:00';
+                document.getElementById('progressBar').style.width = '100%';
+                
+                // Show session expired notification
+                this.showNotification('Your session time has expired. Please wrap up and exit the studio.', 'warning');
+                
+                // Auto-redirect after a delay
+                setTimeout(() => {
+                    window.location.href = 'bookings.html';
+                }, 5000);
+            }
+
+            showEndSessionModal() {
+                document.getElementById('endSessionModal').classList.remove('hidden');
+            }
+
+            hideEndSessionModal() {
+                document.getElementById('endSessionModal').classList.add('hidden');
+            }
+
+            endSession() {
+                clearInterval(this.timerInterval);
+                
+                // Simulate ending session API call
+                this.showNotification('Session ended successfully. Thank you for using PluggedIn!', 'success');
+                
+                // Redirect to bookings page
+                setTimeout(() => {
+                    window.location.href = 'bookings.html';
+                }, 2000);
+            }
+
+            formatTime(date) {
+                return new Intl.DateTimeFormat('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                }).format(date);
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                const bgColor = type === 'success' ? 'bg-green-500' : 
+                               type === 'warning' ? 'bg-yellow-500' : 
+                               type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+                
+                notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, type === 'warning' ? 8000 : 4000);
+            }
+        }
+
+        // Quick Action Functions
+        function showEquipment() {
+            window.location.href = 'equipment.html';
+        }
+
+        function getHelp() {
+            alert('Studio Help:\n\n• For technical issues, press the help button in the studio\n• For emergencies, call studio management\n• Check the equipment guide for setup instructions\n• Studio staff is available during business hours');
+        }
+
+        function rateStudio() {
+            window.location.href = 'reviews.html';
+        }
+
+        function reportIssue() {
+            const issue = prompt('Please describe the issue you\'re experiencing:');
+            if (issue && issue.trim()) {
+                alert('Thank you for reporting the issue. Studio management has been notified and will address it promptly.');
+            }
+        }
+
+        // Initialize session manager
+        document.addEventListener('DOMContentLoaded', () => {
+            window.activeSessionManager = new ActiveSessionManager();
+        });
+
+        // Handle page visibility change (pause timer when tab is not active)
+        document.addEventListener('visibilitychange', () => {
+            if (window.activeSessionManager) {
+                if (document.hidden) {
+                    // Page is hidden, could pause non-critical updates
+                } else {
+                    // Page is visible, ensure timer is accurate
+                    window.activeSessionManager.updateTimer();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

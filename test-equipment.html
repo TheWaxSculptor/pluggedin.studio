@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Data Test - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">🔧 Equipment Data Test</h1>
+            <p class="text-gray-600 mb-8">Direct test of equipment data loading from Supabase.</p>
+            
+            <div id="status" class="mb-6"></div>
+            
+            <button id="testBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                🧪 Test Equipment Loading
+            </button>
+            
+            <div id="results" class="mt-8"></div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const colors = {
+                success: 'bg-green-100 border-green-400 text-green-700',
+                error: 'bg-red-100 border-red-400 text-red-700',
+                info: 'bg-blue-100 border-blue-400 text-blue-700'
+            };
+            
+            statusDiv.innerHTML = `
+                <div class="border-l-4 ${colors[type]} p-4 rounded">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        async function testEquipmentLoading() {
+            try {
+                showStatus('🔍 Testing equipment data loading...', 'info');
+                
+                console.log('🧪 Starting equipment test...');
+                
+                // Test 1: Direct query to equipment table
+                console.log('📋 Test 1: Direct equipment table query');
+                const { data: equipmentData, error: equipmentError } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .order('name');
+                
+                if (equipmentError) {
+                    console.error('❌ Equipment query error:', equipmentError);
+                    throw new Error(`Equipment query failed: ${equipmentError.message}`);
+                }
+                
+                console.log('✅ Equipment data loaded:', equipmentData);
+                
+                // Test 2: Count equipment items
+                const { count, error: countError } = await supabase
+                    .from('equipment')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (countError) {
+                    console.error('❌ Equipment count error:', countError);
+                } else {
+                    console.log(`📊 Equipment count: ${count}`);
+                }
+                
+                // Display results
+                if (equipmentData && equipmentData.length > 0) {
+                    showStatus(`✅ Success! Found ${equipmentData.length} equipment items.`, 'success');
+                    displayEquipmentResults(equipmentData);
+                } else {
+                    showStatus('⚠️ No equipment data found in the table.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('🚨 Test failed:', error);
+                showStatus(`❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function displayEquipmentResults(equipment) {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 class="font-bold text-green-800 mb-3">✅ Equipment Found (${equipment.length})</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${equipment.map(item => `
+                                <div class="bg-white p-3 rounded border">
+                                    <h4 class="font-medium text-gray-900">${item.name}</h4>
+                                    <p class="text-sm text-gray-600">${item.brand} ${item.model}</p>
+                                    <p class="text-xs text-gray-500">Category: ${item.category}</p>
+                                    <p class="text-xs text-gray-500">Studio: ${item.studio_id} | Room: ${item.room}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="font-bold text-blue-800 mb-3">📊 Equipment Summary</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-blue-700">
+                            ${getEquipmentSummary(equipment)}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h3 class="font-bold text-purple-800 mb-3">🎯 Next Steps</h3>
+                        <p class="text-sm text-purple-700">
+                            Equipment data is loading correctly! The issue is likely in the equipment page JavaScript. 
+                            Check the browser console on <a href="equipment.html" class="underline font-medium">equipment.html</a> for errors.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getEquipmentSummary(equipment) {
+            const categories = {};
+            equipment.forEach(item => {
+                categories[item.category] = (categories[item.category] || 0) + 1;
+            });
+            
+            return Object.entries(categories)
+                .map(([category, count]) => `<div><strong>${category}:</strong> ${count}</div>`)
+                .join('');
+        }
+
+        // Event listeners
+        document.getElementById('testBtn').addEventListener('click', testEquipmentLoading);
+        
+        // Auto-run test on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('🎵 Ready to test equipment data loading!', 'info');
+            console.log('🎵 Equipment test page loaded');
+        });
+    </script>
+</body>
+</html>

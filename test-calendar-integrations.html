@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Integration Test - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .test-section {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-passed {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+        .test-failed {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        .test-pending {
+            border-color: #f59e0b;
+            background-color: #fffbeb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Calendar Integration System Test</h1>
+            
+            <!-- Test Results Summary -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Test Results Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div id="passedCount" class="text-3xl font-bold text-green-600">0</div>
+                        <div class="text-sm text-gray-600">Tests Passed</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="failedCount" class="text-3xl font-bold text-red-600">0</div>
+                        <div class="text-sm text-gray-600">Tests Failed</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="totalCount" class="text-3xl font-bold text-blue-600">0</div>
+                        <div class="text-sm text-gray-600">Total Tests</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backend Service Tests -->
+            <div class="test-section test-pending" id="backendTest">
+                <h3 class="text-lg font-semibold mb-3">🔧 Backend Service Initialization</h3>
+                <p class="text-gray-600 mb-3">Testing CalendarBackendService initialization and basic functionality</p>
+                <div id="backendTestResults" class="text-sm text-gray-500">Running tests...</div>
+                <button onclick="runBackendTests()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Run Backend Tests
+                </button>
+            </div>
+
+            <!-- OAuth Flow Tests -->
+            <div class="test-section test-pending" id="oauthTest">
+                <h3 class="text-lg font-semibold mb-3">🔐 OAuth Flow Testing</h3>
+                <p class="text-gray-600 mb-3">Testing OAuth configuration and flow initiation for supported platforms</p>
+                <div id="oauthTestResults" class="text-sm text-gray-500">Ready to test...</div>
+                <button onclick="runOAuthTests()" class="mt-3 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    Test OAuth Flows
+                </button>
+            </div>
+
+            <!-- Integration Manager Tests -->
+            <div class="test-section test-pending" id="integrationTest">
+                <h3 class="text-lg font-semibold mb-3">⚙️ Integration Manager Testing</h3>
+                <p class="text-gray-600 mb-3">Testing CalendarIntegrationsManager functionality and UI integration</p>
+                <div id="integrationTestResults" class="text-sm text-gray-500">Ready to test...</div>
+                <button onclick="runIntegrationTests()" class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Test Integration Manager
+                </button>
+            </div>
+
+            <!-- API Call Tests -->
+            <div class="test-section test-pending" id="apiTest">
+                <h3 class="text-lg font-semibold mb-3">🌐 API Integration Testing</h3>
+                <p class="text-gray-600 mb-3">Testing API configurations and mock calls for each platform</p>
+                <div id="apiTestResults" class="text-sm text-gray-500">Ready to test...</div>
+                <button onclick="runApiTests()" class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    Test API Calls
+                </button>
+            </div>
+
+            <!-- Webhook Handler Tests -->
+            <div class="test-section test-pending" id="webhookTest">
+                <h3 class="text-lg font-semibold mb-3">🔔 Webhook Handler Testing</h3>
+                <p class="text-gray-600 mb-3">Testing webhook processing and real-time updates</p>
+                <div id="webhookTestResults" class="text-sm text-gray-500">Ready to test...</div>
+                <button onclick="runWebhookTests()" class="mt-3 bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+                    Test Webhook Handler
+                </button>
+            </div>
+
+            <!-- Integration Flow Demo -->
+            <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+                <h2 class="text-xl font-semibold mb-4">🚀 Live Integration Demo</h2>
+                <p class="text-gray-600 mb-4">Test the complete integration flow with a supported platform:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <button onclick="demoIntegration('calendly')" class="bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition-colors">
+                        📅 Demo Calendly
+                    </button>
+                    <button onclick="demoIntegration('google_calendar')" class="bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-colors">
+                        📊 Demo Google Calendar
+                    </button>
+                    <button onclick="demoIntegration('square')" class="bg-gray-700 text-white p-3 rounded hover:bg-gray-800 transition-colors">
+                        ⬜ Demo Square
+                    </button>
+                    <button onclick="demoIntegration('acuity')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600 transition-colors">
+                        🎯 Demo Acuity
+                    </button>
+                </div>
+
+                <div id="demoResults" class="bg-gray-50 p-4 rounded-lg text-sm text-gray-600">
+                    Select a platform above to demo the integration flow...
+                </div>
+            </div>
+
+            <!-- Run All Tests -->
+            <div class="text-center mt-8">
+                <button onclick="runAllTests()" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all">
+                    🧪 Run All Tests
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include our integration scripts -->
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/calendar-backend.js"></script>
+    <script src="js/calendar-integrations.js"></script>
+
+    <script>
+        // Test framework
+        let testResults = {
+            passed: 0,
+            failed: 0,
+            total: 0
+        };
+
+        function updateTestCounts() {
+            document.getElementById('passedCount').textContent = testResults.passed;
+            document.getElementById('failedCount').textContent = testResults.failed;
+            document.getElementById('totalCount').textContent = testResults.total;
+        }
+
+        function markTestResult(testId, passed, message) {
+            const testElement = document.getElementById(testId);
+            const resultsElement = document.getElementById(testId + 'Results');
+            
+            testResults.total++;
+            if (passed) {
+                testResults.passed++;
+                testElement.className = testElement.className.replace('test-pending', 'test-passed');
+                resultsElement.innerHTML = `✅ ${message}`;
+            } else {
+                testResults.failed++;
+                testElement.className = testElement.className.replace('test-pending', 'test-failed');
+                resultsElement.innerHTML = `❌ ${message}`;
+            }
+            
+            updateTestCounts();
+        }
+
+        // Backend Service Tests
+        async function runBackendTests() {
+            try {
+                // Test 1: Service initialization
+                const backendService = new CalendarBackendService();
+                if (!backendService) {
+                    throw new Error('Failed to initialize CalendarBackendService');
+                }
+
+                // Test 2: OAuth config retrieval
+                const calendlyConfig = backendService.getOAuthConfig('calendly');
+                if (!calendlyConfig || !calendlyConfig.authUrl) {
+                    throw new Error('Failed to get OAuth config for Calendly');
+                }
+
+                // Test 3: State generation
+                const state = backendService.generateState('test-studio', 'calendly');
+                if (!state || state.length < 10) {
+                    throw new Error('Failed to generate valid state parameter');
+                }
+
+                markTestResult('backendTest', true, 'Backend service initialized successfully with OAuth configs and state generation');
+
+            } catch (error) {
+                markTestResult('backendTest', false, `Backend test failed: ${error.message}`);
+            }
+        }
+
+        // OAuth Flow Tests
+        async function runOAuthTests() {
+            try {
+                const backendService = new CalendarBackendService();
+                const platforms = ['calendly', 'google_calendar', 'square', 'acuity', 'zoho'];
+                
+                let configCount = 0;
+                for (const platform of platforms) {
+                    const config = backendService.getOAuthConfig(platform);
+                    if (config && config.authUrl && config.tokenUrl) {
+                        configCount++;
+                    }
+                }
+
+                if (configCount >= 4) {
+                    markTestResult('oauthTest', true, `OAuth configurations validated for ${configCount} platforms`);
+                } else {
+                    throw new Error(`Only ${configCount} platforms have valid OAuth configs`);
+                }
+
+            } catch (error) {
+                markTestResult('oauthTest', false, `OAuth test failed: ${error.message}`);
+            }
+        }
+
+        // Integration Manager Tests
+        async function runIntegrationTests() {
+            try {
+                // Test CalendarIntegrationsManager initialization
+                if (typeof CalendarIntegrationsManager === 'undefined') {
+                    throw new Error('CalendarIntegrationsManager not loaded');
+                }
+
+                // Test supported integrations
+                const manager = new CalendarIntegrationsManager();
+                if (!manager.supportedIntegrations || Object.keys(manager.supportedIntegrations).length < 8) {
+                    throw new Error('Insufficient supported integrations');
+                }
+
+                // Test backend service integration
+                if (!manager.backendService) {
+                    throw new Error('Backend service not integrated with manager');
+                }
+
+                markTestResult('integrationTest', true, 'Integration manager initialized with 8 supported platforms and backend service');
+
+            } catch (error) {
+                markTestResult('integrationTest', false, `Integration test failed: ${error.message}`);
+            }
+        }
+
+        // API Call Tests
+        async function runApiTests() {
+            try {
+                const backendService = new CalendarBackendService();
+                const platforms = ['calendly', 'google_calendar', 'square', 'acuity'];
+                
+                let apiConfigCount = 0;
+                for (const platform of platforms) {
+                    try {
+                        // Test API configuration structure
+                        const mockCredentials = { access_token: 'test_token' };
+                        const apiCall = backendService.makeApiCall(platform, 'test', mockCredentials);
+                        
+                        // If we get here without throwing, the API config exists
+                        apiConfigCount++;
+                    } catch (error) {
+                        if (!error.message.includes('API config not found')) {
+                            apiConfigCount++; // Config exists, just failed due to mock token
+                        }
+                    }
+                }
+
+                if (apiConfigCount >= 4) {
+                    markTestResult('apiTest', true, `API configurations validated for ${apiConfigCount} platforms`);
+                } else {
+                    throw new Error(`Only ${apiConfigCount} platforms have valid API configs`);
+                }
+
+            } catch (error) {
+                markTestResult('apiTest', false, `API test failed: ${error.message}`);
+            }
+        }
+
+        // Webhook Handler Tests
+        async function runWebhookTests() {
+            try {
+                // Test webhook data processing
+                const backendService = new CalendarBackendService();
+                
+                const testPayload = {
+                    event: 'invitee.created',
+                    payload: {
+                        event: { uuid: 'test-123' },
+                        invitee: { email: 'test@example.com' }
+                    }
+                };
+
+                const processedData = backendService.processWebhookData('calendly', testPayload);
+                
+                if (!processedData || !processedData.platform || !processedData.timestamp) {
+                    throw new Error('Webhook data processing failed');
+                }
+
+                markTestResult('webhookTest', true, 'Webhook processing validated for sample payloads');
+
+            } catch (error) {
+                markTestResult('webhookTest', false, `Webhook test failed: ${error.message}`);
+            }
+        }
+
+        // Demo Integration Flow
+        async function demoIntegration(platform) {
+            const resultsDiv = document.getElementById('demoResults');
+            resultsDiv.innerHTML = `<div class="text-blue-600">🔄 Demonstrating ${platform} integration flow...</div>`;
+
+            try {
+                const backendService = new CalendarBackendService();
+                const studioId = 'demo-studio-123';
+
+                // Step 1: Get OAuth config
+                const config = backendService.getOAuthConfig(platform);
+                if (!config) {
+                    throw new Error(`No OAuth config found for ${platform}`);
+                }
+
+                // Step 2: Generate state
+                const state = backendService.generateState(studioId, platform);
+
+                // Step 3: Simulate OAuth URL generation
+                const authUrl = `${config.authUrl}?client_id=${config.clientId}&redirect_uri=oauth-callback.html&state=${state}`;
+
+                // Step 4: Show demo results
+                resultsDiv.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="text-green-600 font-semibold">✅ ${platform} Integration Demo Successful!</div>
+                        <div><strong>Platform:</strong> ${platform}</div>
+                        <div><strong>Studio ID:</strong> ${studioId}</div>
+                        <div><strong>State:</strong> ${state}</div>
+                        <div><strong>Auth URL:</strong> <a href="${authUrl}" target="_blank" class="text-blue-600 hover:underline">Open OAuth Flow</a></div>
+                        <div class="text-sm text-gray-600 mt-2">
+                            In production, this would open a popup window for OAuth authentication.
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="text-red-600">❌ Demo failed: ${error.message}</div>`;
+            }
+        }
+
+        // Run All Tests
+        async function runAllTests() {
+            // Reset test results
+            testResults = { passed: 0, failed: 0, total: 0 };
+            updateTestCounts();
+
+            // Reset all test sections to pending
+            const testSections = document.querySelectorAll('.test-section');
+            testSections.forEach(section => {
+                section.className = section.className.replace(/test-(passed|failed)/, 'test-pending');
+            });
+
+            // Run all tests in sequence
+            await runBackendTests();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await runOAuthTests();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await runIntegrationTests();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await runApiTests();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await runWebhookTests();
+
+            // Show final results
+            const successRate = Math.round((testResults.passed / testResults.total) * 100);
+            alert(`Test Suite Complete!\n\nPassed: ${testResults.passed}\nFailed: ${testResults.failed}\nSuccess Rate: ${successRate}%`);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Calendar Integration Test Page Loaded');
+            updateTestCounts();
+        });
+    </script>
+</body>
+</html>

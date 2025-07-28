@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Handler - PluggedIn</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://your-project.supabase.co';
+        const supabaseKey = 'your-anon-key';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        /**
+         * Webhook Handler for Calendar Integration Events
+         * This endpoint receives webhooks from external calendar platforms
+         */
+        class WebhookHandler {
+            constructor() {
+                this.backendService = new CalendarBackendService();
+                this.setupRoutes();
+            }
+
+            setupRoutes() {
+                // Parse URL to determine webhook type
+                const urlParams = new URLSearchParams(window.location.search);
+                const platform = urlParams.get('platform');
+                const event = urlParams.get('event');
+
+                if (platform && event) {
+                    this.handleWebhook(platform, event);
+                }
+            }
+
+            async handleWebhook(platform, event) {
+                try {
+                    // Get webhook payload from POST data
+                    const payload = await this.getWebhookPayload();
+                    const signature = this.getWebhookSignature();
+
+                    console.log(`Received webhook from ${platform}:`, { event, payload });
+
+                    // Process webhook using backend service
+                    const result = await this.backendService.handleWebhook(platform, payload, signature);
+
+                    if (result.success) {
+                        // Send success response
+                        this.sendResponse(200, { status: 'success', message: 'Webhook processed successfully' });
+                        
+                        // Trigger real-time updates to connected dashboards
+                        await this.broadcastUpdate(platform, event, payload);
+                    } else {
+                        throw new Error('Webhook processing failed');
+                    }
+
+                } catch (error) {
+                    console.error('Webhook processing error:', error);
+                    this.sendResponse(400, { status: 'error', message: error.message });
+                }
+            }
+
+            async getWebhookPayload() {
+                // In a real implementation, this would parse the POST body
+                // For now, simulate webhook payloads for different platforms
+                const urlParams = new URLSearchParams(window.location.search);
+                const platform = urlParams.get('platform');
+                const event = urlParams.get('event');
+
+                const samplePayloads = {
+                    calendly: {
+                        booking_created: {
+                            event: 'invitee.created',
+                            time: new Date().toISOString(),
+                            payload: {
+                                event_type: {
+                                    name: 'Studio Session',
+                                    duration: 60
+                                },
+                                invitee: {
+                                    name: 'John Doe',
+                                    email: 'john@example.com'
+                                },
+                                event: {
+                                    start_time: new Date(Date.now() + 86400000).toISOString(),
+                                    end_time: new Date(Date.now() + 86400000 + 3600000).toISOString()
+                                }
+                            }
+                        },
+                        booking_cancelled: {
+                            event: 'invitee.canceled',
+                            time: new Date().toISOString(),
+                            payload: {
+                                event: {
+                                    uuid: 'sample-event-uuid'
+                                }
+                            }
+                        }
+                    },
+                    google_calendar: {
+                        event_created: {
+                            kind: 'calendar#event',
+                            eventType: 'default',
+                            summary: 'Studio Booking',
+                            start: {
+                                dateTime: new Date(Date.now() + 86400000).toISOString()
+                            },
+                            end: {
+                                dateTime: new Date(Date.now() + 86400000 + 3600000).toISOString()
+                            }
+                        }
+                    },
+                    square: {
+                        booking_created: {
+                            type: 'booking.created',
+                            data: {
+                                object: {
+                                    booking: {
+                                        id: 'sample-booking-id',
+                                        start_at: new Date(Date.now() + 86400000).toISOString(),
+                                        duration_minutes: 60,
+                                        customer_note: 'Studio session booking'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                return samplePayloads[platform]?.[event] || {};
+            }
+
+            getWebhookSignature() {
+                // In a real implementation, this would get the signature from headers
+                return 'sample-signature';
+            }
+
+            sendResponse(status, data) {
+                // In a real implementation, this would send HTTP response
+                console.log(`Response ${status}:`, data);
+                
+                // Update page content to show response
+                document.body.innerHTML = `
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 2rem; text-align: center;">
+                        <h2>Webhook ${status === 200 ? 'Processed' : 'Failed'}</h2>
+                        <p>Status: ${status}</p>
+                        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; text-align: left; max-width: 600px; margin: 0 auto;">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            }
+
+            async broadcastUpdate(platform, event, payload) {
+                try {
+                    // Broadcast real-time update to connected studio dashboards
+                    const updateData = {
+                        type: 'calendar_webhook',
+                        platform: platform,
+                        event: event,
+                        timestamp: new Date().toISOString(),
+                        data: payload
+                    };
+
+                    // Insert into Supabase for real-time subscriptions
+                    await supabase
+                        .from('integration_events')
+                        .insert(updateData);
+
+                    console.log('Broadcast update sent:', updateData);
+
+                } catch (error) {
+                    console.error('Error broadcasting update:', error);
+                }
+            }
+        }
+
+        // Simple CalendarBackendService for webhook processing
+        class CalendarBackendService {
+            async handleWebhook(platform, payload, signature) {
+                try {
+                    // Verify webhook signature (implement proper verification in production)
+                    if (!this.verifyWebhookSignature(platform, payload, signature)) {
+                        throw new Error('Invalid webhook signature');
+                    }
+
+                    // Process webhook data based on platform and event type
+                    const processedData = this.processWebhookData(platform, payload);
+                    
+                    // Update local data based on webhook
+                    await this.processWebhookUpdate(processedData);
+
+                    return { success: true };
+
+                } catch (error) {
+                    console.error('Webhook processing error:', error);
+                    throw error;
+                }
+            }
+
+            verifyWebhookSignature(platform, payload, signature) {
+                // Implement proper webhook signature verification for each platform
+                // This is crucial for security in production
+                console.log(`Verifying ${platform} webhook signature:`, signature);
+                return true; // Placeholder - implement proper verification
+            }
+
+            processWebhookData(platform, payload) {
+                const processors = {
+                    calendly: (payload) => ({
+                        event_type: payload.event,
+                        booking_id: payload.payload?.event?.uuid,
+                        customer_email: payload.payload?.invitee?.email,
+                        start_time: payload.payload?.event?.start_time,
+                        end_time: payload.payload?.event?.end_time,
+                        status: payload.event.includes('canceled') ? 'cancelled' : 'confirmed'
+                    }),
+                    
+                    google_calendar: (payload) => ({
+                        event_type: 'event_updated',
+                        booking_id: payload.id,
+                        summary: payload.summary,
+                        start_time: payload.start?.dateTime,
+                        end_time: payload.end?.dateTime,
+                        status: payload.status || 'confirmed'
+                    }),
+                    
+                    square: (payload) => ({
+                        event_type: payload.type,
+                        booking_id: payload.data?.object?.booking?.id,
+                        start_time: payload.data?.object?.booking?.start_at,
+                        duration: payload.data?.object?.booking?.duration_minutes,
+                        status: 'confirmed'
+                    })
+                };
+
+                const processor = processors[platform];
+                if (!processor) {
+                    throw new Error(`No processor found for platform: ${platform}`);
+                }
+
+                return {
+                    platform,
+                    ...processor(payload),
+                    timestamp: new Date().toISOString()
+                };
+            }
+
+            async processWebhookUpdate(processedData) {
+                console.log('Processing webhook update:', processedData);
+                
+                // Update booking status in database
+                if (processedData.booking_id) {
+                    await supabase
+                        .from('bookings')
+                        .upsert({
+                            external_id: processedData.booking_id,
+                            platform: processedData.platform,
+                            status: processedData.status,
+                            start_time: processedData.start_time,
+                            end_time: processedData.end_time,
+                            updated_at: new Date().toISOString()
+                        });
+                }
+
+                // Log webhook event
+                await supabase
+                    .from('webhook_logs')
+                    .insert({
+                        platform: processedData.platform,
+                        event_type: processedData.event_type,
+                        booking_id: processedData.booking_id,
+                        processed_at: new Date().toISOString(),
+                        data: processedData
+                    });
+            }
+        }
+
+        // Initialize webhook handler when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new WebhookHandler();
+        });
+    </script>
+</body>
+</html>

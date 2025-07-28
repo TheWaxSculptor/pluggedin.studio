@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Equipment Table - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Create Equipment Table</h1>
+        
+        <!-- Status Messages -->
+        <div id="statusMessage" class="mb-6"></div>
+        
+        <!-- Project Info -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Supabase Project Info</h2>
+            <div class="space-y-2">
+                <p><strong>Project URL:</strong> <code class="bg-gray-100 px-2 py-1 rounded">https://fdkrfyzcxhnhanodxopj.supabase.co</code></p>
+                <p><strong>Project ID:</strong> <code class="bg-gray-100 px-2 py-1 rounded">fdkrfyzcxhnhanodxopj</code></p>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Actions</h2>
+            <div class="space-y-4">
+                <button id="checkConnection" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    1. Test Supabase Connection
+                </button>
+                <button id="checkTables" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                    2. Check Existing Tables
+                </button>
+                <button id="createTable" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                    3. Create Equipment Table
+                </button>
+                <button id="insertData" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700">
+                    4. Insert Sample Data
+                </button>
+                <button id="testQuery" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    5. Test Equipment Query
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold mb-4">Results</h2>
+            <pre id="results" class="bg-gray-100 p-4 rounded-lg text-sm overflow-auto max-h-96"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://fdkrfyzcxhnhanodxopj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // DOM elements
+        const statusMessage = document.getElementById('statusMessage');
+        const results = document.getElementById('results');
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-200',
+                error: 'bg-red-100 text-red-800 border-red-200',
+                info: 'bg-blue-100 text-blue-800 border-blue-200',
+                warning: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+            };
+            
+            statusMessage.innerHTML = `
+                <div class="border rounded-lg p-4 ${colors[type]}">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        // Log to results
+        function logResult(message) {
+            results.textContent += message + '\n';
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        // Clear results
+        function clearResults() {
+            results.textContent = '';
+        }
+        
+        // Test Supabase connection
+        async function testConnection() {
+            clearResults();
+            logResult('🔍 Testing Supabase connection...');
+            
+            try {
+                // Try to query a system table
+                const { data, error } = await supabase
+                    .from('information_schema.tables')
+                    .select('table_name')
+                    .eq('table_schema', 'public')
+                    .limit(1);
+                
+                if (error) {
+                    logResult('❌ Connection failed: ' + error.message);
+                    showStatus('❌ Connection failed: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Connection successful!');
+                    showStatus('✅ Connection successful!', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Connection error: ' + err.message);
+                showStatus('❌ Connection error: ' + err.message, 'error');
+            }
+        }
+        
+        // Check existing tables
+        async function checkTables() {
+            clearResults();
+            logResult('🔍 Checking existing tables...');
+            
+            try {
+                // Use RPC to get table list
+                const { data, error } = await supabase.rpc('get_table_list');
+                
+                if (error) {
+                    // Fallback: try direct query
+                    logResult('⚠️ RPC failed, trying direct query...');
+                    
+                    const { data: tables, error: tableError } = await supabase
+                        .from('pg_tables')
+                        .select('tablename')
+                        .eq('schemaname', 'public');
+                    
+                    if (tableError) {
+                        logResult('❌ Failed to get tables: ' + tableError.message);
+                        showStatus('❌ Failed to get tables: ' + tableError.message, 'error');
+                        return;
+                    }
+                    
+                    logResult('📋 Public tables found:');
+                    tables.forEach(table => {
+                        logResult('  - ' + table.tablename);
+                    });
+                    
+                    const hasEquipment = tables.some(t => t.tablename === 'equipment');
+                    if (hasEquipment) {
+                        showStatus('✅ Equipment table exists!', 'success');
+                    } else {
+                        showStatus('⚠️ Equipment table does not exist', 'warning');
+                    }
+                } else {
+                    logResult('📋 Tables: ' + JSON.stringify(data, null, 2));
+                }
+            } catch (err) {
+                logResult('❌ Error checking tables: ' + err.message);
+                showStatus('❌ Error checking tables: ' + err.message, 'error');
+            }
+        }
+        
+        // Create equipment table
+        async function createTable() {
+            clearResults();
+            logResult('🔨 Creating equipment table...');
+            
+            try {
+                // Use RPC to create table
+                const { data, error } = await supabase.rpc('create_equipment_table');
+                
+                if (error) {
+                    logResult('❌ Failed to create table: ' + error.message);
+                    showStatus('❌ Failed to create table: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Equipment table created successfully!');
+                    showStatus('✅ Equipment table created successfully!', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Error creating table: ' + err.message);
+                showStatus('❌ Error creating table: ' + err.message, 'error');
+            }
+        }
+        
+        // Insert sample data
+        async function insertData() {
+            clearResults();
+            logResult('📝 Inserting sample equipment data...');
+            
+            const sampleData = [
+                {
+                    name: 'Yamaha Grand Piano',
+                    brand: 'Yamaha',
+                    model: 'C7X',
+                    category: 'Piano',
+                    studio_id: 'studio_1',
+                    room: 'Main Room',
+                    description: 'Professional 7-foot grand piano with exceptional sound quality',
+                    image_url: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400'
+                },
+                {
+                    name: 'Neumann U87 Microphone',
+                    brand: 'Neumann',
+                    model: 'U87',
+                    category: 'Microphone',
+                    studio_id: 'studio_1',
+                    room: 'Vocal Booth',
+                    description: 'Industry-standard large-diaphragm condenser microphone',
+                    image_url: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400'
+                },
+                {
+                    name: 'SSL 4000 Series Console',
+                    brand: 'SSL',
+                    model: '4000E',
+                    category: 'Mixing Console',
+                    studio_id: 'studio_1',
+                    room: 'Control Room',
+                    description: 'Legendary analog mixing console used on countless hit records',
+                    image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400'
+                },
+                {
+                    name: 'Fender Stratocaster',
+                    brand: 'Fender',
+                    model: 'American Professional II',
+                    category: 'Guitar',
+                    studio_id: 'studio_2',
+                    room: 'Live Room',
+                    description: 'Classic electric guitar with versatile tone options',
+                    image_url: 'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400'
+                },
+                {
+                    name: 'Roland TR-808 Drum Machine',
+                    brand: 'Roland',
+                    model: 'TR-808',
+                    category: 'Drum Machine',
+                    studio_id: 'studio_2',
+                    room: 'Production Room',
+                    description: 'Iconic drum machine that shaped modern music production',
+                    image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400'
+                }
+            ];
+            
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .insert(sampleData);
+                
+                if (error) {
+                    logResult('❌ Failed to insert data: ' + error.message);
+                    showStatus('❌ Failed to insert data: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Sample data inserted successfully!');
+                    logResult('📊 Inserted ' + sampleData.length + ' equipment items');
+                    showStatus('✅ Sample data inserted successfully!', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Error inserting data: ' + err.message);
+                showStatus('❌ Error inserting data: ' + err.message, 'error');
+            }
+        }
+        
+        // Test equipment query
+        async function testQuery() {
+            clearResults();
+            logResult('🔍 Testing equipment query...');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('equipment')
+                    .select('*')
+                    .order('name');
+                
+                if (error) {
+                    logResult('❌ Query failed: ' + error.message);
+                    showStatus('❌ Query failed: ' + error.message, 'error');
+                } else {
+                    logResult('✅ Query successful!');
+                    logResult('📊 Found ' + data.length + ' equipment items:');
+                    data.forEach((item, index) => {
+                        logResult(`  ${index + 1}. ${item.name} (${item.brand} ${item.model || ''})`);
+                    });
+                    showStatus('✅ Query successful! Found ' + data.length + ' items', 'success');
+                }
+            } catch (err) {
+                logResult('❌ Query error: ' + err.message);
+                showStatus('❌ Query error: ' + err.message, 'error');
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('checkConnection').addEventListener('click', testConnection);
+        document.getElementById('checkTables').addEventListener('click', checkTables);
+        document.getElementById('createTable').addEventListener('click', createTable);
+        document.getElementById('insertData').addEventListener('click', insertData);
+        document.getElementById('testQuery').addEventListener('click', testQuery);
+        
+        // Initial connection test
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('Ready to create equipment table. Click "Test Supabase Connection" to start.', 'info');
+        });
+    </script>
+</body>
+</html>

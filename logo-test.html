@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Logo Loading Test</h1>
+    
+    <div class="space-y-4">
+        <div>
+            <h2 class="text-lg font-semibold">Dark Logo:</h2>
+            <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio Dark" class="h-16 border border-gray-300" onerror="this.style.border='2px solid red'; this.alt='FAILED TO LOAD';">
+        </div>
+        
+        <div>
+            <h2 class="text-lg font-semibold">Light Logo:</h2>
+            <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio Light" class="h-16 border border-gray-300" onerror="this.style.border='2px solid red'; this.alt='FAILED TO LOAD';">
+        </div>
+        
+        <div>
+            <h2 class="text-lg font-semibold">Direct URL Test:</h2>
+            <a href="PluggedIn_Studio_Dark.png" target="_blank" class="text-blue-600 underline">Open Dark Logo Directly</a><br>
+            <a href="PluggedIn_Studio_Light.png" target="_blank" class="text-blue-600 underline">Open Light Logo Directly</a>
+        </div>
+    </div>
+    
+    <script>
+        // Log any image loading errors
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                console.error('Failed to load image:', this.src);
+            });
+            img.addEventListener('load', function() {
+                console.log('Successfully loaded image:', this.src);
+            });
+        });
+    </script>
+</body>
+</html>

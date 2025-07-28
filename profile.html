@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .profile-section {
+            transition: all 0.2s ease-in-out;
+        }
+        .profile-section:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .setting-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s ease;
+        }
+        .setting-item:hover {
+            background-color: #f9fafb;
+        }
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #7c3aed;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black shadow-sm border-b border-gray-800 sticky top-0 z-40" role="navigation" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-16 w-auto">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4" role="menubar">
+                    <a href="app.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Home</a>
+                    <a href="bookings.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Bookings</a>
+                    <a href="profile.html" class="text-white font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem" aria-current="page">Profile</a>
+                    <div id="userMenu" class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                <span id="userInitials" class="text-white text-sm font-medium">U</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Profile Header -->
+        <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <div class="flex items-center space-x-6">
+                <div class="relative">
+                    <div class="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-white text-2xl font-bold" id="profileInitials">U</span>
+                    </div>
+                    <button class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-md border hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1">
+                    <h1 class="text-2xl font-bold text-gray-900" id="profileName">John Doe</h1>
+                    <p class="text-gray-600" id="profileEmail">john.doe@example.com</p>
+                    <p class="text-sm text-gray-500 mt-1">Member since January 2024</p>
+                    <div class="flex items-center space-x-4 mt-4">
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-purple-600" id="totalBookings">12</div>
+                            <div class="text-xs text-gray-500">Total Bookings</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-purple-600" id="favoriteStudios">5</div>
+                            <div class="text-xs text-gray-500">Favorite Studios</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-purple-600" id="reviewsWritten">8</div>
+                            <div class="text-xs text-gray-500">Reviews Written</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Account Settings -->
+            <div class="bg-white rounded-lg shadow-sm profile-section">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Account Settings</h2>
+                </div>
+                <div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Personal Information</h3>
+                            <p class="text-sm text-gray-500">Update your name, email, and phone number</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Password & Security</h3>
+                            <p class="text-sm text-gray-500">Change password and security settings</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Payment Methods</h3>
+                            <p class="text-sm text-gray-500">Manage your payment cards and billing</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="bg-white rounded-lg shadow-sm profile-section">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Notifications</h2>
+                </div>
+                <div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Email Notifications</h3>
+                            <p class="text-sm text-gray-500">Booking confirmations and updates</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Push Notifications</h3>
+                            <p class="text-sm text-gray-500">Mobile app notifications</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">SMS Notifications</h3>
+                            <p class="text-sm text-gray-500">Text message reminders</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Marketing Emails</h3>
+                            <p class="text-sm text-gray-500">Promotions and new features</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favorite Studios -->
+            <div class="bg-white rounded-lg shadow-sm profile-section">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-gray-900">Favorite Studios</h2>
+                        <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">View All</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4" id="favoriteStudiosList">
+                        <!-- Favorite studios will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-lg shadow-sm profile-section">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4" id="recentActivityList">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Studio Owner Section (if applicable) -->
+        <div id="studioOwnerSection" class="mt-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg shadow-sm text-white p-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold mb-2">Studio Owner Dashboard</h2>
+                    <p class="text-purple-100">Manage your studio listings and bookings</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        View Dashboard
+                    </button>
+                    <button class="border border-white text-white px-4 py-2 rounded-lg hover:bg-white hover:text-purple-600 transition-colors">
+                        Add Studio
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Become Studio Owner CTA (if not owner) -->
+        <div id="becomeOwnerSection" class="hidden mt-8 bg-white rounded-lg shadow-sm p-8 text-center">
+            <div class="max-w-md mx-auto">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m4 0v-5a1 1 0 011-1h4a1 1 0 011 1v5m-4-5V8a1 1 0 011-1h2a1 1 0 011 1v3"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Own a Recording Studio?</h3>
+                <p class="text-gray-600 mb-6">List your studio on PluggedIn and start accepting bookings from musicians worldwide.</p>
+                <button class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                    List Your Studio
+                </button>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="mt-8 bg-white rounded-lg shadow-sm border border-red-200">
+            <div class="p-6 border-b border-red-200">
+                <h2 class="text-lg font-semibold text-red-600">Danger Zone</h2>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-medium text-gray-900">Delete Account</h3>
+                        <p class="text-sm text-gray-500">Permanently delete your account and all associated data</p>
+                    </div>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/webapp-supabase.js"></script>
+    <script src="js/webapp-auth.js"></script>
+    <script>
+        // Profile management functionality
+        class ProfileManager {
+            constructor() {
+                this.user = null;
+                this.init();
+            }
+
+            async init() {
+                await this.loadUserProfile();
+                this.loadFavoriteStudios();
+                this.loadRecentActivity();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Toggle switches
+                document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+                    toggle.addEventListener('change', (e) => {
+                        this.updateNotificationSetting(e.target);
+                    });
+                });
+            }
+
+            async loadUserProfile() {
+                try {
+                    // Simulate loading user profile
+                    this.user = {
+                        id: '1',
+                        name: 'John Doe',
+                        email: 'john.doe@example.com',
+                        memberSince: '2024-01-01',
+                        totalBookings: 12,
+                        favoriteStudios: 5,
+                        reviewsWritten: 8,
+                        isStudioOwner: false
+                    };
+
+                    this.updateProfileDisplay();
+                } catch (error) {
+                    console.error('Error loading user profile:', error);
+                }
+            }
+
+            updateProfileDisplay() {
+                if (!this.user) return;
+
+                const initials = this.user.name.split(' ').map(n => n[0]).join('');
+                document.getElementById('profileInitials').textContent = initials;
+                document.getElementById('userInitials').textContent = initials;
+                document.getElementById('profileName').textContent = this.user.name;
+                document.getElementById('profileEmail').textContent = this.user.email;
+                document.getElementById('totalBookings').textContent = this.user.totalBookings;
+                document.getElementById('favoriteStudios').textContent = this.user.favoriteStudios;
+                document.getElementById('reviewsWritten').textContent = this.user.reviewsWritten;
+
+                // Show/hide studio owner section
+                if (this.user.isStudioOwner) {
+                    document.getElementById('studioOwnerSection').classList.remove('hidden');
+                    document.getElementById('becomeOwnerSection').classList.add('hidden');
+                } else {
+                    document.getElementById('studioOwnerSection').classList.add('hidden');
+                    document.getElementById('becomeOwnerSection').classList.remove('hidden');
+                }
+            }
+
+            async loadFavoriteStudios() {
+                try {
+                    const favoriteStudios = [
+                        {
+                            id: '1',
+                            name: 'Abbey Road Studios',
+                            location: 'London, UK',
+                            image: 'https://via.placeholder.com/60x60?text=AR',
+                            rating: 5.0
+                        },
+                        {
+                            id: '2',
+                            name: 'Electric Lady Studios',
+                            location: 'New York, NY',
+                            image: 'https://via.placeholder.com/60x60?text=EL',
+                            rating: 4.9
+                        },
+                        {
+                            id: '3',
+                            name: 'Sunset Sound',
+                            location: 'Los Angeles, CA',
+                            image: 'https://via.placeholder.com/60x60?text=SS',
+                            rating: 4.8
+                        }
+                    ];
+
+                    const container = document.getElementById('favoriteStudiosList');
+                    container.innerHTML = favoriteStudios.map(studio => `
+                        <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                            <img src="${studio.image}" alt="${studio.name}" class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">${studio.name}</h4>
+                                <p class="text-sm text-gray-500">${studio.location}</p>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span class="text-sm text-gray-600">${studio.rating}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('Error loading favorite studios:', error);
+                }
+            }
+
+            async loadRecentActivity() {
+                try {
+                    const activities = [
+                        {
+                            type: 'booking',
+                            title: 'Booked session at Abbey Road Studios',
+                            time: '2 hours ago',
+                            icon: 'calendar'
+                        },
+                        {
+                            type: 'review',
+                            title: 'Left review for Electric Lady Studios',
+                            time: '1 day ago',
+                            icon: 'star'
+                        },
+                        {
+                            type: 'favorite',
+                            title: 'Added Sunset Sound to favorites',
+                            time: '3 days ago',
+                            icon: 'heart'
+                        },
+                        {
+                            type: 'booking',
+                            title: 'Completed session at Sound City',
+                            time: '1 week ago',
+                            icon: 'check'
+                        }
+                    ];
+
+                    const container = document.getElementById('recentActivityList');
+                    container.innerHTML = activities.map(activity => `
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                ${this.getActivityIcon(activity.icon)}
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">${activity.title}</p>
+                                <p class="text-xs text-gray-500">${activity.time}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('Error loading recent activity:', error);
+                }
+            }
+
+            getActivityIcon(type) {
+                const icons = {
+                    calendar: '<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4m-4 8a4 4 0 11-8 0v-4m4-4h8m-4-4v8m-4 4h8"></path></svg>',
+                    star: '<svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>',
+                    heart: '<svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>',
+                    check: '<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+                };
+                return icons[type] || icons.check;
+            }
+
+            updateNotificationSetting(toggle) {
+                const setting = toggle.closest('.setting-item').querySelector('h3').textContent;
+                const enabled = toggle.checked;
+                
+                console.log(`${setting}: ${enabled ? 'enabled' : 'disabled'}`);
+                
+                // In a real app, this would update the setting via API
+                // For now, just show a brief feedback
+                const feedback = document.createElement('div');
+                feedback.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                feedback.textContent = `${setting} ${enabled ? 'enabled' : 'disabled'}`;
+                document.body.appendChild(feedback);
+                
+                setTimeout(() => {
+                    feedback.remove();
+                }, 2000);
+            }
+        }
+
+        // Initialize profile manager
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProfileManager();
+        });
+    </script>
+</body>
+</html>

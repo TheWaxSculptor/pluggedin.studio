@@ -1,0 +1,23 @@
+<svg width="180" height="40" viewBox="0 0 180 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main PluggedIn text -->
+  <text x="8" y="26" fill="#4a5568" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="600">PluggedIn</text>
+  
+  <!-- .studio text -->
+  <text x="105" y="30" fill="#6b7280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="400">.studio</text>
+  
+  <!-- Audio jack icon -->
+  <g transform="translate(150, 20)">
+    <!-- Cable -->
+    <path d="M-15,0 L-5,0" stroke="#8b5cf6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    
+    <!-- Jack body -->
+    <rect x="-5" y="-3" width="12" height="6" rx="3" fill="#8b5cf6"/>
+    
+    <!-- Jack tip -->
+    <rect x="7" y="-1.5" width="4" height="3" rx="1.5" fill="#8b5cf6"/>
+    
+    <!-- Ring detail -->
+    <rect x="1" y="-2" width="1" height="4" fill="#a855f7"/>
+    <rect x="4" y="-2" width="1" height="4" fill="#a855f7"/>
+  </g>
+</svg>

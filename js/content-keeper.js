@@ -14,7 +14,7 @@
         'h1',
         '.tagline',
         '.countdown',
-        '.video-container',
+        // '.video-container', // Removed as requested
         '.subscribe',
         '.whitepaper-section',
         '.social-links'

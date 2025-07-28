@@ -30,6 +30,7 @@ body {
     flex-direction: column;
     transition: background-color 0.3s ease;
     letter-spacing: -0.02em;
+    position: relative; /* Enable proper z-index stacking */
 }
 
 body.dark-mode {
@@ -41,6 +42,61 @@ body.dark-mode .logo-container {
     background-color: rgba(255, 255, 255, 0.03);
     margin: -2rem -2rem 3rem;
     padding: 2rem 2rem 3rem;
+}
+
+/* Landing page logo styles */
+.landing-logo {
+    width: auto;
+    height: 180px !important;
+    max-width: 100%;
+}
+
+/* Logo container styling */
+.logo-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Beta Access Button Styling */
+.beta-access-container {
+    text-align: center; 
+    margin: 60px 0;
+}
+
+.beta-access-btn {
+    display: inline-block !important;
+    background: #000000 !important;
+    color: white !important;
+    padding: 20px 40px !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 1.5rem !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    margin: 20px !important;
+    border: 2px solid #333 !important;
+    position: relative !important;
+    z-index: 9999 !important;
+    cursor: pointer !important;
+    text-transform: uppercase !important;
+    pointer-events: auto !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 1px !important;
+}
+
+.beta-access-caption {
+    color: #000; 
+    margin-top: 20px; 
+    display: block; 
+    font-size: 1.3rem; 
+    font-weight: bold;
+}
+
+/* Beta button animation */
+@keyframes blink-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
 h1 {
@@ -127,11 +183,6 @@ body.dark-mode .time-label {
 
     .time-label {
         font-size: 0.9rem;
-    }
-
-    .video-container {
-        margin: 2rem -1rem;
-        border-radius: 0;
     }
 
     .subscribe {
@@ -296,24 +347,6 @@ body.dark-mode .tagline {
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
     color: var(--subtle-color);
-}
-
-.video-container {
-    margin: 2rem auto;
-    max-width: 500px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-body.dark-mode .video-container {
-    box-shadow: 0 10px 30px rgba(94, 72, 255, 0.3);
-}
-
-video {
-    width: 100%;
-    height: auto;
-    display: block;
 }
 
 .subscribe {
@@ -599,7 +632,7 @@ body.dark-mode .mode-toggle {
 }
 
 /* GitHub Pages Fix - Prevent content from being hidden */
-body, .container, .container > div, .container > h1, .container > p, .container > form, .logo-container, .tagline, .countdown, .video-container, .subscribe, .whitepaper-section, .social-links {
+body, .container, .container > div, .container > h1, .container > p, .container > form, .logo-container, .tagline, .countdown, .subscribe, .whitepaper-section, .social-links {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;

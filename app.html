@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PluggedIn Studio - Book Your Perfect Recording Space</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="css/featured-studios.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/mobile-fixes.css">
+    <link rel="stylesheet" href="css/button-fixes.css?v=1.0">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,12 +27,13 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
+                        <span class="sr-only">Search</span>
                     </button>
                     <button class="bg-transparent text-white px-4 py-2 rounded-lg border border-white hover:bg-white hover:bg-opacity-10 transition-colors" onclick="showRegisterModal()" title="Register">
                         Register
                     </button>
-                    <button class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors" onclick="showSignInModal()" title="Sign In">
-                        Sign In
+                    <button id="bookingBtn" class="flex-1 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black" aria-label="Search for sessions">
+                        Search
                     </button>
                     <div id="userMenu" class="hidden relative">
                         <button id="userMenuBtn" class="flex items-center space-x-2 text-white hover:text-gray-300">
@@ -72,23 +76,62 @@
                                 <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 border-r border-gray-200 rounded-l-lg">
                                     <div class="px-4 py-6">
                                         <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Where</label>
-                                        <input type="text" placeholder="Search studios" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                        <div class="relative">
+                                            <input type="text" id="locationInput" placeholder="Search studios" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium" aria-label="Enter location" autocomplete="off">
+                                            <div id="locationSuggestions" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden">
+                                                <!-- Suggestions will be populated here -->
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Check In Key -->
+                                <!-- Session Start Key -->
                                 <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 border-r border-gray-200">
                                     <div class="px-4 py-6">
-                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Check in</label>
-                                        <input type="text" placeholder="Add dates" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Session Start</label>
+                                        <div class="relative">
+                                            <input type="date" id="sessionStartDate" placeholder="Select date" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium cursor-pointer">
+                                            <select id="sessionStartTime" class="mt-2 w-full text-sm text-gray-700 bg-transparent border border-gray-300 rounded px-2 py-1 outline-none" title="Session start time" aria-label="Choose a start time">
+                                                <option value="">Select time</option>
+                                                <option value="09:00">9:00 AM</option>
+                                                <option value="10:00">10:00 AM</option>
+                                                <option value="11:00">11:00 AM</option>
+                                                <option value="12:00">12:00 PM</option>
+                                                <option value="13:00">1:00 PM</option>
+                                                <option value="14:00">2:00 PM</option>
+                                                <option value="15:00">3:00 PM</option>
+                                                <option value="16:00">4:00 PM</option>
+                                                <option value="17:00">5:00 PM</option>
+                                                <option value="18:00">6:00 PM</option>
+                                                <option value="19:00">7:00 PM</option>
+                                                <option value="20:00">8:00 PM</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Check Out Key -->
+                                <!-- Session End Key -->
                                 <div class="piano-key white-key flex-1 bg-white hover:bg-gray-50 transition-all duration-200 border-r border-gray-200">
                                     <div class="px-4 py-6">
-                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Check out</label>
-                                        <input type="text" placeholder="Add dates" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium">
+                                        <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Session End</label>
+                                        <div class="relative">
+                                            <input type="date" id="sessionEndDate" placeholder="Select date" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium cursor-pointer">
+                                            <select id="sessionEndTime" class="mt-2 w-full text-sm text-gray-700 bg-transparent border border-gray-300 rounded px-2 py-1 outline-none" title="Session end time" aria-label="Choose an end time">
+                                                <option value="">Select time</option>
+                                                <option value="09:00">9:00 AM</option>
+                                                <option value="10:00">10:00 AM</option>
+                                                <option value="11:00">11:00 AM</option>
+                                                <option value="12:00">12:00 PM</option>
+                                                <option value="13:00">1:00 PM</option>
+                                                <option value="14:00">2:00 PM</option>
+                                                <option value="15:00">3:00 PM</option>
+                                                <option value="16:00">4:00 PM</option>
+                                                <option value="17:00">5:00 PM</option>
+                                                <option value="18:00">6:00 PM</option>
+                                                <option value="19:00">7:00 PM</option>
+                                                <option value="20:00">8:00 PM</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -103,7 +146,7 @@
                             
                             <!-- Black Piano Key (Search Button) - Narrower like a real piano key -->
                             <div class="absolute right-2 top-1 bottom-1/3">
-                                <button class="piano-key black-key bg-black hover:bg-gray-800 text-white transition-all duration-200 rounded-b-lg shadow-lg h-full flex items-center justify-center w-16" onclick="window.location.href='search.html'">
+                                <button class="piano-key black-key bg-black hover:bg-gray-800 text-white transition-all duration-200 rounded-b-lg shadow-lg h-full flex items-center justify-center w-16" onclick="window.location.href='search.html'" aria-label="Search for studios">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
@@ -681,5 +724,163 @@
     <script src="js/external-calendar-integration.js"></script>
     <script src="js/webapp-featured-studios.js"></script>
     <script src="js/webapp-app.js"></script>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Register</h2>
+                <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close register modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- User Type Toggle -->
+            <div class="mb-6">
+                <div class="flex border rounded-lg overflow-hidden">
+                    <button type="button" id="clientToggle" class="userTypeToggle flex-1 py-3 px-4 text-center font-medium bg-black text-white" onclick="toggleUserType('client')" aria-pressed="true">Client (Artist)</button>
+                    <button type="button" id="studioToggle" class="userTypeToggle flex-1 py-3 px-4 text-center font-medium bg-gray-100 text-gray-700" onclick="toggleUserType('studio')" aria-pressed="false">Studio Owner</button>
+                </div>
+                <p class="text-sm text-gray-600 mt-2">Select whether you're registering as a client looking for studios or as a studio owner listing your space.</p>
+            </div>
+            <form>
+                <div class="mb-4">
+                    <label for="registerName" class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+                    <input type="text" id="registerName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="registerEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="registerEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label for="registerPassword" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="registerPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-6">
+                    <label for="confirmPassword" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="button" onclick="submitRegistration()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" title="Create account">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal JavaScript Functions -->
+    <script>
+        // Track the selected user type, default to client
+        let selectedUserType = 'client';
+        
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.remove('hidden');
+        }
+        
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.add('hidden');
+        }
+        
+        function toggleUserType(type) {
+            selectedUserType = type;
+            
+            // Update UI to show the active selection
+            const clientToggle = document.getElementById('clientToggle');
+            const studioToggle = document.getElementById('studioToggle');
+            
+            if (type === 'client') {
+                clientToggle.classList.add('bg-black', 'text-white');
+                clientToggle.classList.remove('bg-gray-100', 'text-gray-700');
+                clientToggle.setAttribute('aria-pressed', 'true');
+                
+                studioToggle.classList.add('bg-gray-100', 'text-gray-700');
+                studioToggle.classList.remove('bg-black', 'text-white');
+                studioToggle.setAttribute('aria-pressed', 'false');
+            } else {
+                studioToggle.classList.add('bg-black', 'text-white');
+                studioToggle.classList.remove('bg-gray-100', 'text-gray-700');
+                studioToggle.setAttribute('aria-pressed', 'true');
+                
+                clientToggle.classList.add('bg-gray-100', 'text-gray-700');
+                clientToggle.classList.remove('bg-black', 'text-white');
+                clientToggle.setAttribute('aria-pressed', 'false');
+            }
+        }
+        
+        function submitRegistration() {
+            // Get form values
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate form
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill out all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            // Show loading state
+            const registerBtn = document.querySelector('button[onclick="submitRegistration()"]');
+            const originalBtnText = registerBtn.innerHTML;
+            registerBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Registering...';
+            registerBtn.disabled = true;
+            
+            // Connect to Supabase and register user
+            const { supabase } = window.db;
+            
+            // First register the auth user
+            supabase.auth.signUp({ 
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: name,
+                        user_type: selectedUserType  // Include the user type (client or studio)
+                    }
+                }
+            })
+            .then(({ data, error }) => {
+                if (error) {
+                    console.error('Registration error:', error);
+                    alert('Registration failed: ' + error.message);
+                    registerBtn.innerHTML = originalBtnText;
+                    registerBtn.disabled = false;
+                    return;
+                }
+                
+                // Also store in studio_registrations table for backward compatibility
+                supabase
+                    .from('studio_registrations')
+                    .insert([
+                        { 
+                            name: name,
+                            email: email,
+                            registration_date: new Date().toISOString()
+                        }
+                    ])
+                    .then(({ error: insertError }) => {
+                        if (insertError) {
+                            console.warn('Additional registration data error:', insertError);
+                            // Continue anyway since auth user was created
+                        }
+                        
+                        // Success message and close modal
+                        alert('Registration successful! Check your email to confirm your account.');
+                        closeRegisterModal();
+                        
+                        // Restore button
+                        registerBtn.innerHTML = originalBtnText;
+                        registerBtn.disabled = false;
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

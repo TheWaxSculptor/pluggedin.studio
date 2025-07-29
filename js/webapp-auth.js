@@ -126,6 +126,23 @@ class AuthManager {
             });
         }
 
+        // Google sign up/sign in
+        const googleBtn = document.getElementById('googleSignUpBtn');
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    const { data, error } = await window.supabase.auth.signInWithOAuth({ provider: 'google' });
+                    if (error) {
+                        alert('Google sign in failed: ' + error.message);
+                    }
+                    // On success, Supabase will redirect or handle the session
+                } catch (err) {
+                    alert('Google sign in failed.');
+                }
+            });
+        }
+
         // Profile and bookings links
         const profileLink = document.getElementById('profileLink');
         const bookingsLink = document.getElementById('bookingsLink');

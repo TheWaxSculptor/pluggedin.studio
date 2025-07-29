@@ -36,6 +36,15 @@ class AuthManager {
         if (switchToSignUp) {
             switchToSignUp.addEventListener('click', () => this.toggleAuthMode());
         }
+        // Accessibility: allow Enter/Space to toggle
+        if (switchToSignUp) {
+            switchToSignUp.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.toggleAuthMode();
+                }
+            });
+        }
 
         // Google Sign In
         const googleSignInBtn = document.getElementById('googleSignInBtn');
@@ -48,11 +57,19 @@ class AuthManager {
         if (confirmPassword) {
             confirmPassword.addEventListener('input', () => this.validatePasswordMatch());
         }
+        // Accessibility: announce password mismatch
+        if (confirmPassword) {
+            confirmPassword.setAttribute('aria-describedby', 'passwordHelp');
+        }
 
         // Password strength indicator
         const password = document.getElementById('password');
         if (password) {
             password.addEventListener('input', () => this.validatePasswordStrength());
+        }
+        // Accessibility: announce password requirements
+        if (password) {
+            password.setAttribute('aria-describedby', 'passwordHelp');
         }
 
         // Forgot password
@@ -63,7 +80,27 @@ class AuthManager {
                 this.showForgotPasswordModal();
             });
         }
+        // Accessibility: allow keyboard for forgot password
+        if (forgotPasswordLink) {
+            forgotPasswordLink.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.showForgotPasswordModal();
+                }
+            });
+        }
 
+        // User Type radio accessibility
+        const userTypeRadios = document.getElementsByName('userType');
+        if (userTypeRadios) {
+            userTypeRadios.forEach(radio => {
+                radio.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        radio.checked = true;
+                    }
+                });
+            });
+        }
         // User menu interactions
         const userMenuBtn = document.getElementById('userMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
@@ -145,7 +182,6 @@ class AuthManager {
         const submitBtnText = document.getElementById('submitBtnText');
         const switchBtn = document.getElementById('switchToSignUp');
         const switchText = document.getElementById('switchText');
-        
         // Fields that are only shown for sign up
         const nameField = document.getElementById('nameField');
         const confirmPasswordField = document.getElementById('confirmPasswordField');
@@ -155,7 +191,7 @@ class AuthManager {
         const passwordHelp = document.getElementById('passwordHelp');
         const fullNameInput = document.getElementById('fullName');
         const confirmPasswordInput = document.getElementById('confirmPassword');
-
+        const agreeTerms = document.getElementById('agreeTerms');
         if (this.isSignUpMode) {
             // Update text content
             if (title) title.textContent = 'Join PluggedIn.studio';

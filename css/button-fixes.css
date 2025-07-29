@@ -1,0 +1,64 @@
+/* Button Fixes for PluggedIn.studio */
+
+/* Global fixes for all interactive elements */
+button, 
+a, 
+.btn, 
+.beta-access-btn, 
+input[type="submit"],
+input[type="button"],
+.nav-link,
+.clickable,
+[role="button"] {
+  pointer-events: auto !important; /* Force pointer events to be enabled */
+  position: relative !important; /* Ensure proper stacking context */
+  z-index: 50 !important; /* Ensure buttons are above other content */
+  cursor: pointer !important; /* Show clickable cursor */
+  outline: none !important; /* Remove focus outline */
+  -webkit-tap-highlight-color: rgba(0,0,0,0) !important; /* Remove tap highlight on mobile */
+}
+
+/* Fix for form inputs and other interactive elements */
+input, 
+select, 
+textarea,
+.input-wrapper,
+.select-wrapper {
+  pointer-events: auto !important;
+  z-index: 40 !important;
+}
+
+/* Specific fix for Beta Access button */
+.beta-access-btn {
+  z-index: 1000 !important; /* Extra high z-index to ensure visibility */
+  display: inline-block !important;
+  cursor: pointer !important;
+  transition: transform 0.3s, box-shadow 0.3s !important;
+}
+
+/* Ensure proper hover effects work */
+.beta-access-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 20px 50px rgba(255,0,0,0.6) !important;
+}
+
+/* Fix for modal buttons and other overlay elements */
+.modal button,
+.dropdown button,
+.modal a,
+.dropdown a,
+#registerModal button,
+#authModal button {
+  z-index: 2000 !important;
+}
+
+/* Specific fixes for mobile */
+@media (max-width: 768px) {
+  button, 
+  a, 
+  .btn, 
+  .beta-access-btn {
+    min-height: 44px !important; /* Better tap target for mobile */
+    padding: 10px !important; /* Ensure enough padding for touch */
+  }
+}

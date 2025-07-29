@@ -265,44 +265,26 @@ class AvailabilityCalendar {
             }
         });
     }
-
-    /**
-     * Render available time slots for selected date
-     */
-    renderTimeSlots(dateKey) {
-        const timeSlotsContainer = this.container.querySelector('#timeSlots');
-        if (!timeSlotsContainer) return;
-
         const slots = this.availableSlots.get(dateKey) || [];
-        const availableSlots = slots.filter(slot => slot.available);
+        const availableSlots = slots.filter(slot => slot.available).length;
+        
+        const isCurrentMonth = date.getMonth() === this.currentDate.getMonth();
+        const isToday = date.toDateString() === new Date().toDateString();
+        const isSelected = this.selectedDate && date.toDateString() === this.selectedDate.toDateString();
+        const isPast = date < new Date().setHours(0, 0, 0, 0);
 
-        if (availableSlots.length === 0) {
-            timeSlotsContainer.innerHTML = `
-                <p class="text-sm text-gray-500">No available slots for this date</p>
-            `;
-            return;
-        }
-
-        const slotsHTML = availableSlots.map(slot => `
-            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-purple-300 cursor-pointer transition-colors time-slot" 
-                 data-time="${slot.time}" data-price="${slot.price}" data-duration="${slot.duration}">
-                <div class="flex items-center space-x-3">
-                    <div class="text-sm font-medium text-gray-900">${slot.time}</div>
-                    <div class="text-xs text-gray-500">${slot.duration} hours</div>
-                </div>
-                <div class="text-sm font-semibold text-purple-600">$${slot.price}/hr</div>
-            </div>
-        `).join('');
-
-        timeSlotsContainer.innerHTML = `
-            <div class="space-y-2">
-                <h4 class="text-sm font-medium text-gray-900">Available Times</h4>
-                ${slotsHTML}
-            </div>
-        `;
-
-        // Add click handlers for time slots
-        timeSlotsContainer.querySelectorAll('.time-slot').forEach(slot => {
+        let dayClass = 'calendar-day p-2 text-center text-sm cursor-pointer rounded-md transition-colors ';
+        
+        if (!isCurrentMonth) {
+            dayClass += 'text-gray-300 ';
+        } else if (isPast) {
+            dayClass += 'text-gray-400 cursor-not-allowed ';
+        } else if (isSelected) {
+            dayClass += 'bg-purple-600 text-white ';
+        } else if (isToday) {
+            dayClass += 'bg-purple-100 text-purple-800 font-semibold ';
+        } else if (availableSlots > 0) {
+            dayClass += 'hover:bg-green-50 text-gray-900 ';
             slot.addEventListener('click', () => {
                 const time = slot.dataset.time;
                 const price = slot.dataset.price;
@@ -319,31 +301,133 @@ class AvailabilityCalendar {
     }
 
     /**
+     * Render available time slots for selected date
+     */
+    renderTimeSlots(dateKey) {
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        if (!timeSlotsContainer) return;
+
+        this.selectedDate = new Date(dateKey);
+        const daySlots = this.availableSlots.get(dateKey) || [];
+        
+        // Create a complete list of all possible time slots for the day
+        const allPossibleTimes = [
+            '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
+            '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+        ];
+        
+        // Mark which slots are available and which are booked
+        const slotStatus = new Map();
+        allPossibleTimes.forEach(time => {
+            // Default all slots to unavailable
+            slotStatus.set(time, { available: false, price: 0, duration: 0 });
+        });
+        
+        // Update with actual availability data
+        daySlots.forEach(slot => {
+            slotStatus.set(slot.time, {
+                available: slot.available,
+                price: slot.price,
+                duration: slot.duration
+            });
+        });
+
+        let slotsHTML = '';
+        if (daySlots.length === 0) {
+            slotsHTML = `
+                <div class="p-4 text-center">
+                    <p class="text-gray-500">No available sessions on this date.</p>
+                </div>
+            `;
+        } else {
+            slotsHTML = `
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-4">
+                    ${Array.from(slotStatus).map(([time, details]) => {
+                        const isAvailable = details.available;
+                        const timeClass = isAvailable ? 
+                            "time-slot bg-white border border-gray-200 rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors" : 
+                            "time-slot bg-gray-100 border border-gray-200 rounded-md p-3 opacity-75 relative overflow-hidden";
+                        
+                        const priceDisplay = isAvailable ? `<span class="text-sm text-purple-600 font-semibold">$${details.price}/hr</span>` : '';
+                        const durationDisplay = isAvailable ? `<div class="text-xs text-gray-500">${details.duration} hour session</div>` : '';
+                        
+                        // Create a crossed-out effect for unavailable slots
+                        const crossOutElement = !isAvailable ? `
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="z-10">
+                                    <path d="M10 10 Q20 20 30 30" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M30 10 Q20 20 10 30" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                                </svg>
+                                <span class="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-red-600 font-semibold bg-white bg-opacity-80 px-1 rounded shadow">Unavailable</span>
+                            </div>` : '';
+                        
+                        const slotAttributes = isAvailable ? `
+                            data-time="${time}"
+                            data-price="${details.price}"
+                            data-duration="${details.duration}"
+                        ` : '';
+                        
+                        return `
+                        <div 
+                            class="${timeClass}"
+                            ${slotAttributes}
+                        >
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-gray-900">${this.formatTime(time)}</span>
+                                ${priceDisplay}
+                            </div>
+                            ${durationDisplay}
+                            ${crossOutElement}
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        timeSlotsContainer.innerHTML = `
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <h4 class="font-medium text-gray-900">Available Sessions for ${this.selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h4>
+                </div>
+                ${slotsHTML}
+            </div>
+        `;
+        
+        // Add click handlers for time slots
+        timeSlotsContainer.querySelectorAll('.time-slot[data-time]').forEach(slot => {
+            slot.addEventListener('click', () => {
+                const time = slot.dataset.time;
+                const price = slot.dataset.price;
+                const duration = slot.dataset.duration;
+                
+                this.onTimeSlotSelected({
+                    date: this.selectedDate,
+                    time: time,
+                    price: parseFloat(price),
+                    duration: parseInt(duration)
+                });
+            });
+        });
+    }
+    
+    /**
+     * Format time string to AM/PM format
+     */
+    formatTime(timeString) {
+        const hour = parseInt(timeString.split(':')[0]);
+        if (hour < 12) {
+            return `${hour === 0 ? 12 : hour}:00 AM`;
+        } else {
+            return `${hour === 12 ? 12 : hour - 12}:00 PM`;
+        }
+    }
+    
+    /**
      * Handle time slot selection
      */
     onTimeSlotSelected(booking) {
         // Emit custom event for booking selection
-        const event = new CustomEvent('timeSlotSelected', {
-            detail: booking
-        });
-        this.container.dispatchEvent(event);
-
-        // Show booking confirmation
-        this.showBookingModal(booking);
-    }
-
-    /**
-     * Show booking confirmation modal
-     */
-    showBookingModal(booking) {
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Confirm Booking</h3>
-                <div class="space-y-3 mb-6">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Date:</span>
                         <span class="font-medium">${booking.date.toLocaleDateString()}</span>
                     </div>
                     <div class="flex justify-between">

@@ -726,15 +726,23 @@
     <script src="js/webapp-app.js"></script>
 
     <!-- Register Modal -->
-    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-            <div class="flex justify-between items-center mb-6">
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto py-4">
+        <div class="bg-white rounded-lg p-6 max-w-lg w-full max-h-90vh overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Register</h2>
                 <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close register modal">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
+            </div>
+            
+            <!-- Progress Indicator -->
+            <div class="mb-6">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="formProgressBar" class="bg-black h-2.5 rounded-full"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1 text-right"><span id="currentStep">1</span> of 3</p>
             </div>
             
             <!-- User Type Toggle -->
@@ -745,25 +753,152 @@
                 </div>
                 <p class="text-sm text-gray-600 mt-2">Select whether you're registering as a client looking for studios or as a studio owner listing your space.</p>
             </div>
-            <form>
-                <div class="mb-4">
-                    <label for="registerName" class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
-                    <input type="text" id="registerName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            
+            <!-- Multi-step Form -->
+            <form id="registrationForm">
+                <!-- Step 1: Basic Info -->
+                <div id="formStep1" class="form-step active-step">
+                    <h3 class="font-bold text-lg mb-4">Step 1: Basic Info</h3>
+                    
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-gray-700 text-sm font-bold mb-2">Full Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="registerName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-gray-700 text-sm font-bold mb-2">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="registerEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="registerPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
+                        <input type="tel" id="registerPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="(optional)">
+                    </div>
+                    
+                    <div class="flex justify-end mt-6">
+                        <button type="button" onclick="goToStep(2)" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Next</button>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="registerEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email" id="registerEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                
+                <!-- Step 2: User Preferences -->
+                <div id="formStep2" class="form-step hidden">
+                    <h3 class="font-bold text-lg mb-4">Step 2: User Preferences</h3>
+                    
+                    <!-- All Users Fields -->
+                    <div class="mb-4">
+                        <label for="registerLocation" class="block text-gray-700 text-sm font-bold mb-2">Location</label>
+                        <input type="text" id="registerLocation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="City, State">
+                    </div>
+                    
+                    <!-- Client-specific Fields -->
+                    <div id="clientFields" class="conditional-fields">
+                        <div class="mb-4">
+                            <label for="artistGenres" class="block text-gray-700 text-sm font-bold mb-2">Music Genres</label>
+                            <select id="artistGenres" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" multiple>
+                                <option value="rock">Rock</option>
+                                <option value="pop">Pop</option>
+                                <option value="hip-hop">Hip-Hop</option>
+                                <option value="rnb">R&B</option>
+                                <option value="jazz">Jazz</option>
+                                <option value="classical">Classical</option>
+                                <option value="electronic">Electronic</option>
+                                <option value="folk">Folk</option>
+                                <option value="country">Country</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="experienceLevel" class="block text-gray-700 text-sm font-bold mb-2">Experience Level</label>
+                            <select id="experienceLevel" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">Select experience level</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="professional">Professional</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Studio Owner Fields -->
+                    <div id="studioFields" class="conditional-fields hidden">
+                        <div class="mb-4">
+                            <label for="studioName" class="block text-gray-700 text-sm font-bold mb-2">Studio Name</label>
+                            <input type="text" id="studioName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="studioType" class="block text-gray-700 text-sm font-bold mb-2">Studio Type</label>
+                            <select id="studioType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">Select studio type</option>
+                                <option value="professional">Professional Studio</option>
+                                <option value="home">Home Studio</option>
+                                <option value="project">Project Studio</option>
+                                <option value="rehearsal">Rehearsal Space</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Studio Amenities</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="amenityMixing" class="mr-2">
+                                    <label for="amenityMixing">Mixing</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="amenityMastering" class="mr-2">
+                                    <label for="amenityMastering">Mastering</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="amenityLiveRoom" class="mr-2">
+                                    <label for="amenityLiveRoom">Live Room</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="amenityEngineer" class="mr-2">
+                                    <label for="amenityEngineer">Engineer Available</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" onclick="goToStep(1)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Back</button>
+                        <button type="button" onclick="goToStep(3)" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Next</button>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="registerPassword" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                    <input type="password" id="registerPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="mb-6">
-                    <label for="confirmPassword" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
-                    <input type="password" id="confirmPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="button" onclick="submitRegistration()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" title="Create account">Register</button>
+                
+                <!-- Step 3: Account Security -->
+                <div id="formStep3" class="form-step hidden">
+                    <h3 class="font-bold text-lg mb-4">Step 3: Create Password</h3>
+                    
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-gray-700 text-sm font-bold mb-2">Password <span class="text-red-500">*</span></label>
+                        <input type="password" id="registerPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <p id="passwordStrength" class="text-xs mt-1"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password <span class="text-red-500">*</span></label>
+                        <input type="password" id="confirmPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="termsAccept" class="mr-2" required>
+                            <label for="termsAccept" class="text-sm text-gray-700">I accept the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="marketingConsent" class="mr-2">
+                            <label for="marketingConsent" class="text-sm text-gray-700">I'd like to receive updates about new features and promotions</label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" onclick="goToStep(2)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Back</button>
+                        <button type="button" onclick="submitRegistration()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" title="Create account">Register</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -773,13 +908,71 @@
     <script>
         // Track the selected user type, default to client
         let selectedUserType = 'client';
+        let currentStep = 1;
         
         function showRegisterModal() {
             document.getElementById('registerModal').classList.remove('hidden');
+            // Reset form to step 1
+            goToStep(1, true);
         }
         
         function closeRegisterModal() {
             document.getElementById('registerModal').classList.add('hidden');
+            // Reset form values
+            document.getElementById('registrationForm').reset();
+        }
+        
+        function goToStep(step, skipValidation = false) {
+            // Validate current step before proceeding (unless skipping validation)
+            if (!skipValidation && step > currentStep) {
+                const currentStepElement = document.getElementById(`formStep${currentStep}`);
+                const requiredFields = currentStepElement.querySelectorAll('input[required]');
+                
+                let isValid = true;
+                requiredFields.forEach(field => {
+                    if (!field.value) {
+                        field.classList.add('border-red-500');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('border-red-500');
+                    }
+                });
+                
+                if (!isValid) {
+                    alert('Please fill out all required fields marked with *');
+                    return;
+                }
+                
+                // Additional validation for step 3
+                if (currentStep === 3) {
+                    const password = document.getElementById('registerPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    if (password !== confirmPassword) {
+                        alert('Passwords do not match');
+                        return;
+                    }
+                }
+            }
+            
+            // Hide all steps
+            document.querySelectorAll('.form-step').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Show the requested step
+            document.getElementById(`formStep${step}`).classList.remove('hidden');
+            
+            // Update progress bar
+            const progressPercent = (step / 3) * 100;
+            document.getElementById('formProgressBar').style.width = `${progressPercent}%`;
+            document.getElementById('currentStep').textContent = step;
+            
+            // Update current step tracker
+            currentStep = step;
+            
+            // Show/hide conditional fields based on user type
+            updateConditionalFields();
         }
         
         function toggleUserType(type) {
@@ -806,18 +999,102 @@
                 clientToggle.classList.remove('bg-black', 'text-white');
                 clientToggle.setAttribute('aria-pressed', 'false');
             }
+            
+            // Update conditional fields if on step 2
+            if (currentStep === 2) {
+                updateConditionalFields();
+            }
+        }
+        
+        function updateConditionalFields() {
+            const clientFields = document.getElementById('clientFields');
+            const studioFields = document.getElementById('studioFields');
+            
+            if (selectedUserType === 'client') {
+                clientFields.classList.remove('hidden');
+                studioFields.classList.add('hidden');
+            } else {
+                clientFields.classList.add('hidden');
+                studioFields.classList.remove('hidden');
+            }
+        }
+        
+        function checkPasswordStrength(password) {
+            const strengthMeter = document.getElementById('passwordStrength');
+            
+            // Check password strength
+            let strength = 0;
+            if (password.match(/[a-z]+/)) strength += 1;
+            if (password.match(/[A-Z]+/)) strength += 1;
+            if (password.match(/[0-9]+/)) strength += 1;
+            if (password.match(/[^a-zA-Z0-9]+/)) strength += 1;
+            if (password.length >= 8) strength += 1;
+            
+            // Update the strength indicator
+            if (password.length === 0) {
+                strengthMeter.textContent = '';
+                strengthMeter.className = 'text-xs mt-1';
+            } else if (strength < 2) {
+                strengthMeter.textContent = 'Weak password';
+                strengthMeter.className = 'text-xs mt-1 text-red-500';
+            } else if (strength < 4) {
+                strengthMeter.textContent = 'Medium password';
+                strengthMeter.className = 'text-xs mt-1 text-yellow-500';
+            } else {
+                strengthMeter.textContent = 'Strong password';
+                strengthMeter.className = 'text-xs mt-1 text-green-500';
+            }
         }
         
         function submitRegistration() {
+            // Validate the form
+            const termsAccepted = document.getElementById('termsAccept').checked;
+            if (!termsAccepted) {
+                alert('You must accept the Terms of Service and Privacy Policy');
+                return;
+            }
+            
             // Get form values
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const location = document.getElementById('registerLocation').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const marketingConsent = document.getElementById('marketingConsent').checked;
             
-            // Validate form
+            // Get user type specific fields
+            let additionalData = {};
+            
+            if (selectedUserType === 'client') {
+                const artistGenresSelect = document.getElementById('artistGenres');
+                const selectedGenres = Array.from(artistGenresSelect.selectedOptions).map(option => option.value);
+                const experienceLevel = document.getElementById('experienceLevel').value;
+                
+                additionalData = {
+                    genres: selectedGenres,
+                    experience_level: experienceLevel
+                };
+            } else {
+                const studioName = document.getElementById('studioName').value;
+                const studioType = document.getElementById('studioType').value;
+                const amenities = [
+                    document.getElementById('amenityMixing').checked ? 'mixing' : null,
+                    document.getElementById('amenityMastering').checked ? 'mastering' : null,
+                    document.getElementById('amenityLiveRoom').checked ? 'live_room' : null,
+                    document.getElementById('amenityEngineer').checked ? 'engineer' : null,
+                ].filter(Boolean);
+                
+                additionalData = {
+                    studio_name: studioName,
+                    studio_type: studioType,
+                    amenities: amenities
+                };
+            }
+            
+            // Validate required fields
             if (!name || !email || !password || !confirmPassword) {
-                alert('Please fill out all fields');
+                alert('Please fill out all required fields');
                 return;
             }
             
@@ -835,14 +1112,18 @@
             // Connect to Supabase and register user
             const { supabase } = window.db;
             
-            // First register the auth user
+            // First register the auth user with expanded metadata
             supabase.auth.signUp({ 
                 email: email,
                 password: password,
                 options: {
                     data: {
                         full_name: name,
-                        user_type: selectedUserType  // Include the user type (client or studio)
+                        user_type: selectedUserType,
+                        phone: phone || null,
+                        location: location || null,
+                        marketing_consent: marketingConsent,
+                        ...additionalData
                     }
                 }
             })
@@ -855,13 +1136,18 @@
                     return;
                 }
                 
-                // Also store in studio_registrations table for backward compatibility
+                // Also store in studio_registrations table with additional info
                 supabase
                     .from('studio_registrations')
                     .insert([
                         { 
                             name: name,
                             email: email,
+                            phone: phone || null,
+                            location: location || null,
+                            user_type: selectedUserType,
+                            marketing_consent: marketingConsent,
+                            additional_data: additionalData,
                             registration_date: new Date().toISOString()
                         }
                     ])
@@ -881,6 +1167,18 @@
                     });
             });
         }
+        
+        // Set up event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password strength checker
+            const passwordInput = document.getElementById('registerPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    checkPasswordStrength(this.value);
+                });
+            }
+        });
+
     </script>
 </body>
 </html>

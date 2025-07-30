@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- GitHub Pages Fix -->
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>PluggedIn.studio - Beta Access</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="PluggedIn.studio Beta - Connect with professional and home recording studios worldwide. Book sessions, find equipment, and discover your perfect recording space.">
+    <meta name="keywords" content="recording studio, music production, studio booking, home studio, professional studio, music creators, audio production">
+    <meta name="author" content="PluggedIn.studio">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="PluggedIn.studio - Beta Access">
+    <meta property="og:description" content="Connect with professional and home recording studios worldwide. Now in Beta!">
+    <meta property="og:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+    <meta property="og:url" content="https://pluggedin.studio">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PluggedIn.studio - Coming Soon">
+    <meta name="twitter:description" content="The next generation platform for music creators is almost here.">
+    <meta name="twitter:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" href="favicon/light/apple-icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon/light/apple-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="favicon/light/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/light/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/light/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon/light/favicon-96x96.png">
+    <link rel="manifest" href="favicon/light/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="favicon/light/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    
+    <link rel="stylesheet" href="css/style.css?v=1.3">
+    <link rel="stylesheet" href="css/whitepaper.css?v=1.0">
+    <link rel="stylesheet" href="css/modal.css?v=1.0">
+    <link rel="stylesheet" href="css/button-fixes.css?v=1.0">
+    <style>
+        
+        /* Social Feed Container */
+        .social-feed-container {
+            margin: 30px auto;
+            max-width: 600px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+        
+        .social-feed-container h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        /* Social Buttons Grid */
+        .social-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 0 auto;
+        }
+        
+        /* Modern Social Button Style */
+        .modern-social-button {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modern-social-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modern-social-button i {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .modern-social-button span {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+        
+        /* Button Colors */
+        .modern-social-button.twitter {
+            background: linear-gradient(45deg, #1DA1F2, #19608F);
+        }
+        
+        .modern-social-button.instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        }
+        
+        .modern-social-button.tweet {
+            background: linear-gradient(45deg, #1DA1F2, #0C7ABF);
+        }
+        
+        .modern-social-button.email {
+            background: linear-gradient(45deg, #6b77e8, #4757e6);
+        }
+        
+        /* Dark mode adjustments */
+        body.dark-mode .social-feed-container {
+            background-color: var(--bg-secondary-dark);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        }
+        
+        body.dark-mode .social-feed-container h3 {
+            color: var(--text-primary-dark);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .social-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-feed-container {
+                padding: 15px;
+                max-width: 90%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+</head>
+<body>
+    <!-- Loading Indicator -->
+    <div class="loader loader-hidden" id="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner" aria-hidden="true"></div>
+            <p class="loader-text">Loading PluggedIn.studio...</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Navigation Bar -->
+        <header class="bg-black shadow-sm border-b border-gray-800 sticky top-0 z-40 min-h-[8rem]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-center items-center h-32 min-h-[8rem]">
+                    <a href="index.html" class="flex items-center" aria-label="PluggedIn home">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-20 w-auto max-h-24 object-contain">
+                    </a>
+                </div>
+            </div>
+        </header>
+        
+        <h1>NOW IN BETA!</h1>
+        <p class="tagline">Connect with professional and home recording studios worldwide. Book sessions, find equipment, and discover your perfect recording space.</p>
+        <div class="mt-3 mb-6">
+            <p class="text-lg font-semibold text-blue-900 bg-blue-50 rounded px-4 py-2 shadow-sm border border-blue-200 max-w-2xl mx-auto text-center" style="letter-spacing:0.01em;">
+                Made by artists for artists.<br>
+                <span class="text-blue-700 font-normal">We definitely kept your pockets in mind.</span>
+            </p>
+        </div>
+        
+        <!-- Enhanced Beta Access Section -->
+        <div class="beta-access-container">
+            <div class="beta-features-preview">
+                <div class="feature-highlight">
+                    <i class="fas fa-search"></i>
+                    <span>Find Studios</span>
+                </div>
+                <div class="feature-highlight">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Book Sessions</span>
+                </div>
+                <div class="feature-highlight">
+                    <i class="fas fa-music"></i>
+                    <span>Browse Equipment</span>
+                </div>
+                <div class="feature-highlight">
+                    <i class="fas fa-comments"></i>
+                    <span>Connect & Chat</span>
+                </div>
+            </div>
+            
+            <a href="app.html" class="beta-access-btn enhanced-btn">
+                <span class="btn-icon">🎹</span>
+                <span class="btn-text">ENTER BETA</span>
+                <span class="btn-subtitle">Full Access Available</span>
+            </a>
+            
+            <div class="beta-stats">
+                <div class="stat-item">
+                    <strong>500+</strong>
+                    <span>Studios Listed</span>
+                </div>
+                <div class="stat-item">
+                    <strong>1000+</strong>
+                    <span>Equipment Items</span>
+                </div>
+                <div class="stat-item">
+                    <strong>24/7</strong>
+                    <span>Support Available</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Beta Styles -->
+        <style>
+            /* Beta Features Preview */
+            .beta-features-preview {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 20px;
+                margin: 30px 0;
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .feature-highlight {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s ease;
+            }
+            
+            .feature-highlight:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-5px);
+            }
+            
+            .feature-highlight i {
+                font-size: 2rem;
+                color: #fff;
+                margin-bottom: 10px;
+            }
+            
+            .feature-highlight span {
+                color: #ccc;
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+            
+            /* Enhanced Beta Button */
+            .enhanced-btn {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 25px 40px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: 3px solid #fff;
+                border-radius: 15px;
+                text-decoration: none;
+                color: white;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .enhanced-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
+            }
+            
+            .enhanced-btn:hover::before {
+                left: 100%;
+            }
+            
+            .enhanced-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            }
+            
+            .btn-icon {
+                font-size: 2rem;
+                margin-bottom: 5px;
+            }
+            
+            .btn-text {
+                font-size: 1.2rem;
+                letter-spacing: 1px;
+            }
+            
+            .btn-subtitle {
+                font-size: 0.8rem;
+                opacity: 0.9;
+                margin-top: 5px;
+            }
+            
+            /* Beta Stats */
+            .beta-stats {
+                display: flex;
+                justify-content: center;
+                gap: 40px;
+                margin-top: 40px;
+                flex-wrap: wrap;
+            }
+            
+            .stat-item {
+                text-align: center;
+                color: #fff;
+            }
+            
+            .stat-item strong {
+                display: block;
+                font-size: 1.5rem;
+                color: #667eea;
+                margin-bottom: 5px;
+            }
+            
+            .stat-item span {
+                font-size: 0.9rem;
+                color: #ccc;
+            }
+            
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .beta-features-preview {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 15px;
+                }
+                
+                .beta-stats {
+                    gap: 20px;
+                }
+                
+                .enhanced-btn {
+                    padding: 20px 30px;
+                }
+            }
+            
+            @keyframes blink-animation {
+                0% { opacity: 1; }
+                50% { opacity: 0.7; }
+                100% { opacity: 1; }
+            }
+            
+            .beta-access-btn {
+                border: 5px solid black !important;
+                position: relative !important;
+                z-index: 1000 !important;
+                pointer-events: auto !important;
+                transition: transform 0.3s, box-shadow 0.3s, background 0.3s !important;
+            }
+            
+            .beta-access-btn:hover {
+                background: #333 !important;
+                box-shadow: 0 6px 16px rgba(0,0,0,0.3) !important;
+                transform: translateY(-2px) !important;
+            }
+        </style>
+        
+        <div class="studio-signup" id="studio-signup">
+            <h2>List Your Studio (Beta)</h2>
+            <p class="signup-description">Studio owners: Join our beta and start connecting with artists looking for professional and home recording spaces.</p>
+            
+            <form id="studio-form" class="studio-registration-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studio-name">Studio Name *</label>
+                        <input type="text" id="studio-name" name="studio_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-name">Contact Person *</label>
+                        <input type="text" id="contact-name" name="contact_name" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contact-email">Contact Email *</label>
+                        <input type="email" id="contact-email" name="contact_email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" name="city" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="state">State/Province *</label>
+                        <input type="text" id="state" name="state" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studio-type">Studio Type *</label>
+                        <select id="studio-type" name="studio_type" required>
+                            <option value="">Select studio type...</option>
+                            <option value="recording">Recording Studio</option>
+                            <option value="rehearsal">Rehearsal Space</option>
+                            <option value="home">Home Studio</option>
+                            <option value="multi">Multi-purpose</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="studio-size">Studio Size</label>
+                        <select id="studio-size" name="studio_size">
+                            <option value="">Select size...</option>
+                            <option value="small">Small/Home (1-2 rooms)</option>
+                            <option value="medium">Medium (3-5 rooms)</option>
+                            <option value="large">Large/Commercial (6+ rooms)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hourly-rate">Hourly Rate Range</label>
+                        <select id="hourly-rate" name="hourly_rate">
+                            <option value="">Select rate range...</option>
+                            <option value="25-50">$25-50</option>
+                            <option value="50-100">$50-100</option>
+                            <option value="100-200">$100-200</option>
+                            <option value="200+">$200+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="operating-hours">Operating Hours</label>
+                        <select id="operating-hours" name="operating_hours">
+                            <option value="">Select hours...</option>
+                            <option value="9-5">Business Hours (9AM-5PM)</option>
+                            <option value="extended">Extended (8AM-10PM)</option>
+                            <option value="24-7">24/7 Available</option>
+                            <option value="weekends">Weekends Only</option>
+                            <option value="flexible">Flexible/By Appointment</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="primary-daw">Primary DAW/Software</label>
+                    <select id="primary-daw" name="primary_daw">
+                        <option value="">Select DAW...</option>
+                        <option value="pro-tools">Pro Tools</option>
+                        <option value="logic-pro">Logic Pro</option>
+                        <option value="ableton">Ableton Live</option>
+                        <option value="cubase">Cubase</option>
+                        <option value="studio-one">Studio One</option>
+                        <option value="reaper">Reaper</option>
+                        <option value="fl-studio">FL Studio</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="equipment">Key Equipment & Services</label>
+                    <textarea id="equipment" name="equipment" placeholder="Describe your main equipment, instruments, and services offered (mixing, mastering, etc.)..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="current-booking">Current Booking Method</label>
+                    <select id="current-booking" name="current_booking">
+                        <option value="">How do you currently take bookings?</option>
+                        <option value="phone-email">Phone/Email Only</option>
+                        <option value="peerspace">Peerspace</option>
+                        <option value="website">Own Website</option>
+                        <option value="social-media">Social Media</option>
+                        <option value="word-of-mouth">Word of Mouth</option>
+                        <option value="other-platform">Other Platform</option>
+                        <option value="none">No Current System</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interest-reason">What interests you most about PluggedIn.studio?</label>
+                    <textarea id="interest-reason" name="interest_reason" placeholder="Tell us what drew you to our platform..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="heard-about">How did you hear about us?</label>
+                    <select id="heard-about" name="heard_about">
+                        <option value="">Select source...</option>
+                        <option value="social-media">Social Media</option>
+                        <option value="google-search">Google Search</option>
+                        <option value="referral">Referral from Friend/Colleague</option>
+                        <option value="industry-event">Industry Event</option>
+                        <option value="music-community">Music Community/Forum</option>
+                        <option value="advertisement">Advertisement</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn">Join PluggedIn.studio</button>
+                
+                <div id="form-message" class="form-message"></div>
+            </form>
+        </div>
+        
+
+        <div class="subscribe">
+            <h2>Be the first to know when we launch</h2>
+            <form id="subscribe-form" aria-labelledby="subscribe-heading">
+                <label for="email" class="visually-hidden">Your email address</label>
+                <input type="email" id="email" placeholder="Your email address" required aria-required="true" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+                <button type="submit" aria-label="Subscribe to newsletter">Notify Me</button>
+            </form>
+            <div id="success-message" class="success-message" aria-live="polite">
+                Thank you! Your email has been added to our notification list.
+            </div>
+        </div>
+        
+        <div class="whitepaper-section">
+            <div class="whitepaper-link">
+                <button onclick="openWhitepaper()">
+                    <i class="fas fa-file-alt"></i>
+                    View Whitepaper
+                </button>
+            </div>
+
+            <div id="whitepaperModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close-button" onclick="closeWhitepaper()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <iframe id="whitepaperFrame" src="whitepaper.html"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="social-feed-container">
+            <h3>Connect With Us</h3>
+            <div class="social-buttons-grid">
+                <a href="https://twitter.com/pluggedfeed" target="_blank" rel="noopener" class="modern-social-button twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Follow<br>@PluggedFeed</span>
+                </a>
+                <a href="https://instagram.com/pluggedin.studioapp" target="_blank" rel="noopener" class="modern-social-button instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>Follow on<br>Instagram</span>
+                </a>
+                <a href="https://twitter.com/intent/tweet?screen_name=pluggedfeed" target="_blank" rel="noopener" class="modern-social-button tweet">
+                    <i class="fas fa-comment"></i>
+                    <span>Tweet to Us</span>
+                </a>
+                <a href="mailto:hello@pluggedin.studio" class="modern-social-button email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="support-text">
+            <p>Support the development</p>
+            <!-- Use iframe to completely isolate Ko-fi button -->
+            <iframe src="kofi.html" id="kofi-iframe" style="border: none; overflow: hidden; width: 100%; height: 70px;" title="Ko-fi donate button"></iframe>
+        </div>
+        
+        <!-- Script to handle dark mode for Ko-fi iframe -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const darkModeToggle = document.getElementById('dark-mode-toggle');
+                const kofiIframe = document.getElementById('kofi-iframe');
+                
+                // Function to update Twitter widget theme based on current site theme
+                function updateTwitterTheme() {
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    const existingTimeline = document.querySelector('.twitter-timeline');
+                    
+                    if (existingTimeline) {
+                        // Remove existing timeline
+                        const parent = existingTimeline.parentNode;
+                        parent.removeChild(existingTimeline);
+                        
+                        // Create new timeline with appropriate theme
+                        const newTimeline = document.createElement('a');
+                        newTimeline.className = 'twitter-timeline';
+                        newTimeline.setAttribute('data-height', '400');
+                        newTimeline.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+                        newTimeline.setAttribute('href', 'https://twitter.com/pluggedfeed');
+                        newTimeline.textContent = 'Tweets by @pluggedfeed';
+                        
+                        // Add to DOM
+                        parent.appendChild(newTimeline);
+                        
+                        // Reload widget
+                        if (window.twttr && window.twttr.widgets) {
+                            window.twttr.widgets.load();
+                        }
+                    }
+                }
+                
+                if (darkModeToggle && kofiIframe) {
+                    // Initial theme
+                    const initialIsDarkMode = document.body.classList.contains('dark-mode');
+                    if (initialIsDarkMode) {
+                        setTimeout(function() {
+                            kofiIframe.contentWindow.postMessage('dark-mode', '*');
+                        }, 1000);
+                    }
+                    
+                    // Listen for theme changes
+                    darkModeToggle.addEventListener('click', function() {
+                        setTimeout(function() {
+                            const updatedIsDarkMode = document.body.classList.contains('dark-mode');
+                            kofiIframe.contentWindow.postMessage(
+                                updatedIsDarkMode ? 'dark-mode' : 'light-mode', 
+                                '*'
+                            );
+                            
+                            // Update Twitter theme
+                            updateTwitterTheme();
+                        }, 100);
+                    });
+                }
+            });
+        </script>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="js/supabase-config.js?v=1.0"></script>
+    <script src="js/script.js?v=1.5"></script>
+    <script src="js/tag-buttons.js"></script>
+    <script src="js/global-button-fixes.js"></script>
+    <script src="js/content-keeper.js?v=1.0"></script>
+    <!-- GitHub Pages Fix Script -->
+    <script>
+        // Ensure content is visible regardless of CSS loading issues
+        window.addEventListener('DOMContentLoaded', function() {
+            // Force display all content
+            document.querySelectorAll('.container, .container > *').forEach(function(el) {
+                el.style.display = el.tagName === 'DIV' ? 'block' : '';
+                el.style.visibility = 'visible';
+                el.style.opacity = '1';
+            });
+            
+            // Hide loader immediately
+            var loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('loader-hidden');
+                loader.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

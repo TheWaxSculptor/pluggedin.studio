@@ -4,10 +4,10 @@
 
 const SUPABASE_CONFIG = {
     // Your Supabase Project URL
-    url: 'https://fdkrfyzcxhnhanodxopj.supabase.co',
+    url: 'https://dovsqgkxxdpdkagzpykn.supabase.co',
     
     // Your Supabase anon/public API key
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+    anonKey: 'YOUR_NEW_ANON_KEY_HERE'
 };
 
 // 🚨 IMPORTANT: After updating the values above, your form will be ready to use!

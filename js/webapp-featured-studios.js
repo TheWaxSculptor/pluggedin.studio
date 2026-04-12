@@ -222,7 +222,7 @@ class FeaturedStudiosManager {
             <div class="studio-card flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white cursor-pointer">
                 <div class="relative h-48 overflow-hidden">
                     <img 
-                        src="${studio.coverImage || 'images/studio-placeholder.jpg'}" 
+                        src="${studio.coverImage || studio.cover_image || studio.image || 'images/studio-placeholder.jpg'}" 
                         alt="${studio.name}" 
                         class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                         onerror="this.src='images/studio-placeholder.jpg'"

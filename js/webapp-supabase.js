@@ -3,7 +3,7 @@
 
 // Get config from supabase-config.js
 const SUPABASE_URL = window.SUPABASE_CONFIG?.url || 'https://dovsqgkxxdpdkagzpykn.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || 'YOUR_NEW_ANON_KEY_HERE';
+const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdnNxZ2t4eGRwZGthZ3pweWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI1NjEsImV4cCI6MjA5MTU5ODU2MX0.SBQQ5IwYy16tmxmGAkS6co8rNl5kPsPjAlOXLHSnQw8';
 
 // Initialize Supabase client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

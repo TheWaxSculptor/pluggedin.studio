@@ -139,40 +139,7 @@ ALTER TABLE ONLY public.messages
 ALTER TABLE ONLY public.studio_registrations ALTER COLUMN id SET DEFAULT nextval('public.studio_registrations_id_seq'::regclass);
 
 
---
--- Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
-ALTER TABLE ONLY public.availabilities
-    ADD CONSTRAINT availabilities_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.conversation_participants
-    ADD CONSTRAINT conversation_participants_conversation_id_user_id_key UNIQUE (conversation_id, user_id);
-ALTER TABLE ONLY public.conversation_participants
-    ADD CONSTRAINT conversation_participants_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.conversations
-    ADD CONSTRAINT conversations_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.equipment
-    ADD CONSTRAINT equipment_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.messages
-    ADD CONSTRAINT messages_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.studio_registrations
-    ADD CONSTRAINT studio_registrations_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.studios
-    ADD CONSTRAINT studios_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_email_key UNIQUE (email);
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
-ALTER TABLE ONLY public.conversation_participants
-    ADD CONSTRAINT conversation_participants_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id) ON DELETE CASCADE;
-ALTER TABLE ONLY public.conversation_participants
-    ADD CONSTRAINT conversation_participants_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-ALTER TABLE ONLY public.messages
-    ADD CONSTRAINT messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id) ON DELETE CASCADE;
-ALTER TABLE ONLY public.messages
-    ADD CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
 
 INSERT INTO public.studios (id, name, location, description, hourly_rate, rating, is_active, created_at) VALUES
 ('b3d6bcd9-3aaf-477f-af40-a686a424af92', 'Soundwave Studios', 'Brooklyn, NY', 'Professional recording studio with top-tier equipment', 75.0, 4.8, true, NOW()),

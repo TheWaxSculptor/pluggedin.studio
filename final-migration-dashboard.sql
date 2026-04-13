@@ -2,6 +2,7 @@
 -- Paste this entire script into the Supabase Dashboard -> SQL Editor and Run
 
 SET search_path = public;
+CREATE SEQUENCE IF NOT EXISTS public.studio_registrations_id_seq;
 
 CREATE TABLE public.availabilities (
     id uuid DEFAULT gen_random_uuid() NOT NULL,

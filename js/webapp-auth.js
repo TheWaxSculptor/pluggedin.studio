@@ -99,20 +99,30 @@ class AuthManager {
             password.addEventListener('input', () => this.validatePasswordStrength());
         }
 
-        // User menu interaction
-        const userMenuBtn = document.getElementById('userMenuBtn');
-        const userDropdown = document.getElementById('userDropdown');
-        if (userMenuBtn && userDropdown) {
-            userMenuBtn.addEventListener('click', () => {
-                userDropdown.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
-                    userDropdown.classList.add('hidden');
-                }
+        // Forgot Password
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        if (forgotPasswordLink) {
+            forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showForgotView();
             });
         }
+
+        const backToSignIn = document.getElementById('backToSignIn');
+        if (backToSignIn) {
+            backToSignIn.addEventListener('click', () => this.hideForgotView());
+        }
+
+        const resetPasswordBtn = document.getElementById('resetPasswordSubmit');
+        if (resetPasswordBtn) {
+            resetPasswordBtn.addEventListener('click', () => this.handleResetPassword());
+        }
+
+        // Password visibility toggle
+        const toggleBtns = document.querySelectorAll('.password-toggle');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => this.togglePasswordVisibility(btn));
+        });
 
         // Sign out
         const signOutBtn = document.getElementById('signOutBtn');
@@ -220,9 +230,16 @@ class AuthManager {
         const submitBtn = document.getElementById('signInSubmit');
         const submitBtnText = document.getElementById('submitBtnText');
         const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+        const errorMsg = document.getElementById('authErrorMsg');
+
+        // Reset error state
+        if (errorMsg) {
+            errorMsg.classList.add('hidden');
+            errorMsg.textContent = '';
+        }
 
         if (!email || !password) {
-            window.utils?.showNotification('Please fill in all fields', 'error');
+            this.showAuthError('Please fill in all fields');
             return;
         }
 
@@ -239,11 +256,23 @@ class AuthManager {
             }
         } catch (error) {
             console.error('Auth error:', error);
+            // Show explicit error in modal
+            this.showAuthError(error.message || 'Authentication failed. Please check your credentials.');
             window.utils?.showNotification(error.message, 'error');
         } finally {
             if (submitBtnText) submitBtnText.textContent = originalText;
             if (submitBtnSpinner) submitBtnSpinner.classList.add('hidden');
             submitBtn.disabled = false;
+        }
+    }
+
+    showAuthError(message) {
+        const errorMsg = document.getElementById('authErrorMsg');
+        if (errorMsg) {
+            errorMsg.textContent = message;
+            errorMsg.classList.remove('hidden');
+        } else {
+            window.utils?.showNotification(message, 'error');
         }
     }
 
@@ -418,8 +447,11 @@ class AuthManager {
 
     async handleResetPassword() {
         const email = document.getElementById('forgotEmail').value;
+        const errorMsg = document.getElementById('authErrorMsg');
+        if (errorMsg) errorMsg.classList.add('hidden');
+
         if (!email) {
-            window.utils?.showNotification('Please enter your email', 'error');
+            this.showAuthError('Please enter your email');
             return;
         }
 
@@ -430,9 +462,25 @@ class AuthManager {
             if (error) throw error;
             window.utils?.showNotification('Reset link sent! Check your email.', 'success');
             this.hideForgotView();
-            this.hideAuthModal();
         } catch (error) {
-            window.utils?.showNotification(error.message, 'error');
+            this.showAuthError(error.message);
+        }
+    }
+
+    // Password visibility toggle
+    togglePasswordVisibility(button) {
+        const input = button.parentElement.querySelector('input');
+        const eyeIcon = button.querySelector('.eye-icon');
+        const eyeOffIcon = button.querySelector('.eye-off-icon');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            eyeIcon?.classList.add('hidden');
+            eyeOffIcon?.classList.remove('hidden');
+        } else {
+            input.type = 'password';
+            eyeIcon?.classList.remove('hidden');
+            eyeOffIcon?.classList.add('hidden');
         }
     }
 

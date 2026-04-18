@@ -127,3 +127,386 @@ textarea:focus {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+/* Mode Switch Toggle Styles */
+.mode-toggle-container {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mode-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.mode-switch:hover {
+    background: #f1f5f9;
+}
+
+.toggle-bg {
+    width: 44px;
+    height: 22px;
+    background: #cbd5e1;
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-dot {
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-active .toggle-bg {
+    background: #3b82f6;
+}
+
+.toggle-active .toggle-dot {
+    transform: translateX(22px);
+}
+
+/* Popular Categories Tags */
+.tag-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.tag-btn:hover {
+    border-color: #94a3b8;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.tag-btn.active {
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
+}
+
+/* Active Filter Chips */
+.active-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.active-tag-remove {
+    margin-left: 6px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.1s;
+}
+
+.active-tag-remove:hover {
+    color: #ef4444;
+}
+
+.active-tag i {
+    font-size: 10px;
+    margin-left: 8px;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.active-tag:hover i {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* Clear All Button */
+.clear-all-btn {
+    font-size: 12px;
+    font-weight: 700;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    cursor: pointer;
+    margin-left: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.clear-all-btn:hover {
+    background-color: #eff6ff;
+    text-decoration: underline;
+}
+
+/* Dark Mode Overrides for Tags */
+.dark .tag-btn {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+.dark .tag-btn:hover {
+    background-color: #334155;
+    border-color: #475569;
+}
+
+.dark .tag-btn.active {
+    background-color: #fff;
+    border-color: #fff;
+    color: #000;
+}
+
+.dark .active-tag {
+    background-color: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+/* Alignment fixes for Popular Categories */
+@media (min-width: 1024px) {
+    #activeTagsContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        margin-top: 2rem;
+    }
+}
+
+/* Featured Scroll Bar Alignment */
+#featuredStudiosCarousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.5rem;
+    padding: 1rem 0 2rem 0;
+}
+
+#featuredStudiosCarousel > div {
+    scroll-snap-align: start;
+    flex: 0 0 calc(33.333% - 1rem);
+    min-width: 300px;
+}
+
+@media (max-width: 1024px) {
+    #featuredStudiosCarousel > div {
+        flex: 0 0 calc(50% - 0.75rem);
+    }
+}
+
+@media (max-width: 640px) {
+    #featuredStudiosCarousel > div {
+        flex: 0 0 100%;
+    }
+}
+
+/* Premium Form Styles */
+:root {
+    --input-focus: #000000;
+    --input-border: #e2e8f0;
+    --input-bg: #ffffff;
+    --input-label: #64748b;
+    --input-error: #ef4444;
+}
+
+.dark {
+    --input-focus: #ffffff;
+    --input-border: #334155;
+    --input-bg: #1e293b;
+    --input-label: #94a3b8;
+}
+
+.premium-field-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+    width: 100%;
+}
+
+.premium-input {
+    width: 100%;
+    height: 56px;
+    padding: 24px 16px 8px 16px;
+    font-size: 16px;
+    background-color: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 12px;
+    color: inherit;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none !important;
+}
+
+.premium-input:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.dark .premium-input:focus {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+.premium-label {
+    position: absolute;
+    left: 16px;
+    top: 18px;
+    font-size: 16px;
+    color: var(--input-label);
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top left;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.premium-input:focus ~ .premium-label,
+.premium-input:not(:placeholder-shown) ~ .premium-label {
+    transform: translateY(-14px) scale(0.75);
+    color: var(--input-focus);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* Fix for required asterisk */
+.required-asterisk {
+    color: var(--input-error);
+    font-size: 14px;
+}
+
+/* Premium Select styles */
+.premium-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+/* Modal refinements */
+#registerModal .bg-white {
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.form-step h3 {
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.5rem;
+}
+
+/* User Type Toggle Refinements */
+.userTypeToggle {
+    border-radius: 10px;
+    margin: 4px;
+    transition: all 0.3s ease;
+}
+
+.userTypeToggle.bg-black {
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom transitions for form steps */
+.form-step {
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-step.active-step {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.form-step.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Professional Button Hover */
+button[type="submit"], #registerBtn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button[type="submit"]:hover, #registerBtn:hover {
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+button[type="submit"]:active, #registerBtn:active {
+    transform: translateY(0);
+}
+
+/* Premium Booking Modal Styles */
+.booking-modal-backdrop {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.booking-modal-content {
+    animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.time-slot-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-width: 1.5px;
+}
+
+.time-slot-btn:hover:not(:disabled) {
+    border-color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.time-slot-btn.selected {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+}
+
+.booking-summary-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+}
+
+.dark .booking-summary-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-color: #334155;
+}

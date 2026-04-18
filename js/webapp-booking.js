@@ -20,9 +20,38 @@ class BookingManager {
         });
     }
 
-    startBookingFlow(studio) {
+    async startBookingFlow(studio) {
         this.selectedStudio = studio;
+        // Fetch external integrations for this studio
+        await this.fetchStudioIntegrations();
         this.showBookingModal();
+    }
+
+    async fetchStudioIntegrations() {
+        try {
+            const { data, error } = await db.supabase
+                .from('studio_integrations')
+                .select('*')
+                .eq('studio_id', this.selectedStudio.id)
+                .eq('status', 'active');
+            
+            if (data) {
+                this.selectedStudio.integrations = data;
+                // Look for calendly_url in config/credentials
+                const calendly = data.find(i => i.platform === 'calendly');
+                if (calendly) {
+                    // Try to decrypt or parse credentials
+                    try {
+                        const creds = JSON.parse(atob(calendly.credentials));
+                        this.selectedStudio.external_booking_url = creds.calendly_url;
+                    } catch (e) {
+                        console.error('Error parsing calendly credentials', e);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching integrations:', error);
+        }
     }
 
     showBookingModal() {
@@ -47,86 +76,104 @@ class BookingManager {
     createBookingModal() {
         const modal = document.createElement('div');
         modal.id = 'bookingModal';
-        modal.className = 'hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
+        modal.className = 'hidden fixed inset-0 z-50 flex items-center justify-center p-4 booking-modal-backdrop';
         
         modal.innerHTML = `
-            <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 shadow-lg rounded-md bg-white">
-                <div class="mt-3">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-semibold text-gray-900">Book ${this.selectedStudio.name}</h3>
-                        <button id="closeBookingModal" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Studio Info -->
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h4 class="font-semibold mb-3">Studio Details</h4>
-                            <div class="space-y-2 text-sm">
-                                <p><span class="font-medium">Location:</span> ${this.selectedStudio.location || 'Not specified'}</p>
-                                <p><span class="font-medium">Rate:</span> ${utils.formatCurrency(this.selectedStudio.hourly_rate || 0)}/hour</p>
-                                <p><span class="font-medium">Capacity:</span> ${this.selectedStudio.capacity || 'Not specified'}</p>
+            <div class="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl booking-modal-content">
+                <div class="flex flex-col md:flex-row h-full">
+                    <!-- Left: Studio Preview (Premium) -->
+                    <div class="w-full md:w-5/12 bg-black p-8 text-white flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20">
+                            <img src="${this.selectedStudio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1000&q=80'}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="relative z-10">
+                            <div class="inline-block px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-white/20">Reservation</div>
+                            <h3 class="text-4xl font-black mb-2 leading-none">${this.selectedStudio.name}</h3>
+                            <p class="text-gray-400 text-xs mb-6 flex items-center font-medium">
+                                <i class="fas fa-map-marker-alt mr-2 text-white/50"></i> ${this.selectedStudio.location || 'Studio Location'}
+                            </p>
+                        </div>
+                        
+                        <div class="relative z-10 space-y-4">
+                            <div class="flex items-center justify-between py-4 border-t border-white/10">
+                                <span class="text-white/50 text-xs font-bold uppercase tracking-wider">Hourly Rate</span>
+                                <span class="font-black text-2xl">${utils.formatCurrency(this.selectedStudio.price || 0)}</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Booking Form -->
-                        <div>
-                            <form id="bookingForm" class="space-y-4">
-                                <div>
-                                    <label for="bookingDate" class="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
-                                    <input type="date" id="bookingDate" required 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                           min="${new Date().toISOString().split('T')[0]}">
-                                </div>
+                    <!-- Right: Booking Form -->
+                    <div class="w-full md:w-7/12 p-10 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-8">
+                            <h4 class="text-2xl font-black tracking-tight uppercase">Configure Session</h4>
+                            <button id="closeBookingModal" class="p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <form id="bookingForm" class="space-y-8">
+                            <!-- Date Selection -->
+                            <div class="premium-field-group">
+                                <input type="date" id="bookingDate" required 
+                                       class="premium-input" placeholder=" "
+                                       min="${new Date().toISOString().split('T')[0]}">
+                                <label for="bookingDate" class="premium-label italic">Select Session Date</label>
+                            </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Available Time Slots</label>
-                                    <div id="timeSlots" class="grid grid-cols-2 gap-2">
-                                        <div class="text-center text-gray-500 py-4">Select a date to see available times</div>
+                            <!-- Time Selection -->
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Availability Window</label>
+                                <div id="timeSlots" class="grid grid-cols-3 gap-3">
+                                    <div class="col-span-3 text-center text-gray-400 py-10 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-2xl italic text-sm">
+                                        Select a date to unlock session times
                                     </div>
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
-                                    <select id="duration" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                                        <option value="">Select duration</option>
-                                        <option value="1">1 hour</option>
-                                        <option value="2">2 hours</option>
-                                        <option value="3">3 hours</option>
-                                        <option value="4">4 hours</option>
-                                        <option value="6">6 hours</option>
-                                        <option value="8">8 hours</option>
-                                    </select>
-                                </div>
+                            <!-- Duration Selection -->
+                            <div class="premium-field-group">
+                                <select id="duration" required class="premium-input premium-select">
+                                    <option value="" disabled selected>Duration of stay?</option>
+                                    <option value="1">1 Hour</option>
+                                    <option value="2">2 Hours</option>
+                                    <option value="3">3 Hours</option>
+                                    <option value="4">4 Hours</option>
+                                    <option value="8">Full Day Session (8h)</option>
+                                </select>
+                                <label class="premium-label italic">Session Duration</label>
+                            </div>
 
-                                <div>
-                                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Special Requirements (Optional)</label>
-                                    <textarea id="notes" rows="3" 
-                                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                              placeholder="Any special requirements or notes..."></textarea>
-                                </div>
+                            <!-- Notes -->
+                            <div class="premium-field-group">
+                                <textarea id="notes" class="premium-input h-24 py-4" placeholder=" "></textarea>
+                                <label for="notes" class="premium-label italic">Special Requirements / Notes</label>
+                            </div>
 
-                                <!-- Booking Summary -->
-                                <div id="bookingSummary" class="hidden bg-blue-50 p-4 rounded-lg">
-                                    <h5 class="font-medium text-blue-900 mb-2">Booking Summary</h5>
-                                    <div id="summaryContent" class="text-sm text-blue-800"></div>
-                                </div>
+                            <!-- Summary Card -->
+                            <div id="bookingSummary" class="hidden p-8 rounded-3xl booking-summary-card">
+                                <div id="summaryContent" class="space-y-2"></div>
+                            </div>
 
-                                <div class="flex justify-end space-x-3 pt-4">
-                                    <button type="button" id="cancelBooking" 
-                                            class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
-                                        Cancel
-                                    </button>
-                                    <button type="submit" id="confirmBooking" 
-                                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Confirm Booking
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            <!-- Actions -->
+                            <div class="flex flex-col gap-3 pt-4">
+                                <button type="submit" id="confirmBooking" 
+                                        class="flex-1 bg-black text-white dark:bg-white dark:text-black py-5 rounded-2xl font-black text-lg hover:scale-[1.01] active:scale-[0.99] transition-all shadow-2xl shadow-black/20 uppercase tracking-widest">
+                                    Finalize Booking
+                                </button>
+                                
+                                ${this.selectedStudio.external_booking_url ? `
+                                    <div class="relative py-2 text-center">
+                                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-100 dark:border-gray-800"></div></div>
+                                        <span class="relative px-2 bg-white dark:bg-slate-900 text-[10px] font-black text-gray-400 uppercase tracking-widest">Or Booking via</span>
+                                    </div>
+                                    <a href="${this.selectedStudio.external_booking_url}" target="_blank" 
+                                       class="flex items-center justify-center gap-2 border-2 border-gray-100 dark:border-gray-800 py-4 rounded-2xl font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Reserve on Calendly
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -165,7 +212,8 @@ class BookingManager {
         const modal = document.getElementById('bookingModal');
         if (modal) {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
+                const content = modal.querySelector('.booking-modal-content');
+                if (e.target === modal || (content && !content.contains(e.target))) {
                     this.hideBookingModal();
                 }
             });
@@ -183,15 +231,47 @@ class BookingManager {
         this.selectedDate = dateInput.value;
         
         // Show loading state
-        timeSlotsContainer.innerHTML = '<div class="col-span-2 text-center text-gray-500 py-4">Loading available times...</div>';
+        timeSlotsContainer.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 animate-pulse font-bold tracking-widest text-xs uppercase">Analyzing Studio Schedule...</div>';
 
         try {
-            // Generate time slots (in a real app, this would come from the database)
-            const timeSlots = this.generateTimeSlots();
-            this.renderTimeSlots(timeSlots);
+            // 1. Fetch external busy slots for this date
+            const { data: externalBusy, error } = await db.supabase
+                .from('studio_external_availability')
+                .select('*')
+                .eq('studio_id', this.selectedStudio.id)
+                .gte('start_time', `${this.selectedDate}T00:00:00Z`)
+                .lte('end_time', `${this.selectedDate}T23:59:59Z`);
+
+            if (error) console.error('Error fetching external availability:', error);
+
+            // 2. Generate initial slots
+            let timeSlots = this.generateTimeSlots();
+
+            // 3. Filter out slots that conflict with external busy events
+            if (externalBusy && externalBusy.length > 0) {
+                timeSlots = timeSlots.map(slot => {
+                    const slotStart = new Date(`${this.selectedDate}T${slot.time}:00Z`);
+                    // Cross reference with external busy times
+                    const isConflict = externalBusy.some(busy => {
+                        const busyStart = new Date(busy.start_time);
+                        const busyEnd = new Date(busy.end_time);
+                        return slotStart >= busyStart && slotStart < busyEnd;
+                    });
+
+                    if (isConflict) {
+                        return { ...slot, available: false, label: 'Outside Sync' };
+                    }
+                    return slot;
+                });
+            }
+
+            // Small delay for premium feel
+            setTimeout(() => {
+                this.renderTimeSlots(timeSlots);
+            }, 600);
         } catch (error) {
             console.error('Error loading time slots:', error);
-            timeSlotsContainer.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error loading time slots</div>';
+            timeSlotsContainer.innerHTML = '<div class="col-span-3 text-center text-red-500 py-4">Error loading time slots</div>';
         }
     }
 
@@ -224,39 +304,41 @@ class BookingManager {
 
         timeSlotsContainer.innerHTML = slots.map(slot => `
             <button type="button" 
-                    class="time-slot p-2 text-sm border rounded-md transition-colors ${
+                    class="time-slot-btn py-3 px-1 text-xs font-bold border rounded-xl transition-all ${
                         slot.isAvailable 
-                            ? 'border-gray-300 hover:border-blue-500 hover:bg-blue-50' 
-                            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                            ? 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700' 
+                            : 'opacity-30 cursor-not-allowed border-transparent'
                     }" 
                     data-time="${slot.time}"
                     ${!slot.isAvailable ? 'disabled' : ''}>
                 ${slot.displayTime}
-                ${!slot.isAvailable ? '<br><span class="text-xs">Unavailable</span>' : ''}
             </button>
         `).join('');
 
         // Add click listeners to available slots
-        timeSlotsContainer.querySelectorAll('.time-slot:not([disabled])').forEach(button => {
+        timeSlotsContainer.querySelectorAll('.time-slot-btn:not([disabled])').forEach(button => {
             button.addEventListener('click', () => this.selectTimeSlot(button));
         });
     }
 
     selectTimeSlot(button) {
         // Remove previous selection
-        document.querySelectorAll('.time-slot').forEach(btn => {
-            btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+        document.querySelectorAll('.time-slot-btn').forEach(btn => {
+            btn.classList.remove('selected');
         });
 
         // Add selection to clicked button
-        button.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+        button.classList.add('selected');
         
         this.selectedTimeSlot = button.dataset.time;
         this.updateBookingSummary();
     }
 
     updateBookingSummary() {
-        const duration = document.getElementById('duration').value;
+        const durationSelect = document.getElementById('duration');
+        if (!durationSelect) return;
+        
+        const duration = durationSelect.value;
         const summaryContainer = document.getElementById('bookingSummary');
         const summaryContent = document.getElementById('summaryContent');
 
@@ -267,16 +349,30 @@ class BookingManager {
 
         const startTime = new Date(`${this.selectedDate}T${this.selectedTimeSlot}`);
         const endTime = new Date(startTime.getTime() + (parseInt(duration) * 60 * 60 * 1000));
-        const totalCost = (this.selectedStudio.hourly_rate || 0) * parseInt(duration);
+        const totalCost = (this.selectedStudio.price || 0) * parseInt(duration);
 
         if (summaryContainer && summaryContent) {
             summaryContainer.classList.remove('hidden');
             summaryContent.innerHTML = `
-                <div class="space-y-1">
-                    <p><span class="font-medium">Date:</span> ${utils.formatDate(startTime)}</p>
-                    <p><span class="font-medium">Time:</span> ${utils.formatTime(startTime)} - ${utils.formatTime(endTime)}</p>
-                    <p><span class="font-medium">Duration:</span> ${duration} hour${duration > 1 ? 's' : ''}</p>
-                    <p><span class="font-medium">Total Cost:</span> ${utils.formatCurrency(totalCost)}</p>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Pricing Details</span>
+                    <span class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-[10px] font-bold uppercase tracking-tighter">Est. Total</span>
+                </div>
+                <div class="grid grid-cols-2 gap-y-4">
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Time Frame</p>
+                        <p class="text-sm font-bold">${utils.formatTime(startTime)} - ${utils.formatTime(endTime)}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Session Date</p>
+                        <p class="text-sm font-bold">${utils.formatDate(startTime)}</p>
+                    </div>
+                    <div class="col-span-2 pt-4 border-t border-black/5 dark:border-white/5 flex justify-between items-end">
+                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                            ${duration} hour${duration > 1 ? 's' : ''} session
+                        </div>
+                        <div class="text-3xl font-black">${utils.formatCurrency(totalCost)}</div>
+                    </div>
                 </div>
             `;
         }
@@ -301,13 +397,13 @@ class BookingManager {
         const confirmBtn = document.getElementById('confirmBooking');
         if (confirmBtn) {
             confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Processing...';
+            confirmBtn.innerHTML = '<i class="fas fa-spinner animate-spin mr-2"></i> Processing...';
         }
 
         try {
             const startTime = new Date(`${this.selectedDate}T${this.selectedTimeSlot}`);
             const endTime = new Date(startTime.getTime() + (parseInt(duration) * 60 * 60 * 1000));
-            const totalCost = (this.selectedStudio.hourly_rate || 0) * parseInt(duration);
+            const totalCost = (this.selectedStudio.price || 0) * parseInt(duration);
 
             const bookingData = {
                 studio_id: this.selectedStudio.id,
@@ -324,10 +420,27 @@ class BookingManager {
             // Create booking in database
             const booking = await db.createBooking(bookingData);
             
-            utils.showNotification('Booking created successfully!', 'success');
+            // 2-Way Sync: Push to external calendars
+            if (this.selectedStudio.integrations && this.selectedStudio.integrations.length > 0) {
+                const calendarBackend = new CalendarBackendService();
+                this.selectedStudio.integrations.forEach(async (integration) => {
+                    if (integration.status === 'active') {
+                        try {
+                            await calendarBackend.createExternalBooking(this.selectedStudio.id, integration.platform, {
+                                title: `PluggedIn Studio Session: ${window.authManager.getCurrentUser().full_name || 'Reservation'}`,
+                                start: bookingData.start_time,
+                                end: bookingData.end_time,
+                                description: `Booking Request from PluggedIn\nNotes: ${bookingData.notes || 'None'}`
+                            });
+                        } catch (e) {
+                            console.error(`Failed to push booking to ${integration.platform}`, e);
+                        }
+                    }
+                });
+            }
+
+            utils.showNotification('Booking requested successfully!', 'success');
             this.hideBookingModal();
-            
-            // Optionally redirect to bookings page or show confirmation
             this.showBookingConfirmation(booking);
 
         } catch (error) {
@@ -336,7 +449,7 @@ class BookingManager {
         } finally {
             if (confirmBtn) {
                 confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Confirm Booking';
+                confirmBtn.innerHTML = 'Finalize Booking';
             }
         }
     }
@@ -344,29 +457,21 @@ class BookingManager {
     showBookingConfirmation(booking) {
         // Create a simple confirmation modal
         const confirmationModal = document.createElement('div');
-        confirmationModal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
+        confirmationModal.className = 'fixed inset-0 z-[60] flex items-center justify-center p-4 booking-modal-backdrop';
         
         confirmationModal.innerHTML = `
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3 text-center">
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Booking Confirmed!</h3>
-                    <div class="mt-2 px-7 py-3">
-                        <p class="text-sm text-gray-500">
-                            Your booking has been confirmed. You'll receive a confirmation email shortly.
-                        </p>
-                    </div>
-                    <div class="items-center px-4 py-3">
-                        <button id="closeConfirmation" 
-                                class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-600">
-                            OK
-                        </button>
-                    </div>
+            <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-10 shadow-2xl booking-modal-content text-center">
+                <div class="w-20 h-20 bg-black dark:bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <i class="fas fa-check text-white dark:text-black text-3xl"></i>
                 </div>
+                <h3 class="text-3xl font-black mb-4 uppercase tracking-tight">Request Sent</h3>
+                <p class="text-gray-500 dark:text-gray-400 mb-8 font-medium">
+                    Your session request for <span class="text-black dark:text-white font-bold">${this.selectedStudio.name}</span> has been received. You will be notified once the studio host confirms.
+                </p>
+                <button id="closeConfirmation" 
+                        class="w-full bg-black text-white dark:bg-white dark:text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    Got it
+                </button>
             </div>
         `;
 
@@ -380,12 +485,12 @@ class BookingManager {
             });
         }
 
-        // Auto-remove after 5 seconds
+        // Auto-remove after 8 seconds
         setTimeout(() => {
             if (confirmationModal.parentNode) {
                 confirmationModal.remove();
             }
-        }, 5000);
+        }, 8000);
     }
 
     hideBookingModal() {

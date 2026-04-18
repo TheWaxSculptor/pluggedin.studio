@@ -301,10 +301,38 @@ class StudioDashboard {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="mt-6 pt-6 border-t border-gray-100">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Booking Integrations</h4>
+                            <div id="studioIntegrationsSummary" class="space-y-2">
+                                <p class="text-xs text-gray-400 italic">No external calendars linked</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+
+        // Update integrations summary if possible
+        this.updateIntegrationsSummary();
+    }
+
+    async updateIntegrationsSummary() {
+        const container = document.getElementById('studioIntegrationsSummary');
+        if (!container || !window.calendarIntegrations) return;
+
+        const integrations = window.calendarIntegrations.activeIntegrations;
+        if (integrations && integrations.length > 0) {
+            container.innerHTML = integrations.map(i => `
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center">
+                        <span class="mr-2">${window.calendarIntegrations.supportedIntegrations[i.type]?.icon || '📅'}</span>
+                        <span class="text-gray-900 font-medium">${window.calendarIntegrations.supportedIntegrations[i.type]?.name}</span>
+                    </div>
+                    <span class="text-green-600 text-[10px] font-bold uppercase tracking-tighter">Connected</span>
+                </div>
+            `).join('');
+        }
     }
 
     loadBookingsDetails() {

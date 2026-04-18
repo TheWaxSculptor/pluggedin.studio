@@ -1,5 +1,129 @@
 // Studios Module for PluggedIn Web App
 
+// Global initialization functions for filtering
+window.initializeTagFiltering = function() {
+    const tagButtons = document.querySelectorAll('.tag-btn');
+    const activeTagsContainer = document.getElementById('activeTagsContainer');
+    const activeTagsList = document.getElementById('activeTags');
+    
+    if (!tagButtons.length) return;
+
+    tagButtons.forEach(btn => {
+        // Prevent duplicate listener
+        if (btn.dataset.hasListener) return;
+        btn.dataset.hasListener = "true";
+        
+        btn.addEventListener('click', () => {
+            const tag = btn.dataset.tag;
+            btn.classList.toggle('active');
+            updateActiveTagsUI();
+            
+            // Trigger studio refresh
+            refreshFilteredResults();
+        });
+    });
+
+    function updateActiveTagsUI() {
+        const activeBTNs = document.querySelectorAll('.tag-btn.active');
+        
+        if (activeBTNs.length > 0) {
+            activeTagsContainer.classList.remove('hidden');
+            activeTagsList.innerHTML = Array.from(activeBTNs).map(btn => `
+                <span class="active-tag">
+                    ${btn.textContent}
+                    <i class="fas fa-times active-tag-remove" onclick="removeActiveFilter('${btn.dataset.tag}')" title="Remove filter"></i>
+                </span>
+            `).join('') + `
+                <button class="clear-all-btn" onclick="clearAllActiveFilters()">Clear All</button>
+            `;
+        } else {
+            activeTagsContainer.classList.add('hidden');
+            activeTagsList.innerHTML = '';
+        }
+    }
+    
+    function refreshFilteredResults() {
+        if (window.studiosManager) {
+            const activeTags = Array.from(document.querySelectorAll('.tag-btn.active'))
+                .map(b => b.dataset.tag);
+            
+            window.studiosManager.currentFilters.tags = activeTags.length > 0 ? activeTags : null;
+            window.studiosManager.loadStudios();
+        }
+    }
+    
+    // Global functions for inline onclicks
+    window.removeActiveFilter = function(tag) {
+        const btn = document.querySelector(`.tag-btn[data-tag="${tag}"]`);
+        if (btn) {
+            btn.classList.remove('active');
+            updateActiveTagsUI();
+            refreshFilteredResults();
+        }
+    };
+    
+    window.clearAllActiveFilters = function() {
+        document.querySelectorAll('.tag-btn.active').forEach(btn => btn.classList.remove('active'));
+        updateActiveTagsUI();
+        if (window.studiosManager) {
+            window.studiosManager.currentFilters.tags = null;
+            window.studiosManager.loadStudios();
+        }
+    };
+};
+
+window.initializeCityPicker = function() {
+    const locationInput = document.getElementById('locationSearch');
+    const suggestions = document.getElementById('locationSuggestions');
+    
+    if (!locationInput) return;
+
+    locationInput.addEventListener('input', (e) => {
+        const value = e.target.value.toLowerCase();
+        if (value.length < 1) {
+            suggestions?.classList.add('hidden');
+            return;
+        }
+
+        // Simple city lookup from current studios
+        if (window.studiosManager) {
+            const cities = [...new Set(window.studiosManager.getStudios()
+                .map(s => s.location ? s.location.split(',')[0].trim() : '')
+                .filter(c => c !== ''))];
+            
+            const filtered = cities.filter(c => c.toLowerCase().includes(value));
+            
+            if (filtered.length > 0) {
+                suggestions.innerHTML = filtered.map(city => `
+                    <div class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0" onclick="selectCity('${city}')">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">${city}</span>
+                    </div>
+                `).join('');
+                suggestions.classList.remove('hidden');
+            } else {
+                suggestions.classList.add('hidden');
+            }
+        }
+    });
+
+    window.selectCity = function(city) {
+        locationInput.value = city;
+        if (suggestions) suggestions.classList.add('hidden');
+        
+        if (window.studiosManager) {
+            window.studiosManager.currentFilters.location = city;
+            window.studiosManager.loadStudios();
+        }
+    };
+
+    // Close suggestions on click outside
+    document.addEventListener('click', (e) => {
+        if (!locationInput.contains(e.target) && !suggestions?.contains(e.target)) {
+            suggestions?.classList.add('hidden');
+        }
+    });
+};
+
 class StudiosManager {
     constructor() {
         this.studios = [];
@@ -12,6 +136,10 @@ class StudiosManager {
     init() {
         this.setupEventListeners();
         this.loadStudios();
+        
+        // Initialize global components
+        window.initializeTagFiltering();
+        window.initializeCityPicker();
     }
 
     setupEventListeners() {
@@ -65,18 +193,13 @@ class StudiosManager {
     handleSearch() {
         const searchTerm = document.getElementById('locationSearch').value.trim();
         
+        // Update both the specific location filter and broad search if needed
         if (searchTerm) {
-            this.currentFilters = {
-                location: searchTerm,
-            };
+            this.currentFilters.location = searchTerm;
         } else {
-            this.currentFilters = {};
+            delete this.currentFilters.location;
         }
 
-        initializeCityPicker();
-        initializeTagFiltering();
-        loadFeaturedStudios();
-        loadRecentStudios();
         this.loadStudios();
     }
 
@@ -285,8 +408,13 @@ class StudiosManager {
             return;
         }
 
-        // TODO: Implement booking flow
-        utils.showNotification('Booking feature coming soon!', 'info');
+        // Dispatch event for BookingManager to handle
+        document.dispatchEvent(new CustomEvent('initiate-booking', { 
+            detail: { studio } 
+        }));
+        
+        // Hide the studio detail modal as well
+        this.hideStudioModal();
     }
 
     getStudios() {

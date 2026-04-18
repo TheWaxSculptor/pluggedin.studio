@@ -1,35 +1,46 @@
+// Global variable declarations for downstream script compatibility
+var supabaseClient = null;
+var db = {};
+var utils = {};
+
 // Supabase Configuration for PluggedIn Web App
 // Using actual Supabase project credentials
 
 // Get config from supabase-config.js
-const SUPABASE_URL = window.SUPABASE_CONFIG?.url || 'https://dovsqgkxxdpdkagzpykn.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdnNxZ2t4eGRwZGthZ3pweWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI1NjEsImV4cCI6MjA5MTU5ODU2MX0.SBQQ5IwYy16tmxmGAkS6co8rNl5kPsPjAlOXLHSnQw8';
+// Initialize Supabase client globally
+(function() {
+    const SUPABASE_URL = window.SUPABASE_CONFIG?.url || 'https://dovsqgkxxdpdkagzpykn.supabase.co';
+    const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdnNxZ2t4eGRwZGthZ3pweWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI1NjEsImV4cCI6MjA5MTU5ODU2MX0.SBQQ5IwYy16tmxmGAkS6co8rNl5kPsPjAlOXLHSnQw8';
 
-// Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    try {
+        if (window.supabase && window.supabase.createClient) {
+            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            window.supabaseClient = client;
+            supabaseClient = client; // Set top-level var
+            console.log('✅ Supabase Client Initialized');
+        } else {
+            console.error('❌ Supabase library not found in window');
+        }
+    } catch (e) {
+        console.error('❌ Error initializing Supabase client:', e);
+    }
+})();
 
-// Export for use in other modules
-window.supabaseClient = supabase;
-
-// Auth state management
+// Auth state management using global supabaseClient
 let currentUser = null;
 let authStateListeners = [];
 
-// Subscribe to auth changes
-supabase.auth.onAuthStateChange((event, session) => {
-    console.log('Auth state changed:', event, session);
-    
-    if (session) {
-        currentUser = session.user;
-        updateUIForAuthenticatedUser(currentUser);
-    } else {
-        currentUser = null;
-        updateUIForUnauthenticatedUser();
-    }
-    
-    // Notify all listeners
-    authStateListeners.forEach(listener => listener(event, session));
-});
+// Subscribe to auth changes if client is ready
+if (supabaseClient) {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('Auth state changed:', event, session);
+        
+        currentUser = session ? session.user : null;
+        
+        // Notify all listeners
+        authStateListeners.forEach(listener => listener(event, session));
+    });
+}
 
 // Add auth state listener
 function addAuthStateListener(callback) {
@@ -105,7 +116,7 @@ async function detectTableNames() {
     for (const [key, variants] of Object.entries(variations)) {
         for (const variant of variants) {
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from(variant)
                     .select('*', { count: 'exact', head: true });
                 
@@ -133,12 +144,17 @@ detectTableNames().then(() => {
 });
 
 // Database helper functions
-const db = {
+const dbMethods = {
     // Studios
     async getStudios(filters = {}) {
+        const client = window.supabaseClient || supabaseClient;
+        if (!client) {
+            console.error('Supabase client not ready for getStudios');
+            return [];
+        }
         const tableName = tableNames.studios || 'studios';
         
-        let query = supabase
+        let query = client
             .from(tableName)
             .select('*');
         
@@ -161,7 +177,7 @@ const db = {
     },
     
     async getStudio(id) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('studios')
             .select(`
                 *,
@@ -177,7 +193,7 @@ const db = {
     
     // Bookings
     async createBooking(bookingData) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('bookings')
             .insert([bookingData])
             .select()
@@ -188,7 +204,7 @@ const db = {
     },
     
     async getUserBookings(userId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('bookings')
             .select(`
                 *,
@@ -203,7 +219,7 @@ const db = {
     
     // User profile
     async getUserProfile(userId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('users')
             .select('*')
             .eq('id', userId)
@@ -214,7 +230,7 @@ const db = {
     },
     
     async updateUserProfile(userId, updates) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('users')
             .update(updates)
             .eq('id', userId)
@@ -234,7 +250,7 @@ const db = {
         console.log(`🔍 Querying equipment table: ${tableName}`);
         
         // Try querying with explicit schema reference
-        let query = supabase
+        let query = supabaseClient
             .from(tableName)
             .select('*');
         
@@ -266,7 +282,7 @@ const db = {
     },
 
     async addEquipment(equipmentData) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('equipment')
             .insert([equipmentData])
             .select()
@@ -278,7 +294,7 @@ const db = {
 
     // Payments
     async getPayments(userId, filters = {}) {
-        let query = supabase
+        let query = supabaseClient
             .from('payments')
             .select(`
                 *,
@@ -296,7 +312,7 @@ const db = {
     },
 
     async createPayment(paymentData) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('payments')
             .insert([paymentData])
             .select()
@@ -307,7 +323,7 @@ const db = {
     },
 
     async updatePayment(paymentId, updates) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('payments')
             .update(updates)
             .eq('id', paymentId)
@@ -320,7 +336,7 @@ const db = {
 
     // Reviews
     async getStudioReviews(studioId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('reviews')
             .select(`
                 *,
@@ -335,7 +351,7 @@ const db = {
     },
 
     async createReview(reviewData) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('reviews')
             .insert([reviewData])
             .select(`
@@ -350,7 +366,7 @@ const db = {
 
     // Messages
     async getConversations(userId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('conversations')
             .select(`
                 *,
@@ -365,7 +381,7 @@ const db = {
     },
 
     async getMessages(conversationId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('messages')
             .select(`
                 *,
@@ -379,7 +395,7 @@ const db = {
     },
 
     async sendMessage(messageData) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('messages')
             .insert([messageData])
             .select(`
@@ -394,7 +410,7 @@ const db = {
 
     // Active Sessions
     async getActiveSession(userId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('active_sessions')
             .select(`
                 *,
@@ -414,7 +430,7 @@ const db = {
     },
 
     async endSession(sessionId) {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('active_sessions')
             .update({ 
                 status: 'completed',
@@ -449,7 +465,7 @@ const db = {
             
             // Get studios count (this should work since we just created the table)
             try {
-                const { count: studiosCount, error: studiosError } = await supabase
+                const { count: studiosCount, error: studiosError } = await supabaseClient
                     .from(studiosTable)
                     .select('*', { count: 'exact', head: true });
                 
@@ -465,7 +481,7 @@ const db = {
             
             // Get users count
             try {
-                const { count: usersCount, error: usersError } = await supabase
+                const { count: usersCount, error: usersError } = await supabaseClient
                     .from(usersTable)
                     .select('*', { count: 'exact', head: true });
                 
@@ -481,7 +497,7 @@ const db = {
             
             // Get bookings count
             try {
-                const { count: bookingsCount, error: bookingsError } = await supabase
+                const { count: bookingsCount, error: bookingsError } = await supabaseClient
                     .from(bookingsTable)
                     .select('*', { count: 'exact', head: true });
                 
@@ -497,7 +513,7 @@ const db = {
             
             // Get revenue (optional - might not have payments table yet)
             try {
-                const { data: paymentsData, error: paymentsError } = await supabase
+                const { data: paymentsData, error: paymentsError } = await supabaseClient
                     .from(paymentsTable)
                     .select('amount')
                     .eq('status', 'completed');
@@ -527,7 +543,7 @@ const db = {
     },
 
     async getAdminUsers(filters = {}) {
-        let query = supabase
+        let query = supabaseClient
             .from('users')
             .select('*');
         
@@ -541,7 +557,7 @@ const db = {
     },
 
     async getAdminStudios() {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('studios')
             .select(`
                 *,
@@ -554,7 +570,7 @@ const db = {
     },
 
     async getAdminBookings(filters = {}) {
-        let query = supabase
+        let query = supabaseClient
             .from('bookings')
             .select(`
                 *,
@@ -576,7 +592,7 @@ const db = {
         const activities = [];
         
         // Recent users
-        const { data: recentUsers } = await supabase
+        const { data: recentUsers } = await supabaseClient
             .from('users')
             .select('id, name, created_at')
             .order('created_at', { ascending: false })
@@ -594,7 +610,7 @@ const db = {
         });
         
         // Recent studios
-        const { data: recentStudios } = await supabase
+        const { data: recentStudios } = await supabaseClient
             .from('studios')
             .select('id, name, created_at')
             .order('created_at', { ascending: false })
@@ -612,7 +628,7 @@ const db = {
         });
         
         // Recent bookings
-        const { data: recentBookings } = await supabase
+        const { data: recentBookings } = await supabaseClient
             .from('bookings')
             .select(`
                 id, created_at,
@@ -640,11 +656,13 @@ const db = {
     }
 };
 
-// Export database helper
+// Initialize DB object with current methods
+Object.assign(db, dbMethods);
+db.supabase = supabaseClient; // Ensure supabase client is accessible on db object
 window.db = db;
 
 // Utility functions
-const utils = {
+const utilsMethods = {
     formatDate(date) {
         return new Date(date).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -685,5 +703,5 @@ const utils = {
     }
 };
 
-// Export utilities
+Object.assign(utils, utilsMethods);
 window.utils = utils;

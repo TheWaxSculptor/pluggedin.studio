@@ -38,17 +38,56 @@ body.dark-mode {
     color: var(--dark-text);
 }
 
-body.dark-mode .logo-container {
-    background-color: rgba(255, 255, 255, 0.03);
-    margin: -2rem -2rem 3rem;
-    padding: 2rem 2rem 3rem;
+/* Global Dark Mode support using .dark class on html */
+.dark body, 
+.dark main, 
+.dark div.bg-white, 
+.dark div.bg-gray-50,
+.dark section.bg-white {
+    background-color: #000000 !important;
+    color: #f8f9fa !important;
+}
+
+.dark .text-gray-900, 
+.dark .text-gray-800, 
+.dark h1, .dark h2, .dark h3 {
+    color: #ffffff !important;
+}
+
+.dark .text-gray-600, 
+.dark .text-gray-500, 
+.dark p, .dark label {
+    color: #cbd5e0 !important;
+}
+
+.dark .border, 
+.dark .border-gray-200, 
+.dark .border-gray-300 {
+    border-color: #2d3748 !important;
+}
+
+.dark input, .dark select, .dark textarea {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #333 !important;
+}
+
+/* Ensure the navbar stays dark if it was already dark */
+nav.bg-black {
+    background-color: #000000 !important;
 }
 
 /* Landing page logo styles */
 .landing-logo {
     width: auto;
-    height: 180px !important;
+    height: 120px !important;
     max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .landing-logo {
+        height: 80px !important;
+    }
 }
 
 /* Logo container styling */

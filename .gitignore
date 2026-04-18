@@ -9,3 +9,5 @@ node_modules/
 *.avi
 *.mkv
 *.webm
+js/*.bundle.js
+js/*.bundle.js.map

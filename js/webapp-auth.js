@@ -8,15 +8,56 @@ class AuthManager {
     }
 
     init() {
+        this.client = window.supabaseClient || window.supabase || (window.db && window.db.supabase);
         this.setupEventListeners();
         this.checkAuthState();
+        
+        // Subscribe to auth changes
+        if (this.client) {
+            this.client.auth.onAuthStateChange((event, session) => {
+                console.log('Auth state changed in AuthManager:', event);
+                this.currentUser = session ? session.user : null;
+                if (this.currentUser) {
+                    this.updateUIForAuthenticatedUser();
+                } else {
+                    this.updateUIForUnauthenticatedUser();
+                }
+            });
+        }
+    }
+
+    getClient() {
+        if (!this.client) {
+            this.client = window.supabaseClient || window.supabase || (window.db && window.db.supabase);
+        }
+        return this.client;
     }
 
     setupEventListeners() {
-        // Auth button click
+        // Auth button click (Sign In)
         const authBtn = document.getElementById('authBtn');
         if (authBtn) {
-            authBtn.addEventListener('click', () => this.showAuthModal());
+            authBtn.addEventListener('click', () => {
+                this.isSignUpMode = false;
+                this.showAuthModal();
+                this.updateAuthForm();
+            });
+        }
+
+        // Register button click (Header)
+        const registerBtnHeader = document.getElementById('registerBtnHeader');
+        if (registerBtnHeader) {
+            registerBtnHeader.addEventListener('click', () => {
+                if (typeof window.showRegisterModal === 'function') {
+                    window.showRegisterModal();
+                } else {
+                    console.error('showRegisterModal function not found');
+                    // Fallback to sign up mode in auth modal
+                    this.isSignUpMode = true;
+                    this.showAuthModal();
+                    this.updateAuthForm();
+                }
+            });
         }
 
         // Auth modal close
@@ -32,18 +73,14 @@ class AuthManager {
         }
 
         // Switch between sign in and sign up
+        const switchAuthBtn = document.getElementById('switchAuthBtn');
         const switchToSignUp = document.getElementById('switchToSignUp');
+        
+        if (switchAuthBtn) {
+            switchAuthBtn.addEventListener('click', () => this.toggleAuthMode());
+        }
         if (switchToSignUp) {
             switchToSignUp.addEventListener('click', () => this.toggleAuthMode());
-        }
-        // Accessibility: allow Enter/Space to toggle
-        if (switchToSignUp) {
-            switchToSignUp.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.toggleAuthMode();
-                }
-            });
         }
 
         // Google Sign In
@@ -52,56 +89,17 @@ class AuthManager {
             googleSignInBtn.addEventListener('click', () => this.signInWithGoogle());
         }
 
-        // Password confirmation validation
+        // Password validation
         const confirmPassword = document.getElementById('confirmPassword');
         if (confirmPassword) {
             confirmPassword.addEventListener('input', () => this.validatePasswordMatch());
         }
-        // Accessibility: announce password mismatch
-        if (confirmPassword) {
-            confirmPassword.setAttribute('aria-describedby', 'passwordHelp');
-        }
-
-        // Password strength indicator
         const password = document.getElementById('password');
         if (password) {
             password.addEventListener('input', () => this.validatePasswordStrength());
         }
-        // Accessibility: announce password requirements
-        if (password) {
-            password.setAttribute('aria-describedby', 'passwordHelp');
-        }
 
-        // Forgot password
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        if (forgotPasswordLink) {
-            forgotPasswordLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showForgotPasswordModal();
-            });
-        }
-        // Accessibility: allow keyboard for forgot password
-        if (forgotPasswordLink) {
-            forgotPasswordLink.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.showForgotPasswordModal();
-                }
-            });
-        }
-
-        // User Type radio accessibility
-        const userTypeRadios = document.getElementsByName('userType');
-        if (userTypeRadios) {
-            userTypeRadios.forEach(radio => {
-                radio.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        radio.checked = true;
-                    }
-                });
-            });
-        }
-        // User menu interactions
+        // User menu interaction
         const userMenuBtn = document.getElementById('userMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
         if (userMenuBtn && userDropdown) {
@@ -109,7 +107,6 @@ class AuthManager {
                 userDropdown.classList.toggle('hidden');
             });
 
-            // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
                 if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
                     userDropdown.classList.add('hidden');
@@ -125,46 +122,13 @@ class AuthManager {
                 this.signOut();
             });
         }
-
-        // Google sign up/sign in
-        const googleBtn = document.getElementById('googleSignUpBtn');
-        if (googleBtn) {
-            googleBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    const { data, error } = await window.supabase.auth.signInWithOAuth({ provider: 'google' });
-                    if (error) {
-                        alert('Google sign in failed: ' + error.message);
-                    }
-                    // On success, Supabase will redirect or handle the session
-                } catch (err) {
-                    alert('Google sign in failed.');
-                }
-            });
-        }
-
-        // Profile and bookings links
-        const profileLink = document.getElementById('profileLink');
-        const bookingsLink = document.getElementById('bookingsLink');
-        
-        if (profileLink) {
-            profileLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showProfile();
-            });
-        }
-
-        if (bookingsLink) {
-            bookingsLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showBookings();
-            });
-        }
     }
 
     async checkAuthState() {
         try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
+            const client = this.getClient();
+            if (!client) return;
+            const { data: { session } } = await client.auth.getSession();
             if (session) {
                 this.currentUser = session.user;
                 this.updateUIForAuthenticatedUser();
@@ -179,6 +143,7 @@ class AuthManager {
         if (modal) {
             modal.classList.remove('hidden');
             this.resetAuthForm();
+            this.hideForgotView();
         }
     }
 
@@ -197,73 +162,59 @@ class AuthManager {
     updateAuthForm() {
         const title = document.querySelector('#authModal h3');
         const submitBtnText = document.getElementById('submitBtnText');
-        const switchBtn = document.getElementById('switchToSignUp');
-        const switchText = document.getElementById('switchText');
-        // Fields that are only shown for sign up
+        const switchBtn = document.getElementById('switchToSignUp') || document.getElementById('switchAuthBtn');
+        const switchText = document.getElementById('switchText') || document.getElementById('switchViewText');
         const nameField = document.getElementById('nameField');
         const confirmPasswordField = document.getElementById('confirmPasswordField');
         const userTypeField = document.getElementById('userTypeField');
         const signInOptions = document.getElementById('signInOptions');
         const signUpOptions = document.getElementById('signUpOptions');
-        const passwordHelp = document.getElementById('passwordHelp');
-        const fullNameInput = document.getElementById('fullName');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
         const confirmPasswordInput = document.getElementById('confirmPassword');
-        const agreeTerms = document.getElementById('agreeTerms');
+
         if (this.isSignUpMode) {
-            // Update text content
             if (title) title.textContent = 'Join PluggedIn.studio';
             if (submitBtnText) submitBtnText.textContent = 'Create Account';
             if (switchText) switchText.textContent = 'Already have an account? ';
             if (switchBtn) switchBtn.textContent = 'Sign in';
             
-            // Show sign up specific fields
-            if (nameField) nameField.classList.remove('hidden');
-            if (confirmPasswordField) confirmPasswordField.classList.remove('hidden');
-            if (userTypeField) userTypeField.classList.remove('hidden');
-            if (signUpOptions) signUpOptions.classList.remove('hidden');
-            if (passwordHelp) passwordHelp.classList.remove('hidden');
+            nameField?.classList.remove('hidden');
+            confirmPasswordField?.classList.remove('hidden');
+            userTypeField?.classList.remove('hidden');
+            signUpOptions?.classList.remove('hidden');
+            signInOptions?.classList.add('hidden');
             
-            // Hide sign in specific options
-            if (signInOptions) signInOptions.classList.add('hidden');
-            
-            // Make additional fields required
-            if (fullNameInput) fullNameInput.required = true;
+            if (firstNameInput) firstNameInput.required = true;
+            if (lastNameInput) lastNameInput.required = true;
             if (confirmPasswordInput) confirmPasswordInput.required = true;
         } else {
-            // Update text content
             if (title) title.textContent = 'Welcome Back';
             if (submitBtnText) submitBtnText.textContent = 'Sign In';
             if (switchText) switchText.textContent = "Don't have an account? ";
             if (switchBtn) switchBtn.textContent = 'Sign up';
             
-            // Hide sign up specific fields
-            if (nameField) nameField.classList.add('hidden');
-            if (confirmPasswordField) confirmPasswordField.classList.add('hidden');
-            if (userTypeField) userTypeField.classList.add('hidden');
-            if (signUpOptions) signUpOptions.classList.add('hidden');
-            if (passwordHelp) passwordHelp.classList.add('hidden');
+            nameField?.classList.add('hidden');
+            confirmPasswordField?.classList.add('hidden');
+            userTypeField?.classList.add('hidden');
+            signUpOptions?.classList.add('hidden');
+            signInOptions?.classList.remove('hidden');
             
-            // Show sign in specific options
-            if (signInOptions) signInOptions.classList.remove('hidden');
-            
-            // Remove required from additional fields
-            if (fullNameInput) fullNameInput.required = false;
+            if (firstNameInput) firstNameInput.required = false;
+            if (lastNameInput) lastNameInput.required = false;
             if (confirmPasswordInput) confirmPasswordInput.required = false;
         }
     }
 
     resetAuthForm() {
         const form = document.getElementById('authForm');
-        if (form) {
-            form.reset();
-        }
+        form?.reset();
         this.isSignUpMode = false;
         this.updateAuthForm();
     }
 
     async handleAuthSubmit(e) {
         e.preventDefault();
-        
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const submitBtn = document.getElementById('signInSubmit');
@@ -271,38 +222,10 @@ class AuthManager {
         const submitBtnSpinner = document.getElementById('submitBtnSpinner');
 
         if (!email || !password) {
-            utils.showNotification('Please fill in all fields', 'error');
+            window.utils?.showNotification('Please fill in all fields', 'error');
             return;
         }
 
-        // Additional validation for sign up
-        if (this.isSignUpMode) {
-            const fullName = document.getElementById('fullName').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-
-            if (!fullName.trim()) {
-                utils.showNotification('Please enter your full name', 'error');
-                return;
-            }
-
-            if (password.length < 6) {
-                utils.showNotification('Password must be at least 6 characters long', 'error');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                utils.showNotification('Passwords do not match', 'error');
-                return;
-            }
-
-            if (!agreeTerms) {
-                utils.showNotification('Please agree to the Terms of Service and Privacy Policy', 'error');
-                return;
-            }
-        }
-
-        // Show loading state
         const originalText = submitBtnText.textContent;
         if (submitBtnText) submitBtnText.textContent = 'Loading...';
         if (submitBtnSpinner) submitBtnSpinner.classList.remove('hidden');
@@ -316,9 +239,8 @@ class AuthManager {
             }
         } catch (error) {
             console.error('Auth error:', error);
-            utils.showNotification(error.message, 'error');
+            window.utils?.showNotification(error.message, 'error');
         } finally {
-            // Reset button state
             if (submitBtnText) submitBtnText.textContent = originalText;
             if (submitBtnSpinner) submitBtnSpinner.classList.add('hidden');
             submitBtn.disabled = false;
@@ -326,255 +248,236 @@ class AuthManager {
     }
 
     async signIn(email, password) {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
-
+        const { data, error } = await this.getClient().auth.signInWithPassword({ email, password });
         if (error) throw error;
-
         this.currentUser = data.user;
         this.updateUIForAuthenticatedUser();
         this.hideAuthModal();
-        utils.showNotification('Welcome back!', 'success');
+        window.utils?.showNotification('Welcome back!', 'success');
     }
 
     async signUp(email, password) {
-        const fullName = document.getElementById('fullName').value;
-        const userType = document.querySelector('input[name="userType"]:checked').value;
+        const firstName = document.getElementById('firstName')?.value || '';
+        const lastName = document.getElementById('lastName')?.value || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        const userType = document.querySelector('input[name="userType"]:checked')?.value || 'client';
+        const referral = document.getElementById('registerReferral')?.value || 'direct';
 
-        const { data, error } = await supabaseClient.auth.signUp({
+        const { data, error } = await this.getClient().auth.signUp({
             email,
             password,
             options: {
                 data: {
+                    first_name: firstName,
+                    last_name: lastName,
                     full_name: fullName,
-                    user_type: userType
+                    user_type: userType,
+                    referral_source: referral
                 }
             }
         });
 
         if (error) throw error;
-
         if (data.user) {
-            // Create user profile with additional information
-            await this.createUserProfile(data.user, fullName, userType);
-            utils.showNotification('Account created successfully! Please check your email to verify your account.', 'success');
+            await this.createUserProfile(data.user, firstName, lastName, fullName, userType, referral);
+            window.utils?.showNotification('Account created! Please verify your email.', 'success');
         }
-
         this.hideAuthModal();
     }
 
-    async createUserProfile(user, fullName = null, userType = null) {
+    async createUserProfile(user, firstName, lastName, fullName, userType, referral) {
         try {
-            const { error } = await supabaseClient
-                .from('users')
-                .insert([
-                    {
-                        id: user.id,
-                        email: user.email,
-                        name: fullName || user.user_metadata?.full_name || user.email.split('@')[0],
-                        user_type: userType || user.user_metadata?.user_type || 'artist',
-                        avatar_url: user.user_metadata?.avatar_url || null,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
-
-            if (error) throw error;
+            const client = this.getClient();
+            // Try to find correct users table (might be users or profiles)
+            const tableName = (window.db && window.db.tableNames && window.db.tableNames.users) || 'users';
+            
+            await client.from(tableName).insert([{
+                id: user.id,
+                email: user.email,
+                first_name: firstName,
+                last_name: lastName,
+                name: fullName,
+                user_type: userType,
+                referral_source: referral,
+                created_at: new Date().toISOString()
+            }]);
         } catch (error) {
-            console.error('Error creating user profile:', error);
+            console.error('Profile creation error:', error);
         }
     }
 
     async signOut() {
+        const { error } = await this.getClient().auth.signOut();
+        if (error) {
+            window.utils?.showNotification('Error signing out', 'error');
+            return;
+        }
+        this.currentUser = null;
+        this.updateUIForUnauthenticatedUser();
+        window.utils?.showNotification('Signed out successfully', 'success');
+        window.location.reload(); // Refresh to clear state
+    }
+
+    // Role switching functionality
+    async toggleUserType() {
+        if (!this.currentUser) {
+            window.utils?.showNotification('Please sign in to switch roles', 'info');
+            return;
+        }
+
+        const currentType = this.currentUser.user_metadata?.user_type || 'client';
+        const newType = currentType === 'client' ? 'studio' : 'client';
+        
         try {
-            const { error } = await supabaseClient.auth.signOut();
+            const client = this.getClient();
+            const { data, error } = await client.auth.updateUser({
+                data: { user_type: newType }
+            });
+
             if (error) throw error;
 
-            this.currentUser = null;
-            this.updateUIForUnauthenticatedUser();
-            utils.showNotification('Signed out successfully', 'success');
+            this.currentUser = data.user;
+            
+            // Also update in the database if possible
+            const tableName = (window.db && window.db.tableNames && window.db.tableNames.users) || 'users';
+            const { error: dbError } = await client.from(tableName)
+                .update({ user_type: newType })
+                .eq('id', this.currentUser.id);
+
+            if (dbError) {
+                console.warn('Metadata updated but database record update failed:', dbError);
+            }
+
+            this.updateUIForAuthenticatedUser();
+            window.utils?.showNotification(`Switched to ${newType === 'studio' ? 'Studio' : 'Client'} Mode`, 'success');
+
+            // Dispatch event for other components
+            window.dispatchEvent(new CustomEvent('userRoleChanged', { detail: { userType: newType } }));
         } catch (error) {
-            console.error('Sign out error:', error);
-            utils.showNotification('Error signing out', 'error');
+            console.error('Switch mode error:', error);
+            window.utils?.showNotification('Error switching mode: ' + error.message, 'error');
         }
     }
 
     updateUIForAuthenticatedUser() {
-        const authBtn = document.getElementById('authBtn');
         const userMenu = document.getElementById('userMenu');
+        const authButtons = document.getElementById('authButtons');
         const userInitials = document.getElementById('userInitials');
+        const modeToggle = document.getElementById('modeToggle');
+        const modeLabel = document.getElementById('modeLabel');
 
-        if (authBtn) authBtn.classList.add('hidden');
         if (userMenu) userMenu.classList.remove('hidden');
+        if (authButtons) authButtons.classList.add('hidden');
 
-        if (userInitials && this.currentUser?.email) {
-            const initials = this.currentUser.email.substring(0, 2).toUpperCase();
-            userInitials.textContent = initials;
+        if (this.currentUser) {
+            const userMetadata = this.currentUser.user_metadata || {};
+            const currentType = userMetadata.user_type || 'client';
+            
+            // Update Initials
+            if (userInitials) {
+                const name = userMetadata.first_name || userMetadata.full_name || this.currentUser.email;
+                userInitials.textContent = name.substring(0, 2).toUpperCase();
+            }
+
+            // Update Toggle State
+            if (modeToggle) {
+                if (currentType === 'studio') {
+                    modeToggle.parentElement.classList.add('toggle-active');
+                    if (modeLabel) modeLabel.textContent = 'Studio Mode';
+                    document.body.classList.add('studio-mode-active');
+                } else {
+                    modeToggle.parentElement.classList.remove('toggle-active');
+                    if (modeLabel) modeLabel.textContent = 'Client Mode';
+                    document.body.classList.remove('studio-mode-active');
+                }
+            }
         }
     }
 
     updateUIForUnauthenticatedUser() {
-        const authBtn = document.getElementById('authBtn');
         const userMenu = document.getElementById('userMenu');
-
-        if (authBtn) authBtn.classList.remove('hidden');
+        const authButtons = document.getElementById('authButtons');
         if (userMenu) userMenu.classList.add('hidden');
+        if (authButtons) authButtons.classList.remove('hidden');
+        document.body.classList.remove('studio-mode-active');
     }
 
-    showProfile() {
-        // TODO: Implement profile modal/page
-        utils.showNotification('Profile feature coming soon!', 'info');
+    // Forgot Password Flow
+    showForgotView() {
+        document.getElementById('authForm')?.classList.add('hidden');
+        document.getElementById('forgotPasswordView')?.classList.remove('hidden');
+        const title = document.querySelector('#authModal h3');
+        if (title) title.textContent = 'Reset Password';
     }
 
-    showBookings() {
-        if (!this.currentUser) {
-            this.showAuthModal();
+    hideForgotView() {
+        document.getElementById('authForm')?.classList.remove('hidden');
+        document.getElementById('forgotPasswordView')?.classList.add('hidden');
+        this.updateAuthForm();
+    }
+
+    async handleResetPassword() {
+        const email = document.getElementById('forgotEmail').value;
+        if (!email) {
+            window.utils?.showNotification('Please enter your email', 'error');
             return;
         }
-        
-        // TODO: Implement bookings view
-        utils.showNotification('Bookings feature coming soon!', 'info');
-    }
 
-    getCurrentUser() {
-        return this.currentUser;
-    }
-
-    isAuthenticated() {
-        return this.currentUser !== null;
+        try {
+            const { error } = await this.getClient().auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/app.html'
+            });
+            if (error) throw error;
+            window.utils?.showNotification('Reset link sent! Check your email.', 'success');
+            this.hideForgotView();
+            this.hideAuthModal();
+        } catch (error) {
+            window.utils?.showNotification(error.message, 'error');
+        }
     }
 
     // Google Sign In
     async signInWithGoogle() {
         try {
-            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            const { error } = await this.getClient().auth.signInWithOAuth({
                 provider: 'google',
-                options: {
-                    redirectTo: window.location.origin + '/app.html'
-                }
+                options: { redirectTo: window.location.origin + '/app.html' }
             });
-
             if (error) throw error;
-
-            // The redirect will handle the rest
         } catch (error) {
-            console.error('Google sign in error:', error);
-            utils.showNotification('Error signing in with Google: ' + error.message, 'error');
+            window.utils?.showNotification(error.message, 'error');
         }
     }
 
-    // Password validation helpers
+    // Validation Helpers
     validatePasswordStrength() {
         const password = document.getElementById('password').value;
-        const passwordHelp = document.getElementById('passwordHelp');
-        
-        if (!passwordHelp) return;
-
-        if (password.length === 0) {
-            passwordHelp.classList.add('hidden');
-            return;
-        }
-
-        passwordHelp.classList.remove('hidden');
-        
+        const help = document.getElementById('passwordHelp');
+        if (!help) return;
+        if (!password) { help.classList.add('hidden'); return; }
+        help.classList.remove('hidden');
         if (password.length < 6) {
-            passwordHelp.textContent = 'Password must be at least 6 characters long';
-            passwordHelp.className = 'mt-1 text-xs text-red-500';
-        } else if (password.length < 8) {
-            passwordHelp.textContent = 'Good password length';
-            passwordHelp.className = 'mt-1 text-xs text-yellow-500';
+            help.textContent = 'Too short (min 6 chars)';
+            help.className = 'mt-1 text-xs text-red-500';
         } else {
-            passwordHelp.textContent = 'Strong password!';
-            passwordHelp.className = 'mt-1 text-xs text-green-500';
+            help.textContent = 'Password strength: Good';
+            help.className = 'mt-1 text-xs text-green-500';
         }
     }
 
     validatePasswordMatch() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const confirmPasswordField = document.getElementById('confirmPasswordField');
-        
-        if (!confirmPasswordField) return;
-
-        const existingHelp = confirmPasswordField.querySelector('.password-match-help');
-        if (existingHelp) {
-            existingHelp.remove();
-        }
-
-        if (confirmPassword.length === 0) return;
-
-        const helpElement = document.createElement('p');
-        helpElement.className = 'password-match-help mt-1 text-xs';
-        
-        if (password === confirmPassword) {
-            helpElement.textContent = 'Passwords match!';
-            helpElement.classList.add('text-green-500');
-        } else {
-            helpElement.textContent = 'Passwords do not match';
-            helpElement.classList.add('text-red-500');
-        }
-        
-        confirmPasswordField.appendChild(helpElement);
-    }
-
-    // Forgot password functionality
-    async showForgotPasswordModal() {
-        const email = document.getElementById('email').value;
-        
-        if (!email) {
-            utils.showNotification('Please enter your email address first', 'error');
-            return;
-        }
-
-        const confirmed = confirm(`Send password reset email to ${email}?`);
-        if (!confirmed) return;
-
-        try {
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + '/app.html'
-            });
-
-            if (error) throw error;
-
-            utils.showNotification('Password reset email sent! Check your inbox.', 'success');
-            this.hideAuthModal();
-        } catch (error) {
-            console.error('Password reset error:', error);
-            utils.showNotification('Error sending password reset email: ' + error.message, 'error');
-        }
-    }
-
-    // Enhanced user profile display
-    updateUIForAuthenticatedUser() {
-        const authBtn = document.getElementById('authBtn');
-        const userMenu = document.getElementById('userMenu');
-        const userInitials = document.getElementById('userInitials');
-        const userAvatar = document.getElementById('userAvatar');
-
-        if (authBtn) authBtn.classList.add('hidden');
-        if (userMenu) userMenu.classList.remove('hidden');
-
-        if (this.currentUser) {
-            // Set user avatar or initials
-            const avatarUrl = this.currentUser.user_metadata?.avatar_url;
-            const fullName = this.currentUser.user_metadata?.full_name || this.currentUser.email;
-            
-            if (avatarUrl && userAvatar) {
-                userAvatar.src = avatarUrl;
-                userAvatar.classList.remove('hidden');
-                if (userInitials) userInitials.classList.add('hidden');
-            } else if (userInitials) {
-                const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                userInitials.textContent = initials;
-                userInitials.classList.remove('hidden');
-                if (userAvatar) userAvatar.classList.add('hidden');
-            }
-        }
+        const p1 = document.getElementById('password').value;
+        const p2 = document.getElementById('confirmPassword').value;
+        const field = document.getElementById('confirmPasswordField');
+        if (!field || !p2) return;
+        let help = field.querySelector('.password-match-help') || document.createElement('p');
+        help.className = 'password-match-help mt-1 text-xs ' + (p1 === p2 ? 'text-green-500' : 'text-red-500');
+        help.textContent = p1 === p2 ? 'Passwords match!' : 'Passwords do not match';
+        if (!help.parentElement) field.appendChild(help);
     }
 }
 
-// Initialize auth manager when DOM is loaded
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     window.authManager = new AuthManager();
 });

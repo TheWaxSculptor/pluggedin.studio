@@ -4,48 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PluggedIn Studio - Book Your Perfect Recording Space</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link rel="stylesheet" href="css/featured-studios.css">
-    <link rel="stylesheet" href="css/app.css">
-    <link rel="stylesheet" href="css/mobile-fixes.css">
-    <link rel="stylesheet" href="css/button-fixes.css?v=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/script.js" defer></script>
+    <script>
+        // Theme and UI Configuration
+        (function() {
+            // Theme detection
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Tailwind Config (shared global state)
+            window.tailwindConfig = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            dark: {
+                                bg: '#121212',
+                                card: '#1e1e1e',
+                                text: '#f8f9fa'
+                            }
+                        }
+                    }
+                }
+            };
+        })();
+    </script>
+
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <!-- Navigation -->
-    <nav class="bg-black shadow-sm border-b border-gray-800 min-h-[8rem]" aria-label="Main Navigation">
+    <nav class="bg-black shadow-sm border-b border-gray-800 transition-all duration-300" aria-label="Main Navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-32 min-h-[8rem]">
+            <div class="flex justify-between items-center h-20">
                 <div class="flex items-center">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-32 w-auto max-h-40 object-contain">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-16 w-auto object-contain">
                 </div>
                 <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="text-gray-400 hover:text-white p-2 rounded-full transition-colors" title="Toggle theme">
+                        <i class="fas fa-moon text-xl"></i>
+                    </button>
                     <button id="searchBtn" class="text-white hover:text-gray-300" title="Search studios" aria-label="Search for recording studios">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <span class="sr-only">Search</span>
                     </button>
-                    <button class="bg-transparent text-white px-4 py-2 rounded-lg border border-white hover:bg-white hover:bg-opacity-10 transition-colors" onclick="showRegisterModal()" title="Register">
-                        Register
-                    </button>
-                    <button id="bookingBtn" class="flex-1 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black" aria-label="Search for sessions">
-                        Search
-                    </button>
+                    <!-- Sign In/Register Group -->
+                    <div id="authButtons" class="flex items-center space-x-2">
+                        <button id="authBtn" class="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">
+                            Sign In
+                        </button>
+                        <button id="registerBtnHeader" class="bg-white text-black px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors">
+                            Register
+                        </button>
+                    </div>
                     <div id="userMenu" class="hidden relative">
                         <button id="userMenuBtn" class="flex items-center space-x-2 text-white hover:text-gray-300">
-                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                                <span id="userInitials" class="text-black text-sm font-medium"></span>
-                                <span id="userInitials" class="text-white text-sm font-medium"></span>
+                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center border border-gray-100 dark:border-gray-800">
+                                <span id="userInitials" class="text-black dark:text-black text-sm font-bold opacity-0 transition-opacity duration-300"></span>
                             </div>
                         </button>
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
+                            <div class="px-4 py-2 border-b border-gray-100 mb-1">
+                                <p class="text-xs text-gray-500 uppercase font-bold">Account</p>
+                            </div>
                             <a href="#" id="profileLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                             <a href="#" id="bookingsLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Bookings</a>
-                            <a href="#" id="signOutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
+                            <div class="mode-toggle-container">
+                                <div class="mode-switch" onclick="window.authManager.toggleUserType(); event.stopPropagation();">
+                                    <span class="text-sm font-medium text-gray-700" id="modeLabel">Studio Mode</span>
+                                    <div class="toggle-bg" id="modeToggle">
+                                        <div class="toggle-dot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" id="signOutBtn" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 border-t border-gray-100">Sign Out</a>
                         </div>
                     </div>
                 </div>
@@ -54,14 +93,14 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white dark:bg-black transition-colors duration-300">
         <!-- Hero Section with Airbnb-style Search -->
         <div class="bg-white py-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Main Heading -->
                 <div class="text-center mb-12">
-                    <h1 class="text-5xl font-bold text-gray-900 mb-4">Find Your Perfect Recording Space</h1>
-                    <p class="text-xl text-gray-600">Discover professional studios and home setups for your next session</p>
+                    <h1 class="text-5xl font-bold text-gray-900 dark:text-white mb-4">Find Your Perfect Recording Space</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-400">Discover professional studios and home setups for your next session</p>
                 </div>
                 
                 <!-- Airbnb-style Search Bar -->
@@ -77,7 +116,7 @@
                                     <div class="px-4 py-6">
                                         <label class="block text-xs font-bold text-gray-900 mb-2 uppercase tracking-wide">Where</label>
                                         <div class="relative">
-                                            <input type="text" id="locationInput" placeholder="Search studios" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium" aria-label="Enter location" autocomplete="off">
+                                            <input type="text" id="locationSearch" placeholder="Search studios" class="w-full text-sm text-gray-700 bg-transparent border-none outline-none placeholder-gray-500 font-medium" aria-label="Enter location" autocomplete="off">
                                             <div id="locationSuggestions" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden">
                                                 <!-- Suggestions will be populated here -->
                                             </div>
@@ -146,7 +185,7 @@
                             
                             <!-- Black Piano Key (Search Button) - Narrower like a real piano key -->
                             <div class="absolute right-2 top-1 bottom-1/3">
-                                <button class="piano-key black-key bg-black hover:bg-gray-800 text-white transition-all duration-200 rounded-b-lg shadow-lg h-full flex items-center justify-center w-16" onclick="window.location.href='search.html'" aria-label="Search for studios">
+                                <button id="searchSubmit" class="piano-key black-key bg-black hover:bg-gray-800 text-white transition-all duration-200 rounded-b-lg shadow-lg h-full flex items-center justify-center w-16" aria-label="Search for studios">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
@@ -185,9 +224,9 @@
                 </div>
                 
                 <!-- Active Tags Display -->
-                <div id="activeTagsContainer" class="hidden mb-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Active Filters:</h3>
-                    <div id="activeTags" class="flex flex-wrap gap-2"></div>
+                <div id="activeTagsContainer" class="hidden mb-8 text-center">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Active Filters</h3>
+                    <div id="activeTags" class="flex flex-wrap justify-center gap-3"></div>
                 </div>
             </div>
         </section>
@@ -438,11 +477,11 @@
 
     <!-- Studio Detail Modal -->
     <div id="studioModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-2xl bg-white dark:bg-slate-900">
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 id="modalStudioName" class="text-lg font-medium text-gray-900"></h3>
-                    <button id="closeModal" class="text-gray-400 hover:text-gray-600" title="Close modal" aria-label="Close studio details modal">
+                    <h3 id="modalStudioName" class="text-xl font-bold text-gray-900 dark:text-white"></h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2" title="Close modal" aria-label="Close studio details modal">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -456,122 +495,143 @@
     </div>
 
     <!-- Auth Modal -->
-    <div id="authModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Sign In to PluggedIn</h3>
-                    <button id="closeAuthModal" class="text-gray-400 hover:text-gray-600" title="Close sign in modal" aria-label="Close sign in modal">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+        <div class="relative mx-auto p-8 border-0 w-full max-w-md shadow-2xl rounded-3xl bg-white dark:bg-slate-900 transition-all duration-300 transform">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white" id="authTitle">Sign In</h3>
+                <button id="closeAuthModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2" title="Close sign in modal" aria-label="Close sign in modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="authContent">
+                <!-- Google Sign In Button - Premium Style -->
+                <div class="mb-8">
+                    <button type="button" id="googleSignInBtn" 
+                            class="w-full flex items-center justify-center py-4 px-4 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black dark:focus:ring-white transition-all transform active:scale-95">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
+                        Continue with Google
                     </button>
-                </div>
-                <div id="authContent">
-                    <!-- Google Sign In Button -->
-                    <div class="mb-6">
-                        <button type="button" id="googleSignInBtn" 
-                                class="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Continue with Google
-                        </button>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="relative mb-6">
+                    
+                    <div class="relative mt-8 mb-6">
                         <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
+                            <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+                            <span class="px-3 bg-white dark:bg-slate-900 text-gray-500 font-medium">Or email address</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email/Password Form -->
+                <form id="authForm" class="auth-view">
+                    <!-- Name fields (only shown for sign up) -->
+                    <div id="nameField" class="hidden flex gap-4 mb-0">
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="firstName" class="premium-input" placeholder=" " required>
+                            <label for="firstName" class="premium-label">First Name</label>
+                        </div>
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="lastName" class="premium-input" placeholder=" " required>
+                            <label for="lastName" class="premium-label">Last Name</label>
+                        </div>
+                    </div>
+                    
+                    <div class="premium-field-group">
+                        <input type="email" id="email" required class="premium-input" placeholder=" ">
+                        <label for="email" class="premium-label">Email Address</label>
+                    </div>
+                    
+                    <div id="passwordFieldContainer" class="premium-field-group">
+                        <input type="password" id="password" required class="premium-input" placeholder=" ">
+                        <label for="password" class="premium-label">Password</label>
+                        <p id="passwordHelp" class="mt-2 text-xs text-gray-500 hidden">At least 6 characters</p>
+                    </div>
+                    
+                    <!-- Confirm Password field (only shown for sign up) -->
+                    <div id="confirmPasswordField" class="hidden premium-field-group">
+                        <input type="password" id="confirmPassword" class="premium-input" placeholder=" ">
+                        <label for="confirmPassword" class="premium-label">Confirm Password</label>
+                    </div>
+                    
+                    <!-- User Type Selection (only shown for sign up) -->
+                    <div id="userTypeField" class="hidden mb-6">
+                        <label class="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3 ml-1">Account Type</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <label class="flex items-center p-3 border border-gray-100 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                                <input type="radio" name="userType" value="artist" class="h-4 w-4 text-black focus:ring-black border-gray-300" checked>
+                                <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 font-medium">Artist looking for studios</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-100 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                                <input type="radio" name="userType" value="studio_owner" class="h-4 w-4 text-black focus:ring-black border-gray-300">
+                                <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 font-medium">Studio owner listing a space</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Remember Me / Terms -->
+                    <div id="signInOptions" class="flex items-center justify-between mb-6 px-1">
+                        <div class="flex items-center">
+                            <input id="remember" type="checkbox" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded-md">
+                            <label for="remember" class="ml-2 block text-sm text-gray-600 dark:text-gray-400">Remember me</label>
+                        </div>
+                        <div class="text-sm">
+                            <button type="button" onclick="window.authManager.showForgotView()" class="font-bold text-black dark:text-white hover:underline underline-offset-4">Forgot password?</button>
+                        </div>
+                    </div>
+                    
+                    <div id="signUpOptions" class="hidden mb-6 px-1">
+                        <div class="flex items-start">
+                            <input id="agreeTerms" type="checkbox" class="mt-0.5 h-4 w-4 text-black focus:ring-black border-gray-300 rounded-md" required>
+                            <label for="agreeTerms" class="ml-3 block text-sm text-gray-600 dark:text-gray-400">
+                                I agree to the <a href="#" class="text-black dark:text-white font-bold underline">Terms</a> and <a href="#" class="text-black dark:text-white font-bold underline">Privacy Policy</a>
+                            </label>
                         </div>
                     </div>
 
-                    <!-- Email/Password Form -->
-                    <form id="authForm" class="space-y-4">
-                        <!-- Name field (only shown for sign up) -->
-                        <div id="nameField" class="hidden">
-                            <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
-                            <input type="text" id="fullName" 
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
-                        </div>
-                        
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" id="email" required 
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
-                        </div>
-                        
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input type="password" id="password" required 
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
-                            <p id="passwordHelp" class="mt-1 text-xs text-gray-500 hidden">Password must be at least 6 characters long</p>
-                        </div>
-                        
-                        <!-- Confirm Password field (only shown for sign up) -->
-                        <div id="confirmPasswordField" class="hidden">
-                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                            <input type="password" id="confirmPassword" 
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
-                        </div>
-                        
-                        <!-- User Type Selection (only shown for sign up) -->
-                        <div id="userTypeField" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
-                            <div class="space-y-2">
-                                <label class="flex items-center">
-                                    <input type="radio" name="userType" value="artist" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300" checked>
-                                    <span class="ml-2 text-sm text-gray-700">Artist/Musician looking for studios</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="userType" value="studio_owner" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300">
-                                    <span class="ml-2 text-sm text-gray-700">Studio owner wanting to list my space</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- Remember Me / Terms (conditional) -->
-                        <div id="signInOptions" class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input id="remember" type="checkbox" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300 rounded">
-                                <label for="remember" class="ml-2 block text-sm text-gray-900">Remember me</label>
-                            </div>
-                            <div class="text-sm">
-                                <a href="#" id="forgotPasswordLink" class="font-medium text-gray-900 hover:text-black">Forgot password?</a>
-                            </div>
-                        </div>
-                        
-                        <div id="signUpOptions" class="hidden">
-                            <div class="flex items-center">
-                                <input id="agreeTerms" type="checkbox" class="h-4 w-4 text-black focus:ring-gray-500 border-gray-300 rounded" required>
-                                <label for="agreeTerms" class="ml-2 block text-sm text-gray-700">
-                                    I agree to the <a href="#" class="text-gray-900 hover:text-black underline">Terms of Service</a> and <a href="#" class="text-gray-900 hover:text-black underline">Privacy Policy</a>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <button type="submit" id="signInSubmit" 
-                                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
-                                <span id="submitBtnText">Sign In</span>
-                                <svg id="submitBtnSpinner" class="hidden animate-spin -mr-1 ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div class="text-center">
-                            <span id="switchText" class="text-sm text-gray-600">Don't have an account? </span>
-                            <button type="button" id="switchToSignUp" class="text-sm font-medium text-gray-900 hover:text-black underline">Sign up</button>
-                        </div>
-                    </form>
+                    <button type="submit" id="signInSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all transform active:scale-[0.98]">
+                        <span id="submitBtnText">Sign In</span>
+                        <svg id="submitBtnSpinner" class="hidden animate-spin ml-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="mt-8 text-center">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <span id="switchText">Don't have an account?</span>
+                        <button type="button" id="switchToSignUp" class="ml-1 font-bold text-black dark:text-white hover:underline underline-offset-4">Sign up</button>
+                    </p>
+                </div>
+            </div>
+                <!-- Forgot Password View -->
+                <div id="forgotPasswordView" class="hidden auth-view">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 px-1">
+                        Enter your email address and we'll send you a link to reset your password.
+                    </p>
+                    
+                    <div class="premium-field-group">
+                        <input type="email" id="forgotEmail" class="premium-input" placeholder=" " required>
+                        <label for="forgotEmail" class="premium-label">Email Address</label>
+                    </div>
+                    
+                    <button type="button" onclick="window.authManager.handleResetPassword()" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all transform active:scale-[0.98]">
+                        Send Reset Link
+                    </button>
+                    
+                    <div class="mt-6 text-center">
+                        <button type="button" onclick="window.authManager.hideForgotView()" class="text-sm font-bold text-black dark:text-white hover:underline underline-offset-4">
+                            Back to Sign In
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -714,22 +774,27 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (window.tailwind && window.tailwindConfig) {
+            tailwind.config = window.tailwindConfig;
+        }
+    </script>
+    <script src="js/core.bundle.js"></script>
     <script src="js/webapp-supabase.js"></script>
     <script src="js/webapp-auth.js"></script>
-    <script src="js/webapp-studios.js"></script>
     <script src="js/webapp-booking.js"></script>
-    <script src="js/availability-calendar.js"></script>
-    <script src="js/webapp-calendar-integration.js"></script>
-    <script src="js/external-calendar-integration.js"></script>
-    <script src="js/webapp-featured-studios.js"></script>
-    <script src="js/webapp-app.js"></script>
+    <script src="js/webapp-studios.js"></script>
+    <script src="js/features.bundle.js"></script>
 
     <!-- Register Modal -->
     <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto py-4">
         <div class="bg-white rounded-lg p-6 max-w-lg w-full max-h-90vh overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Register</h2>
+                <div>
+                    <h2 class="text-2xl font-bold">Register Studio</h2>
+                    <p class="text-xs text-gray-500">Already have an account? <button onclick="closeRegisterModal(); window.authManager.showAuthModal();" class="text-black font-bold underline">Sign In</button></p>
+                </div>
                 <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close register modal">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -760,19 +825,25 @@
                 <div id="formStep1" class="form-step active-step">
                     <h3 class="font-bold text-lg mb-4">Step 1: Basic Info</h3>
                     
-                    <div class="mb-4">
-                        <label for="registerName" class="block text-gray-700 text-sm font-bold mb-2">Full Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="registerName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <div class="flex gap-4">
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="registerFirstName" class="premium-input" placeholder=" " required>
+                            <label for="registerFirstName" class="premium-label">First Name <span class="required-asterisk">*</span></label>
+                        </div>
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="registerLastName" class="premium-input" placeholder=" " required>
+                            <label for="registerLastName" class="premium-label">Last Name <span class="required-asterisk">*</span></label>
+                        </div>
                     </div>
                     
-                    <div class="mb-4">
-                        <label for="registerEmail" class="block text-gray-700 text-sm font-bold mb-2">Email <span class="text-red-500">*</span></label>
-                        <input type="email" id="registerEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <div class="premium-field-group">
+                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required>
+                        <label for="registerEmail" class="premium-label">Email <span class="required-asterisk">*</span></label>
                     </div>
                     
-                    <div class="mb-4">
-                        <label for="registerPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
-                        <input type="tel" id="registerPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="(optional)">
+                    <div class="premium-field-group">
+                        <input type="tel" id="registerPhone" class="premium-input" placeholder=" ">
+                        <label for="registerPhone" class="premium-label">Phone Number (optional)</label>
                     </div>
                     
                     <div class="flex justify-end mt-6">
@@ -785,16 +856,44 @@
                     <h3 class="font-bold text-lg mb-4">Step 2: User Preferences</h3>
                     
                     <!-- All Users Fields -->
-                    <div class="mb-4">
-                        <label for="registerLocation" class="block text-gray-700 text-sm font-bold mb-2">Location</label>
-                        <input type="text" id="registerLocation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="City, State">
+                    <div class="premium-field-group">
+                        <input type="text" id="registerAddress" class="premium-input" placeholder=" ">
+                        <label for="registerAddress" class="premium-label">Street Address</label>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <div class="premium-field-group flex-[2]">
+                            <input type="text" id="registerCity" class="premium-input" placeholder=" ">
+                            <label for="registerCity" class="premium-label">City</label>
+                        </div>
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="registerState" class="premium-input" placeholder=" ">
+                            <label for="registerState" class="premium-label">State</label>
+                        </div>
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="registerZip" class="premium-input" placeholder=" ">
+                            <label for="registerZip" class="premium-label">Zip</label>
+                        </div>
+                    </div>
+
+                    <div class="premium-field-group">
+                        <select id="registerReferral" class="premium-input premium-select" required>
+                            <option value="" disabled selected hidden></option>
+                            <option value="social-media">Social Media</option>
+                            <option value="google-search">Google Search</option>
+                            <option value="referral">Referral from Friend/Colleague</option>
+                            <option value="industry-event">Industry Event</option>
+                            <option value="music-community">Music Community/Forum</option>
+                            <option value="advertisement">Advertisement</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <label for="registerReferral" class="premium-label">How did you hear about us? <span class="required-asterisk">*</span></label>
                     </div>
                     
                     <!-- Client-specific Fields -->
                     <div id="clientFields" class="conditional-fields">
-                        <div class="mb-4">
-                            <label for="artistGenres" class="block text-gray-700 text-sm font-bold mb-2">Music Genres</label>
-                            <select id="artistGenres" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" multiple>
+                        <div class="premium-field-group">
+                            <select id="artistGenres" class="premium-input premium-select" multiple style="height: auto; min-height: 100px; padding-top: 28px;">
                                 <option value="rock">Rock</option>
                                 <option value="pop">Pop</option>
                                 <option value="hip-hop">Hip-Hop</option>
@@ -805,64 +904,64 @@
                                 <option value="folk">Folk</option>
                                 <option value="country">Country</option>
                             </select>
-                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                            <label for="artistGenres" class="premium-label">Music Genres (Ctrl/Cmd to multi-select)</label>
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="experienceLevel" class="block text-gray-700 text-sm font-bold mb-2">Experience Level</label>
-                            <select id="experienceLevel" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                <option value="">Select experience level</option>
+                        <div class="premium-field-group mt-6">
+                            <select id="experienceLevel" class="premium-input premium-select">
+                                <option value="" disabled selected hidden></option>
                                 <option value="beginner">Beginner</option>
                                 <option value="intermediate">Intermediate</option>
                                 <option value="professional">Professional</option>
                             </select>
+                            <label for="experienceLevel" class="premium-label">Experience Level</label>
                         </div>
                     </div>
                     
                     <!-- Studio Owner Fields -->
                     <div id="studioFields" class="conditional-fields hidden">
-                        <div class="mb-4">
-                            <label for="studioName" class="block text-gray-700 text-sm font-bold mb-2">Studio Name</label>
-                            <input type="text" id="studioName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <div class="premium-field-group">
+                            <input type="text" id="studioName" class="premium-input" placeholder=" ">
+                            <label for="studioName" class="premium-label">Studio Name</label>
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="studioType" class="block text-gray-700 text-sm font-bold mb-2">Studio Type</label>
-                            <select id="studioType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                <option value="">Select studio type</option>
+                        <div class="premium-field-group mt-6">
+                            <select id="studioType" class="premium-input premium-select">
+                                <option value="" disabled selected hidden></option>
                                 <option value="professional">Professional Studio</option>
                                 <option value="home">Home Studio</option>
                                 <option value="project">Project Studio</option>
                                 <option value="rehearsal">Rehearsal Space</option>
                             </select>
+                            <label for="studioType" class="premium-label">Studio Type</label>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Studio Amenities</label>
-                            <div class="grid grid-cols-2 gap-2">
+                        <div class="mb-4 mt-6">
+                            <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-3">Studio Amenities</label>
+                            <div class="grid grid-cols-2 gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="amenityMixing" class="mr-2">
-                                    <label for="amenityMixing">Mixing</label>
+                                    <input type="checkbox" id="amenityMixing" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black">
+                                    <label for="amenityMixing" class="ml-2 text-sm">Mixing</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="amenityMastering" class="mr-2">
-                                    <label for="amenityMastering">Mastering</label>
+                                    <input type="checkbox" id="amenityMastering" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black">
+                                    <label for="amenityMastering" class="ml-2 text-sm">Mastering</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="amenityLiveRoom" class="mr-2">
-                                    <label for="amenityLiveRoom">Live Room</label>
+                                    <input type="checkbox" id="amenityLiveRoom" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black">
+                                    <label for="amenityLiveRoom" class="ml-2 text-sm">Live Room</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="amenityEngineer" class="mr-2">
-                                    <label for="amenityEngineer">Engineer Available</label>
+                                    <input type="checkbox" id="amenityEngineer" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black">
+                                    <label for="amenityEngineer" class="ml-2 text-sm">Engineer Available</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-between mt-6">
-                        <button type="button" onclick="goToStep(1)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Back</button>
-                        <button type="button" onclick="goToStep(3)" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Next</button>
+                    <div class="flex justify-between mt-8">
+                        <button type="button" onclick="goToStep(1)" class="border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-2 px-6 rounded-xl transition-colors">Back</button>
+                        <button type="button" onclick="goToStep(3)" class="bg-black text-white hover:bg-gray-800 font-bold py-2 px-6 rounded-xl transition-colors">Next</button>
                     </div>
                 </div>
                 
@@ -870,34 +969,40 @@
                 <div id="formStep3" class="form-step hidden">
                     <h3 class="font-bold text-lg mb-4">Step 3: Create Password</h3>
                     
-                    <div class="mb-4">
-                        <label for="registerPassword" class="block text-gray-700 text-sm font-bold mb-2">Password <span class="text-red-500">*</span></label>
-                        <input type="password" id="registerPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        <p id="passwordStrength" class="text-xs mt-1"></p>
+                    <div class="premium-field-group">
+                        <input type="password" id="registerPassword" class="premium-input" placeholder=" " required onkeyup="checkPasswordStrength(this.value)">
+                        <label for="registerPassword" class="premium-label">Password <span class="required-asterisk">*</span></label>
+                        <p id="passwordStrength" class="text-xs mt-2 font-semibold"></p>
                     </div>
                     
-                    <div class="mb-4">
-                        <label for="registerConfirmPassword" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password <span class="text-red-500">*</span></label>
-                        <input type="password" id="registerConfirmPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <div class="premium-field-group mt-6">
+                        <input type="password" id="registerConfirmPassword" class="premium-input" placeholder=" " required>
+                        <label for="registerConfirmPassword" class="premium-label">Confirm Password <span class="required-asterisk">*</span></label>
                     </div>
                     
-                    <div class="mb-4">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="termsAccept" class="mr-2" required>
-                            <label for="termsAccept" class="text-sm text-gray-700">I accept the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></label>
+                    <div class="space-y-4 mt-6">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" id="termsAccept" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black" required>
+                            </div>
+                            <label for="termsAccept" class="ml-3 text-sm text-gray-600 dark:text-gray-400">
+                                I accept the <a href="#" class="text-black dark:text-white font-bold underline hover:no-underline">Terms of Service</a> and <a href="#" class="text-black dark:text-white font-bold underline hover:no-underline">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" id="marketingConsent" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black">
+                            </div>
+                            <label for="marketingConsent" class="ml-3 text-sm text-gray-600 dark:text-gray-400">
+                                I'd like to receive updates about new features and promotions
+                            </label>
                         </div>
                     </div>
                     
-                    <div class="mb-4">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="marketingConsent" class="mr-2">
-                            <label for="marketingConsent" class="text-sm text-gray-700">I'd like to receive updates about new features and promotions</label>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-between mt-6">
-                        <button type="button" onclick="goToStep(2)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Back</button>
-                        <button type="button" onclick="submitRegistration()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" title="Create account">Register</button>
+                    <div class="flex justify-between mt-8">
+                        <button type="button" onclick="goToStep(2)" class="border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-2 px-6 rounded-xl transition-colors">Back</button>
+                        <button type="button" onclick="submitRegistration()" class="bg-black text-white hover:bg-gray-800 font-bold py-2 px-8 rounded-xl transition-transform active:scale-95 shadow-lg" title="Create account" id="registerBtn">Register</button>
                     </div>
                 </div>
             </form>
@@ -1058,13 +1163,21 @@
             }
             
             // Get form values
-            const name = document.getElementById('registerName').value;
+            const firstName = document.getElementById('registerFirstName').value;
+            const lastName = document.getElementById('registerLastName').value;
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
-            const location = document.getElementById('registerLocation').value;
+            const address = document.getElementById('registerAddress').value;
+            const city = document.getElementById('registerCity').value;
+            const state = document.getElementById('registerState').value;
+            const zip = document.getElementById('registerZip').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const referral = document.getElementById('registerReferral').value;
             const marketingConsent = document.getElementById('marketingConsent').checked;
+
+            const fullName = `${firstName} ${lastName}`.trim();
+            const fullAddress = `${address}, ${city}, ${state} ${zip}`.trim();
             
             // Get user type specific fields
             let additionalData = {};
@@ -1096,7 +1209,7 @@
             }
             
             // Validate required fields
-            if (!name || !email || !password || !confirmPassword) {
+            if (!firstName || !lastName || !email || !password || !confirmPassword) {
                 alert('Please fill out all required fields');
                 return;
             }
@@ -1113,7 +1226,15 @@
             registerBtn.disabled = true;
             
             // Connect to Supabase and register user
-            const { supabase } = window.db;
+            const supabase = window.db?.supabase || window.supabaseClient;
+            
+            if (!supabase) {
+                console.error('Supabase client not initialized');
+                alert('Connection error. Please refresh the page and try again.');
+                registerBtn.innerHTML = originalBtnText;
+                registerBtn.disabled = false;
+                return;
+            }
             
             // First register the auth user with expanded metadata
             supabase.auth.signUp({ 
@@ -1121,11 +1242,18 @@
                 password: password,
                 options: {
                     data: {
-                        full_name: name,
+                        first_name: firstName,
+                        last_name: lastName,
+                        full_name: fullName,
                         user_type: selectedUserType,
                         phone: phone || null,
-                        location: location || null,
+                        address: address || null,
+                        city: city || null,
+                        state: state || null,
+                        zip: zip || null,
+                        location: fullAddress || null,
                         marketing_consent: marketingConsent,
+                        referral: referral || 'direct',
                         ...additionalData
                     }
                 }
@@ -1144,12 +1272,19 @@
                     .from('studio_registrations')
                     .insert([
                         { 
-                            name: name,
+                            first_name: firstName,
+                            last_name: lastName,
+                            name: fullName,
                             email: email,
                             phone: phone || null,
-                            location: location || null,
+                            address: address || null,
+                            city: city || null,
+                            state: state || null,
+                            zip: zip || null,
+                            location: fullAddress || null,
                             user_type: selectedUserType,
                             marketing_consent: marketingConsent,
+                            referral: referral || 'direct',
                             additional_data: additionalData,
                             registration_date: new Date().toISOString()
                         }

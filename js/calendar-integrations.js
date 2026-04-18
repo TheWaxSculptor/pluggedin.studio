@@ -8,9 +8,9 @@ class CalendarIntegrationsManager {
                 description: 'Sync your Calendly availability and bookings',
                 icon: '📅',
                 color: 'blue',
-                authType: 'oauth',
-                features: ['availability_sync', 'booking_sync', 'webhook_support'],
-                setupFields: ['calendly_username', 'webhook_url']
+                authType: 'api_key', // Changed to api_key for direct URL setup
+                features: ['availability_sync', 'booking_sync', 'direct_booking'],
+                setupFields: ['calendly_url', 'api_key']
             },
             square: {
                 name: 'Square Appointments',
@@ -32,11 +32,20 @@ class CalendarIntegrationsManager {
             },
             google: {
                 name: 'Google Calendar',
-                description: 'Sync with Google Calendar for availability',
+                description: 'Full 2-way sync with Google Calendar',
                 icon: '📊',
                 color: 'red',
                 authType: 'oauth',
-                features: ['availability_sync', 'event_sync', 'real_time_updates'],
+                features: ['availability_sync', 'push_bookings', 'real_time_updates'],
+                setupFields: ['calendar_id']
+            },
+            outlook: {
+                name: 'Outlook / Office 365',
+                description: 'Microsoft 365 and Outlook.com sync',
+                icon: '📧',
+                color: 'blue',
+                authType: 'oauth',
+                features: ['availability_sync', 'push_bookings', 'real_time_updates'],
                 setupFields: ['calendar_id']
             },
             setmore: {
@@ -74,6 +83,15 @@ class CalendarIntegrationsManager {
                 authType: 'api_key',
                 features: ['availability_sync', 'booking_sync', 'multi_location'],
                 setupFields: ['company_login', 'api_key']
+            },
+            apple: {
+                name: 'Apple iCloud',
+                description: 'Full sync via Apple ID and App-Specific Password',
+                icon: '🍏',
+                color: 'gray',
+                authType: 'api_key',
+                features: ['availability_sync', 'push_bookings'],
+                setupFields: ['apple_id', 'app_specific_password']
             }
         };
 
@@ -114,34 +132,28 @@ class CalendarIntegrationsManager {
 
     async loadActiveIntegrations() {
         try {
-            // In a real implementation, this would load from the database
-            // For now, we'll simulate some active integrations
-            this.activeIntegrations = [
-                {
-                    id: '1',
-                    type: 'calendly',
-                    status: 'active',
-                    lastSync: new Date().toISOString(),
-                    config: {
-                        calendly_username: 'mystudio',
-                        webhook_url: 'https://pluggedin.studio/webhooks/calendly'
-                    }
-                },
-                {
-                    id: '2',
-                    type: 'google',
-                    status: 'active',
-                    lastSync: new Date(Date.now() - 3600000).toISOString(),
-                    config: {
-                        calendar_id: 'primary'
-                    }
-                }
-            ];
+            const studioId = window.currentUser?.studioId || 'demo-studio-id';
+            
+            const { data, error } = await this.backendService.supabase
+                .from('studio_integrations')
+                .select('*')
+                .eq('studio_id', studioId);
+
+            if (error) throw error;
+
+            this.activeIntegrations = data.map(item => ({
+                id: item.id,
+                type: item.platform,
+                status: item.status,
+                lastSync: item.last_sync || item.connected_at,
+                config: item.sync_settings
+            }));
 
             this.renderActiveIntegrations();
+            this.renderAvailableIntegrations(); // Refresh available list too
         } catch (error) {
             console.error('Error loading integrations:', error);
-            utils.showNotification('Error loading integrations', 'error');
+            if (window.utils) utils.showNotification('Error loading integrations', 'error');
         }
     }
 
@@ -397,8 +409,15 @@ class CalendarIntegrationsManager {
     getFieldHelp(type, field) {
         const helpText = {
             calendly: {
-                calendly_username: 'Your Calendly username (e.g., mystudio)',
-                webhook_url: 'Webhook URL for real-time updates'
+                calendly_url: 'Your public Calendly booking URL',
+                api_key: 'Your Calendly personal access token (optional for sync)'
+            },
+            apple: {
+                apple_id: 'Your Apple ID email address',
+                app_specific_password: 'Created in appleid.apple.com (NOT your main password)'
+            },
+             outlook: {
+                calendar_id: 'Usually "primary" for your main calendar'
             },
             square: {
                 application_id: 'Found in your Square Developer Dashboard',
@@ -478,28 +497,20 @@ class CalendarIntegrationsManager {
             }
             
             if (result.success) {
-                // Add to active integrations
-                const newIntegration = {
-                    id: Date.now().toString(),
-                    type: type,
-                    status: 'active',
-                    lastSync: new Date().toISOString(),
-                    config: config
-                };
+                // Reload integrations from database to get real IDs and status
+                await this.loadActiveIntegrations();
                 
-                this.activeIntegrations.push(newIntegration);
-                
-                // Update UI
-                this.renderActiveIntegrations();
-                this.renderAvailableIntegrations();
                 this.hideIntegrationModal();
                 
                 utils.showNotification(`${this.supportedIntegrations[type].name} integration added successfully!`, 'success');
                 
                 // Perform initial sync
-                setTimeout(() => {
-                    this.syncIntegration(newIntegration.id);
-                }, 1000);
+                const newIntegration = this.activeIntegrations.find(i => i.type === type);
+                if (newIntegration) {
+                    setTimeout(() => {
+                        this.syncIntegration(newIntegration.id);
+                    }, 1000);
+                }
             } else {
                 throw new Error(result.error || 'Integration setup failed');
             }

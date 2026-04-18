@@ -300,6 +300,13 @@ class CalendarBackendService {
                 authUrl: 'https://acuityscheduling.com/oauth2/authorize',
                 tokenUrl: 'https://acuityscheduling.com/oauth2/token',
                 scope: 'api-v1'
+            },
+            outlook: {
+                clientId: process.env.OUTLOOK_CLIENT_ID,
+                clientSecret: process.env.OUTLOOK_CLIENT_SECRET,
+                authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+                tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+                scope: 'https://graph.microsoft.com/Calendars.ReadWrite'
             }
         };
 
@@ -342,6 +349,22 @@ class CalendarBackendService {
                     availability: '/availability/times',
                     create_booking: '/appointments'
                 }
+            },
+            outlook: {
+                baseUrl: 'https://graph.microsoft.com/v1.0',
+                endpoints: {
+                    test: '/me',
+                    availability: '/me/calendar/calendarView',
+                    create_booking: '/me/events'
+                }
+            },
+            apple: {
+                baseUrl: 'https://caldav.icloud.com',
+                endpoints: {
+                    test: '/', 
+                    availability: '/',
+                    create_booking: '/'
+                }
             }
         };
 
@@ -361,6 +384,23 @@ class CalendarBackendService {
 
         if (data) {
             options.body = JSON.stringify(data);
+        }
+
+        // Handle CalDAV/Apple fetching manually
+        if (platform === 'apple' || platform === 'icloud') {
+            const { apple_id, app_specific_password } = credentials;
+            if (!apple_id || !app_specific_password) throw new Error('Missing Apple ID or Password');
+            // Simplified CalDAV PROPFIND simulation (In production, use a library like dav-js)
+            const response = await fetch(`${config.baseUrl}/${apple_id}/calendars/`, {
+                method: 'PROPFIND',
+                headers: {
+                    'Authorization': `Basic ${btoa(`${apple_id}:${app_specific_password}`)}`,
+                    'Depth': '1',
+                    'Content-Type': 'application/xml'
+                }
+            });
+            const text = await response.text();
+            return { raw: text };
         }
 
         const response = await fetch(url, options);
@@ -433,24 +473,57 @@ class CalendarBackendService {
                 start: slot.time,
                 end: new Date(new Date(slot.time).getTime() + slot.duration * 60000).toISOString(),
                 available: true
-            }))
+            })),
+            
+            outlook: (data) => data.value?.map(event => ({
+                start: event.start.dateTime,
+                end: event.end.dateTime,
+                available: false
+            })) || [],
+
+            apple: (data) => {
+                if (!data.raw) return [];
+                // Simplified XML/CalDAV parser for demo
+                const events = [];
+                // Regex to find start/end times in CalDAV VCALENDAR components if returned
+                const matches = [...data.raw.matchAll(/DTSTART:(\d+T\d+Z)[\s\S]*?DTEND:(\d+T\d+Z)/g)];
+                for (const match of matches) {
+                    events.push({
+                        start: this.parseICalDate(match[1]),
+                        end: this.parseICalDate(match[2]),
+                        available: false
+                    });
+                }
+                return events;
+            }
         };
 
         return processors[platform]?.(data) || [];
     }
 
     async updateLocalAvailability(studioId, availabilityData) {
-        // Update local availability records in Supabase
-        for (const slot of availabilityData) {
+        // Update local cache of external availability records in Supabase
+        // First, clear existing external records for this studio for the current/future dates
+        const now = new Date().toISOString();
+        await this.supabase
+            .from('studio_external_availability')
+            .delete()
+            .eq('studio_id', studioId)
+            .gte('start_time', now);
+
+        if (availabilityData.length === 0) return;
+
+        // Filter for busy slots (available: false)
+        const busySlots = availabilityData.filter(slot => !slot.available);
+
+        for (const slot of busySlots) {
             await this.supabase
-                .from('studio_availability')
+                .from('studio_external_availability')
                 .upsert({
                     studio_id: studioId,
                     start_time: slot.start,
                     end_time: slot.end,
-                    is_available: slot.available,
-                    source: 'external_sync',
-                    updated_at: new Date().toISOString()
+                    source_platform: 'external_sync'
                 });
         }
     }
@@ -477,6 +550,18 @@ class CalendarBackendService {
         // Implement webhook signature verification for each platform
         // This is crucial for security
         return true; // Placeholder - implement proper verification
+    }
+
+    parseICalDate(icalStr) {
+        if (!icalStr) return null;
+        // Basic parser for YYYYMMDDTHHMMSSZ
+        const y = icalStr.substring(0, 4);
+        const m = icalStr.substring(4, 6);
+        const d = icalStr.substring(6, 8);
+        const h = icalStr.substring(9, 11);
+        const min = icalStr.substring(11, 13);
+        const s = icalStr.substring(13, 15);
+        return new Date(`${y}-${m}-${d}T${h}:${min}:${s}Z`).toISOString();
     }
 }
 

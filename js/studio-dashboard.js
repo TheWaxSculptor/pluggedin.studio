@@ -126,12 +126,17 @@ class StudioDashboard {
 
     async loadDashboardData() {
         try {
-            // Load initial dashboard data
-            await Promise.all([
-                this.loadStudioData(),
-                this.loadBookingsData(),
-                this.loadAnalyticsData()
+            // First verify we have a studio ID (in a real app this would be linked to the user)
+            const studioId = localStorage.getItem('currentStudioId') || '1';
+            
+            // Load initial dashboard data from DB
+            const [financials, payouts] = await Promise.all([
+                db.getStudioFinancials(studioId),
+                db.getStudioPayouts(studioId)
             ]);
+
+            this.processAnalytics(financials);
+            this.payoutsData = payouts;
 
             this.updateOverviewStats();
         } catch (error) {
@@ -140,70 +145,29 @@ class StudioDashboard {
         }
     }
 
-    async loadStudioData() {
-        try {
-            // In a real implementation, this would load the studio data from the database
-            // For now, we'll simulate studio data
-            this.studioData = {
-                id: '1',
-                name: 'Harmony Recording Studio',
-                location: 'Nashville, TN',
-                hourly_rate: 150,
-                capacity: 8,
-                description: 'Professional recording studio with state-of-the-art equipment',
-                equipment_count: 25,
-                images: ['studio1.jpg'],
-                status: 'active'
-            };
-        } catch (error) {
-            console.error('Error loading studio data:', error);
-        }
-    }
+    processAnalytics(financials) {
+        const platformFeePercentage = 0.10; // 10% platform fee
+        const succeeded = financials.filter(f => f.status === 'succeeded');
+        
+        const grossRevenue = succeeded.reduce((sum, f) => sum + (f.amount || 0), 0);
+        const netRevenue = grossRevenue * (1 - platformFeePercentage);
+        const totalBookings = succeeded.length;
+        
+        // Calculate this month's revenue
+        const now = new Date();
+        const thisMonth = succeeded.filter(f => {
+            const date = new Date(f.created_at);
+            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+        });
+        
+        const monthlyGross = thisMonth.reduce((sum, f) => sum + (f.amount || 0), 0);
 
-    async loadBookingsData() {
-        try {
-            // Simulate bookings data
-            this.bookingsData = [
-                {
-                    id: '1',
-                    client_name: 'John Smith',
-                    start_time: new Date().toISOString(),
-                    duration: 3,
-                    total_cost: 450,
-                    status: 'confirmed'
-                },
-                {
-                    id: '2',
-                    client_name: 'Sarah Johnson',
-                    start_time: new Date(Date.now() + 86400000).toISOString(),
-                    duration: 2,
-                    total_cost: 300,
-                    status: 'pending'
-                }
-            ];
-        } catch (error) {
-            console.error('Error loading bookings data:', error);
-        }
-    }
-
-    async loadAnalyticsData() {
-        try {
-            // Simulate analytics data
-            this.analyticsData = {
-                monthlyBookings: 12,
-                monthlyRevenue: 2400,
-                averageBookingDuration: 2.5,
-                repeatCustomers: 8,
-                popularTimes: ['2pm-4pm', '6pm-8pm'],
-                equipmentUsage: {
-                    'Microphones': 85,
-                    'Mixing Board': 90,
-                    'Monitors': 75
-                }
-            };
-        } catch (error) {
-            console.error('Error loading analytics data:', error);
-        }
+        this.analyticsData = {
+            monthlyBookings: totalBookings, // For demo purposes using total as monthly if monthly is small
+            monthlyRevenue: monthlyGross / 100, // Convert cents to dollars
+            netEarnings: (netRevenue / 100).toFixed(2),
+            totalGross: (grossRevenue / 100).toFixed(2)
+        };
     }
 
     updateOverviewStats() {

@@ -292,7 +292,6 @@ const dbMethods = {
         return data;
     },
 
-    // Payments
     async getPayments(userId, filters = {}) {
         let query = supabaseClient
             .from('payments')
@@ -309,6 +308,36 @@ const dbMethods = {
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
         return data;
+    },
+
+    // Studio Analytics & Financials
+    async getStudioFinancials(studioId) {
+        // Fetch all successful payments for bookings belonging to this studio
+        const { data, error } = await supabaseClient
+            .from('payments')
+            .select(`
+                *,
+                bookings!inner(id, studio_id)
+            `)
+            .eq('bookings.studio_id', studioId);
+
+        if (error) throw error;
+        return data || [];
+    },
+
+    async getStudioPayouts(studioId) {
+        // Fetch payout history (assuming a payouts table or similar log)
+        const { data, error } = await supabaseClient
+            .from('payouts')
+            .select('*')
+            .eq('studio_id', studioId)
+            .order('created_at', { ascending: false });
+
+        if (error && error.code !== 'PGRST116') { // Ignore missing table for now, handle gracefully
+            console.warn('Payouts table might not be initialized yet');
+            return [];
+        }
+        return data || [];
     },
 
     async createPayment(paymentData) {

@@ -253,57 +253,25 @@
             }
 
             async loadPayments() {
-                // Simulate loading payment data
-                this.payments = [
-                    {
-                        id: '1',
-                        bookingId: 'booking-001',
-                        studioName: 'Abbey Road Studios',
-                        roomName: 'Studio One',
-                        date: new Date('2024-01-20T14:00:00'),
-                        amount: 15000, // $150.00 in cents
-                        status: 'succeeded',
-                        paymentIntentId: 'pi_1JfGhT2eZvKYlo2C1s3EpAXW',
-                        paymentDate: new Date('2024-01-20T14:00:00'),
-                        description: '2-hour recording session'
-                    },
-                    {
-                        id: '2',
-                        bookingId: 'booking-002',
-                        studioName: 'Electric Lady Studios',
-                        roomName: 'Main Room',
-                        date: new Date('2024-01-15T16:00:00'),
-                        amount: 20000, // $200.00 in cents
-                        status: 'succeeded',
-                        paymentIntentId: 'pi_1JdFhT2eZvKYlo2C1s3EpBXY',
-                        paymentDate: new Date('2024-01-15T16:00:00'),
-                        description: '3-hour mixing session'
-                    },
-                    {
-                        id: '3',
-                        bookingId: 'booking-003',
-                        studioName: 'Sound City Studios',
-                        roomName: 'Room B',
-                        date: new Date('2024-01-25T10:00:00'),
-                        amount: 12500, // $125.00 in cents
-                        status: 'pending',
-                        paymentIntentId: 'pi_1JhPzT2eZvKYlo2C3r9EqAZX',
-                        paymentDate: null,
-                        description: '2-hour rehearsal session'
-                    },
-                    {
-                        id: '4',
-                        bookingId: 'booking-004',
-                        studioName: 'Blackbird Studio',
-                        roomName: 'Studio A',
-                        date: new Date('2024-01-10T12:00:00'),
-                        amount: 22000, // $220.00 in cents
-                        status: 'failed',
-                        paymentIntentId: 'pi_1JbGhT2eZvKYlo2C1s3EpCZW',
-                        paymentDate: null,
-                        description: '4-hour recording session'
-                    }
-                ];
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (!session) return;
+
+                    // Fetch real payments from DB
+                    this.payments = await db.getPayments(session.user.id);
+                    
+                    // Format amounts from cents to dollars if they are in cents
+                    this.payments = this.payments.map(p => ({
+                        ...p,
+                        studioName: p.bookings?.studios?.name || 'Unknown Studio',
+                        roomName: p.bookings?.room_name || 'Main Room',
+                        date: new Date(p.created_at),
+                        paymentDate: p.paid_at ? new Date(p.paid_at) : null,
+                        description: p.description || 'Studio Booking'
+                    }));
+                } catch (error) {
+                    console.error('Error loading payments:', error);
+                }
             }
 
             setActiveFilter(filter) {

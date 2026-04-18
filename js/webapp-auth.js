@@ -174,13 +174,19 @@ class AuthManager {
         const submitBtnText = document.getElementById('submitBtnText');
         const switchBtn = document.getElementById('switchToSignUp') || document.getElementById('switchAuthBtn');
         const switchText = document.getElementById('switchText') || document.getElementById('switchViewText');
-        const nameField = document.getElementById('nameField');
+        const signUpFields = document.getElementById('signUpFields');
         const confirmPasswordField = document.getElementById('confirmPasswordField');
         const userTypeField = document.getElementById('userTypeField');
         const signInOptions = document.getElementById('signInOptions');
         const signUpOptions = document.getElementById('signUpOptions');
+        
+        // Inputs to toggle required status
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
+        const addressInput = document.getElementById('address');
+        const cityInput = document.getElementById('regCity');
+        const stateInput = document.getElementById('regState');
+        const zipInput = document.getElementById('regZip');
         const confirmPasswordInput = document.getElementById('confirmPassword');
 
         if (this.isSignUpMode) {
@@ -189,7 +195,7 @@ class AuthManager {
             if (switchText) switchText.textContent = 'Already have an account? ';
             if (switchBtn) switchBtn.textContent = 'Sign in';
             
-            nameField?.classList.remove('hidden');
+            signUpFields?.classList.remove('hidden');
             confirmPasswordField?.classList.remove('hidden');
             userTypeField?.classList.remove('hidden');
             signUpOptions?.classList.remove('hidden');
@@ -197,6 +203,10 @@ class AuthManager {
             
             if (firstNameInput) firstNameInput.required = true;
             if (lastNameInput) lastNameInput.required = true;
+            if (addressInput) addressInput.required = true;
+            if (cityInput) cityInput.required = true;
+            if (stateInput) stateInput.required = true;
+            if (zipInput) zipInput.required = true;
             if (confirmPasswordInput) confirmPasswordInput.required = true;
         } else {
             if (title) title.textContent = 'Welcome Back';
@@ -204,7 +214,7 @@ class AuthManager {
             if (switchText) switchText.textContent = "Don't have an account? ";
             if (switchBtn) switchBtn.textContent = 'Sign up';
             
-            nameField?.classList.add('hidden');
+            signUpFields?.classList.add('hidden');
             confirmPasswordField?.classList.add('hidden');
             userTypeField?.classList.add('hidden');
             signUpOptions?.classList.add('hidden');
@@ -212,6 +222,10 @@ class AuthManager {
             
             if (firstNameInput) firstNameInput.required = false;
             if (lastNameInput) lastNameInput.required = false;
+            if (addressInput) addressInput.required = false;
+            if (cityInput) cityInput.required = false;
+            if (stateInput) stateInput.required = false;
+            if (zipInput) zipInput.required = false;
             if (confirmPasswordInput) confirmPasswordInput.required = false;
         }
     }
@@ -289,8 +303,12 @@ class AuthManager {
         const firstName = document.getElementById('firstName')?.value || '';
         const lastName = document.getElementById('lastName')?.value || '';
         const fullName = `${firstName} ${lastName}`.trim();
+        const address = document.getElementById('address')?.value || '';
+        const city = document.getElementById('regCity')?.value || '';
+        const state = document.getElementById('regState')?.value || '';
+        const zip = document.getElementById('regZip')?.value || '';
         const userType = document.querySelector('input[name="userType"]:checked')?.value || 'client';
-        const referral = document.getElementById('registerReferral')?.value || 'direct';
+        const referral = document.getElementById('registerReferral')?.value || '';
 
         const { data, error } = await this.getClient().auth.signUp({
             email,
@@ -300,6 +318,10 @@ class AuthManager {
                     first_name: firstName,
                     last_name: lastName,
                     full_name: fullName,
+                    address: address,
+                    city: city,
+                    state: state,
+                    zip: zip,
                     user_type: userType,
                     referral_source: referral
                 }

@@ -63,8 +63,18 @@ class AuthManager {
         // Auth modal close
         const closeAuthModal = document.getElementById('closeAuthModal');
         if (closeAuthModal) {
-            closeAuthModal.addEventListener('click', () => this.hideAuthModal());
+            closeAuthModal.addEventListener('click', () => {
+                console.log('Close auth modal clicked');
+                this.hideAuthModal();
+            });
         }
+
+        // ESC key listener for modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !document.getElementById('authModal').classList.contains('hidden')) {
+                this.hideAuthModal();
+            }
+        });
 
         // Auth form submit
         const authForm = document.getElementById('authForm');
@@ -161,6 +171,9 @@ class AuthManager {
         const modal = document.getElementById('authModal');
         if (modal) {
             modal.classList.add('hidden');
+            // Reset to Sign In mode for next time
+            this.isSignUpMode = false;
+            this.hideForgotView();
         }
     }
 
@@ -186,48 +199,51 @@ class AuthManager {
         const addressInput = document.getElementById('address');
         const cityInput = document.getElementById('regCity');
         const stateInput = document.getElementById('regState');
-        const zipInput = document.getElementById('regZip');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
+            const zipInput = document.getElementById('regZip');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
 
-        if (this.isSignUpMode) {
-            if (title) title.textContent = 'Join PluggedIn.studio';
-            if (submitBtnText) submitBtnText.textContent = 'Create Account';
-            if (switchText) switchText.textContent = 'Already have an account? ';
-            if (switchBtn) switchBtn.textContent = 'Sign in';
-            
-            signUpFields?.classList.remove('hidden');
-            confirmPasswordField?.classList.remove('hidden');
-            userTypeField?.classList.remove('hidden');
-            signUpOptions?.classList.remove('hidden');
-            signInOptions?.classList.add('hidden');
-            
-            if (firstNameInput) firstNameInput.required = true;
-            if (lastNameInput) lastNameInput.required = true;
-            if (addressInput) addressInput.required = true;
-            if (cityInput) cityInput.required = true;
-            if (stateInput) stateInput.required = true;
-            if (zipInput) zipInput.required = true;
-            if (confirmPasswordInput) confirmPasswordInput.required = true;
-        } else {
-            if (title) title.textContent = 'Welcome Back';
-            if (submitBtnText) submitBtnText.textContent = 'Sign In';
-            if (switchText) switchText.textContent = "Don't have an account? ";
-            if (switchBtn) switchBtn.textContent = 'Sign up';
-            
-            signUpFields?.classList.add('hidden');
-            confirmPasswordField?.classList.add('hidden');
-            userTypeField?.classList.add('hidden');
-            signUpOptions?.classList.add('hidden');
-            signInOptions?.classList.remove('hidden');
-            
-            if (firstNameInput) firstNameInput.required = false;
-            if (lastNameInput) lastNameInput.required = false;
-            if (addressInput) addressInput.required = false;
-            if (cityInput) cityInput.required = false;
-            if (stateInput) stateInput.required = false;
-            if (zipInput) zipInput.required = false;
-            if (confirmPasswordInput) confirmPasswordInput.required = false;
-        }
+            if (this.isSignUpMode) {
+                if (title) title.textContent = 'Join PluggedIn.studio';
+                if (submitBtnText) submitBtnText.textContent = 'Create Account';
+                if (switchText) switchText.textContent = 'Already have an account? ';
+                if (switchBtn) switchBtn.textContent = 'Sign in';
+                if (passwordInput) passwordInput.setAttribute('autocomplete', 'new-password');
+                
+                signUpFields?.classList.remove('hidden');
+                confirmPasswordField?.classList.remove('hidden');
+                userTypeField?.classList.remove('hidden');
+                signUpOptions?.classList.remove('hidden');
+                signInOptions?.classList.add('hidden');
+                
+                if (firstNameInput) firstNameInput.required = true;
+                if (lastNameInput) lastNameInput.required = true;
+                if (addressInput) addressInput.required = true;
+                if (cityInput) cityInput.required = true;
+                if (stateInput) stateInput.required = true;
+                if (zipInput) zipInput.required = true;
+                if (confirmPasswordInput) confirmPasswordInput.required = true;
+            } else {
+                if (title) title.textContent = 'Welcome Back';
+                if (submitBtnText) submitBtnText.textContent = 'Sign In';
+                if (switchText) switchText.textContent = "Don't have an account? ";
+                if (switchBtn) switchBtn.textContent = 'Sign up';
+                if (passwordInput) passwordInput.setAttribute('autocomplete', 'current-password');
+                
+                signUpFields?.classList.add('hidden');
+                confirmPasswordField?.classList.add('hidden');
+                userTypeField?.classList.add('hidden');
+                signUpOptions?.classList.add('hidden');
+                signInOptions?.classList.remove('hidden');
+                
+                if (firstNameInput) firstNameInput.required = false;
+                if (lastNameInput) lastNameInput.required = false;
+                if (addressInput) addressInput.required = false;
+                if (cityInput) cityInput.required = false;
+                if (stateInput) stateInput.required = false;
+                if (zipInput) zipInput.required = false;
+                if (confirmPasswordInput) confirmPasswordInput.required = false;
+            }
     }
 
     resetAuthForm() {
@@ -457,13 +473,14 @@ class AuthManager {
     showForgotView() {
         document.getElementById('authForm')?.classList.add('hidden');
         document.getElementById('forgotPasswordView')?.classList.remove('hidden');
-        const title = document.querySelector('#authModal h3');
+        const title = document.getElementById('authTitle') || document.querySelector('#authModal h3');
         if (title) title.textContent = 'Reset Password';
     }
 
     hideForgotView() {
         document.getElementById('authForm')?.classList.remove('hidden');
         document.getElementById('forgotPasswordView')?.classList.add('hidden');
+        const title = document.getElementById('authTitle') || document.querySelector('#authModal h3');
         this.updateAuthForm();
     }
 
@@ -524,14 +541,19 @@ class AuthManager {
         const password = document.getElementById('password').value;
         const help = document.getElementById('passwordHelp');
         if (!help) return;
-        if (!password) { help.classList.add('hidden'); return; }
+        
+        if (!password) {
+            help.classList.add('hidden');
+            return;
+        }
+        
         help.classList.remove('hidden');
-        if (password.length < 6) {
-            help.textContent = 'Too short (min 6 chars)';
-            help.className = 'mt-1 text-xs text-red-500';
+        if (password.length >= 6) {
+            help.innerHTML = `<span class="flex items-center"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Password meets requirements</span>`;
+            help.className = 'mt-1 text-xs text-green-600 font-medium';
         } else {
-            help.textContent = 'Password strength: Good';
-            help.className = 'mt-1 text-xs text-green-500';
+            help.textContent = 'Keep typing... (Min 6 characters needed)';
+            help.className = 'mt-1 text-xs text-red-500';
         }
     }
 

@@ -1415,11 +1415,16 @@
                     registerBtn.disabled = false;
                     return;
                 }
+                // Create core user profile in users table
+                if (window.authManager && typeof window.authManager.createUserProfile === 'function') {
+                    window.authManager.createUserProfile(data.user, firstName, lastName, fullName, selectedUserType, referral);
+                }
                 
                 // Also store in studio_registrations table with additional info
                 supabase
                     .from('studio_registrations')
                     .insert([
+
                         { 
                             first_name: firstName,
                             last_name: lastName,
@@ -1438,6 +1443,7 @@
                             registration_date: new Date().toISOString()
                         }
                     ])
+
                     .then(({ error: insertError }) => {
                         if (insertError) {
                             console.warn('Additional registration data error:', insertError);

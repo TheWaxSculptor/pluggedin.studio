@@ -30,8 +30,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light h-8 w-auto">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark h-8 w-auto">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="inline-block dark:hidden h-8 w-auto">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="hidden dark:inline-block h-8 w-auto">
                     <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">PluggedIn Studio</span>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -170,15 +170,41 @@
 
                 <!-- Email/Password Form -->
                 <form id="authForm" class="auth-view space-y-4">
-                    <!-- Name fields (only shown for sign up) -->
-                    <div id="nameField" class="hidden flex gap-4">
-                        <div class="premium-field-group flex-1">
-                            <input type="text" id="firstName" name="firstName" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
-                            <label for="firstName" class="premium-label text-sm text-gray-500">First Name</label>
+                    <div id="signUpFields" class="hidden space-y-4">
+                        <div class="flex gap-4">
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="firstName" name="firstName" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                                <label for="firstName" class="premium-label text-sm text-gray-500">First Name</label>
+                            </div>
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="lastName" name="lastName" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                                <label for="lastName" class="premium-label text-sm text-gray-500">Last Name</label>
+                            </div>
                         </div>
-                        <div class="premium-field-group flex-1">
-                            <input type="text" id="lastName" name="lastName" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
-                            <label for="lastName" class="premium-label text-sm text-gray-500">Last Name</label>
+
+                        <div class="premium-field-group">
+                            <input type="text" id="address" name="address" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                            <label for="address" class="premium-label text-sm text-gray-500">Street Address</label>
+                        </div>
+
+                        <div class="premium-field-group">
+                            <input type="text" id="address2" name="address2" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                            <label for="address2" class="premium-label text-sm text-gray-500">Apartment, suite, unit, etc. (optional)</label>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="premium-field-group flex-[2]">
+                                <input type="text" id="regCity" name="city" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                                <label for="regCity" class="premium-label text-sm text-gray-500">City</label>
+                            </div>
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="regState" name="state" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                                <label for="regState" class="premium-label text-sm text-gray-500">State</label>
+                            </div>
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="regZip" name="zip" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                                <label for="regZip" class="premium-label text-sm text-gray-500">Zip</label>
+                            </div>
                         </div>
                     </div>
                     

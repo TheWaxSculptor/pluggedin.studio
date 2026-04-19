@@ -503,8 +503,9 @@ class CalendarBackendService {
 
     async updateLocalAvailability(studioId, availabilityData) {
         // Update local cache of external availability records in Supabase
-        // First, clear existing external records for this studio for the current/future dates
         const now = new Date().toISOString();
+        
+        // delete existing records for this studio for the current/future dates to avoid duplicates
         await this.supabase
             .from('studio_external_availability')
             .delete()
@@ -514,17 +515,21 @@ class CalendarBackendService {
         if (availabilityData.length === 0) return;
 
         // Filter for busy slots (available: false)
-        const busySlots = availabilityData.filter(slot => !slot.available);
+        const busySlots = availabilityData
+            .filter(slot => !slot.available)
+            .map(slot => ({
+                studio_id: studioId,
+                start_time: slot.start,
+                end_time: slot.end,
+                source_platform: 'external_sync'
+            }));
 
-        for (const slot of busySlots) {
-            await this.supabase
+        if (busySlots.length > 0) {
+            const { error } = await this.supabase
                 .from('studio_external_availability')
-                .upsert({
-                    studio_id: studioId,
-                    start_time: slot.start,
-                    end_time: slot.end,
-                    source_platform: 'external_sync'
-                });
+                .upsert(busySlots);
+            
+            if (error) throw error;
         }
     }
 

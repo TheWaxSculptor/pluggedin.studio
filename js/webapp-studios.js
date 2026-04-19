@@ -366,14 +366,22 @@ class StudiosManager {
 
                     <!-- Booking Section -->
                     <div class="border-t pt-6">
-                        <div class="flex justify-between items-center">
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                             <div>
                                 <h4 class="text-lg font-semibold">Ready to book?</h4>
-                                <p class="text-gray-600">Select your preferred time slot</p>
+                                <p class="text-gray-600">Choose your preferred booking method</p>
                             </div>
-                            <button id="bookStudioBtn" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                Book Now
-                            </button>
+                            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                                ${studio.external_booking_url ? `
+                                    <a href="${studio.external_booking_url}" target="_blank" 
+                                       class="flex-1 text-center bg-white border-2 border-blue-600 text-blue-600 px-6 py-2 rounded-md hover:bg-blue-50 transition-colors font-medium">
+                                        Book via ${studio.external_platform === 'calendly' ? 'Calendly' : 'External Calendar'}
+                                    </a>
+                                ` : ''}
+                                <button id="bookStudioBtn" class="flex-1 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium">
+                                    Native Booking
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

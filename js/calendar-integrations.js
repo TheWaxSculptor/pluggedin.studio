@@ -497,6 +497,17 @@ class CalendarIntegrationsManager {
             }
             
             if (result.success) {
+                // If this is a direct link platform like Calendly, also update the studio record
+                if (type === 'calendly' && config.calendly_url) {
+                    await this.backendService.supabase
+                        .from('studios')
+                        .update({ 
+                            external_booking_url: config.calendly_url,
+                            external_platform: 'calendly'
+                        })
+                        .eq('id', studioId);
+                }
+
                 // Reload integrations from database to get real IDs and status
                 await this.loadActiveIntegrations();
                 

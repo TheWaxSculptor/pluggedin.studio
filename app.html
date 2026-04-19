@@ -43,8 +43,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="inline-block dark:hidden h-16 w-auto object-contain">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="hidden dark:inline-block h-16 w-auto object-contain">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light h-16 w-auto object-contain">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark h-16 w-auto object-contain">
                 </div>
                 <div class="flex items-center space-x-4">
                     <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme">
@@ -558,24 +558,28 @@
                         <label for="email" class="premium-label">Email Address</label>
                     </div>
                     
-                    <div id="passwordFieldContainer" class="premium-field-group relative">
-                        <input type="password" id="password" name="password" required class="premium-input pr-12" placeholder=" " autocomplete="current-password">
-                        <label for="password" class="premium-label">Password</label>
-                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('password', this)" title="Toggle password visibility">
-                            <i class="fas fa-eye text-sm eye-icon"></i>
-                            <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
-                        </button>
+                    <div id="passwordFieldContainer" class="premium-field-group">
+                        <div class="password-field-wrapper relative">
+                            <input type="password" id="password" name="password" required class="premium-input pr-12" placeholder=" " autocomplete="current-password">
+                            <label for="password" class="premium-label">Password</label>
+                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('password', this)" title="Toggle password visibility">
+                                <i class="fas fa-eye text-sm eye-icon"></i>
+                                <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
+                            </button>
+                        </div>
                         <p id="passwordHelp" class="mt-2 text-xs text-gray-500 hidden font-medium"></p>
                     </div>
                     
                     <!-- Confirm Password field (only shown for sign up) -->
-                    <div id="confirmPasswordField" class="hidden premium-field-group mt-6 relative">
-                        <input type="password" id="confirmPassword" name="confirm-password" class="premium-input pr-12" placeholder=" " autocomplete="new-password">
-                        <label for="confirmPassword" class="premium-label">Confirm Password</label>
-                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('confirmPassword', this)" title="Toggle password visibility">
-                            <i class="fas fa-eye text-sm eye-icon"></i>
-                            <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
-                        </button>
+                    <div id="confirmPasswordField" class="hidden premium-field-group mt-6">
+                        <div class="password-field-wrapper relative">
+                            <input type="password" id="confirmPassword" name="confirm-password" class="premium-input pr-12" placeholder=" " autocomplete="new-password">
+                            <label for="confirmPassword" class="premium-label">Confirm Password</label>
+                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('confirmPassword', this)" title="Toggle password visibility">
+                                <i class="fas fa-eye text-sm eye-icon"></i>
+                                <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- User Type Selection (only shown for sign up) -->
@@ -1155,7 +1159,11 @@
                 if (error) throw error;
             } catch (error) {
                 console.error('Google Sign-In Error:', error);
-                alert('Sign-In failed: ' + error.message);
+                if (error.message.includes('provider is not enabled')) {
+                    alert('Google Sign-In is not yet enabled in your Supabase project. Please enable it in your Supabase Dashboard (Authentication -> Providers -> Google) using your Client ID and Secret.');
+                } else {
+                    alert('Sign-In failed: ' + error.message);
+                }
             }
         }
 

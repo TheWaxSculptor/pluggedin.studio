@@ -58,18 +58,18 @@ nav button#registerBtnHeader:not(.dark *) {
 }
 
 /* Piano Brand Assets - Professional Sync */
-/* Piano Brand Assets - Professional Sync */
-.logo-light { display: block !important; }
+.logo-light { display: inline-block !important; }
 .logo-dark { display: none !important; }
 
-.dark .logo-light { display: none !important; }
-.dark .logo-dark { display: block !important; }
+html.dark .logo-light { display: none !important; }
+html.dark .logo-dark { display: inline-block !important; }
 
+/* Handle Tailwind utility fallbacks */
 .inline-block.dark\:hidden { display: inline-block !important; }
-.dark .inline-block.dark\:hidden { display: none !important; }
+html.dark .inline-block.dark\:hidden { display: none !important; }
 
 .hidden.dark\:inline-block { display: none !important; }
-.dark .hidden.dark\:inline-block { display: inline-block !important; }
+html.dark .hidden.dark\:inline-block { display: inline-block !important; }
 
 /* Global Responsive Constraints */
 img, svg, picture, video {
@@ -2428,11 +2428,11 @@ nav, .glass-panel {
 .dark #themeToggle .fa-moon { display: none; }
 
 /* Logo Swapping System - Responsive Overrides */
-.logo-light { display: block; }
+.logo-light { display: inline-block; }
 .logo-dark { display: none; }
 
-.dark .logo-light { display: none; }
-.dark .logo-dark { display: block; }
+html.dark .logo-light { display: none; }
+html.dark .logo-dark { display: inline-block; }
 
 /* Mobile Section Refinements */
 @media (max-width: 768px) {
@@ -2468,10 +2468,12 @@ html.dark .bg-gray-50/50 {
     background-color: var(--bg-secondary) !important;
 }
 
-/* Password Toggle styling */
+/* Password Toggle styling - Precision Alignment */
 .password-toggle {
     z-index: 10;
     outline: none !important;
+    top: 36px !important; /* Visual center of typing area */
+    transform: translateY(-50%) !important;
 }
 
 #passwordStrength {

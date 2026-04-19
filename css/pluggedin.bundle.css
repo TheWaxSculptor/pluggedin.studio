@@ -58,11 +58,23 @@ nav button#registerBtnHeader:not(.dark *) {
 }
 
 /* Piano Brand Assets - Professional Sync */
-.logo-light { display: inline-block !important; }
-.logo-dark { display: none !important; }
+.logo-light {
+    display: inline-block !important;
+    height: 4rem !important;   /* h-16 = 64px */
+    width: auto !important;
+}
+.logo-dark {
+    display: none !important;
+    height: 4rem !important;
+    width: auto !important;
+}
 
-html.dark .logo-light { display: none !important; }
-html.dark .logo-dark { display: inline-block !important; }
+html.dark .logo-light {
+    display: none !important;
+}
+html.dark .logo-dark {
+    display: inline-block !important;
+}
 
 /* Handle Tailwind utility fallbacks */
 .inline-block.dark\:hidden { display: inline-block !important; }
@@ -74,8 +86,6 @@ html.dark .hidden.dark\:inline-block { display: inline-block !important; }
 /* Global Responsive Constraints */
 img, svg, picture, video {
     max-width: 100%;
-    height: auto;
-    display: block;
 }
 
 /* PluggedIn Web App Styles */

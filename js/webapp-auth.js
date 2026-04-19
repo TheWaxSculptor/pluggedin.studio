@@ -199,9 +199,10 @@ class AuthManager {
         const addressInput = document.getElementById('address');
         const cityInput = document.getElementById('regCity');
         const stateInput = document.getElementById('regState');
-            const zipInput = document.getElementById('regZip');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirmPassword');
+        const zipInput = document.getElementById('regZip');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const agreeTermsInput = document.getElementById('agreeTerms');
 
             if (this.isSignUpMode) {
                 if (title) title.textContent = 'Join PluggedIn.studio';
@@ -221,8 +222,9 @@ class AuthManager {
                 if (addressInput) addressInput.required = true;
                 if (cityInput) cityInput.required = true;
                 if (stateInput) stateInput.required = true;
-                if (zipInput) zipInput.required = true;
-                if (confirmPasswordInput) confirmPasswordInput.required = true;
+            if (zipInput) zipInput.required = true;
+            if (confirmPasswordInput) confirmPasswordInput.required = true;
+            if (agreeTermsInput) agreeTermsInput.required = true;
             } else {
                 if (title) title.textContent = 'Welcome Back';
                 if (submitBtnText) submitBtnText.textContent = 'Sign In';
@@ -241,9 +243,10 @@ class AuthManager {
                 if (addressInput) addressInput.required = false;
                 if (cityInput) cityInput.required = false;
                 if (stateInput) stateInput.required = false;
-                if (zipInput) zipInput.required = false;
-                if (confirmPasswordInput) confirmPasswordInput.required = false;
-            }
+            if (zipInput) zipInput.required = false;
+            if (confirmPasswordInput) confirmPasswordInput.required = false;
+            if (agreeTermsInput) agreeTermsInput.required = false;
+        }
     }
 
     resetAuthForm() {

@@ -1,3 +1,16 @@
+/* Global Pitch Black Dark Mode Standard */
+html.dark body { 
+    background-color: #000 !important;
+    color: #f3f4f6 !important;
+}
+
+html.dark main, 
+html.dark section,
+html.dark .bg-white,
+html.dark .bg-gray-50 {
+    background-color: #000 !important;
+}
+
 /* PluggedIn Web App Styles */
 
 /* Custom utilities and enhancements for the web app */
@@ -461,41 +474,71 @@ body.dark-mode {
 
 /* Global Dark Mode support using .dark class on html */
 .dark body, 
-.dark main, 
-.dark div.bg-white, 
-.dark div.bg-gray-50,
-.dark section.bg-white {
+.dark main {
     background-color: #000000 !important;
     color: #f8f9fa !important;
 }
 
-.dark .text-gray-900, 
-.dark .text-gray-800, 
-.dark h1, .dark h2, .dark h3 {
-    color: #ffffff !important;
-}
-
-.dark .text-gray-600, 
-.dark .text-gray-500, 
-.dark p, .dark label {
-    color: #cbd5e0 !important;
-}
-
-.dark .border, 
-.dark .border-gray-200, 
-.dark .border-gray-300 {
-    border-color: #2d3748 !important;
-}
-
-.dark input, .dark select, .dark textarea {
-    background-color: #1a1a1a !important;
-    color: #ffffff !important;
-    border-color: #333 !important;
-}
-
-/* Ensure the navbar stays dark if it was already dark */
-nav.bg-black {
+/* Surgery: Only override bg-white if it's not a piano-key */
+.dark div.bg-white:not(.piano-key), 
+.dark div.bg-gray-50:not(.piano-key),
+.dark section.bg-white:not(.piano-key) {
     background-color: #000000 !important;
+    color: #f8f9fa !important;
+}
+
+/* Restore the Piano Keys visibility in Dark Mode with High Contrast */
+.dark .piano-key.white-key {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.dark .piano-key.white-key .premium-label {
+    color: #64748b !important; /* Muted Slate for the moving label */
+}
+
+.dark .piano-key.white-key input,
+.dark .piano-key.white-key select {
+    color: #000000 !important; /* Ensure input text is black on white keys */
+    background-color: transparent !important;
+}
+
+.dark .piano-key.black-key {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #333333 !important;
+}
+
+.dark .piano-key.black-key .premium-label {
+    color: #94a3b8 !important;
+}
+
+.dark .piano-key.black-key input,
+.dark .piano-key.black-key select {
+    color: #ffffff !important;
+}
+
+.dark .text-gray-900:not(.piano-key *) {
+    color: #ffffff !important;
+}
+
+/* Theme Icon Swapping (CSS-driven to prevent flicker) */
+#themeToggle .fa-sun {
+    display: none;
+    color: #facc15; /* Yellow-400 */
+}
+
+#themeToggle .fa-moon {
+    display: inline-block;
+    color: #f8f9fa;
+}
+
+.dark #themeToggle .fa-sun {
+    display: inline-block;
+}
+
+.dark #themeToggle .fa-moon {
+    display: none;
 }
 
 /* Landing page logo styles */
@@ -2270,4 +2313,20 @@ body.dark-mode .comparison-table .legend {
         font-size: 0.85rem;
         margin-top: 0.5rem;
     }
+}
+
+/* Password Toggle styling */
+.password-toggle {
+    z-index: 10;
+    outline: none !important;
+}
+
+#passwordStrength {
+    transition: color 0.3s ease;
+    letter-spacing: 0.01em;
+}
+
+/* User Type selections */
+.userTypeToggle {
+    cursor: pointer;
 }

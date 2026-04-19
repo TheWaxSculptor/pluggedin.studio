@@ -8,12 +8,25 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Maps Places API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwORHaU_0UPgZaehxB6p-G_xX6_LIENUA&libraries=places"></script>
+    <script>
+        // Theme and UI Configuration (Immediate Execution to prevent flash)
+        (function() {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = theme === 'dark' || (!theme && prefersDark);
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 dark:bg-black min-h-screen transition-colors duration-300">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
+    <nav class="bg-white dark:bg-black shadow-lg sticky top-0 z-[1001] border-b dark:border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -21,16 +34,9 @@
                     <span class="ml-2 text-xl font-bold text-gray-900">PluggedIn Studio</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!-- Theme Toggle -->
-                    <button id="themeToggle" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors" title="Toggle dark mode" aria-label="Toggle dark mode">
-                        <!-- Sun Icon (shown in dark mode) -->
-                        <svg id="sunIcon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
-                        </svg>
-                        <!-- Moon Icon (shown in light mode) -->
-                        <svg id="moonIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                        </svg>
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-50 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle dark mode" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon text-xl"></i>
+                        <i class="fas fa-sun text-xl"></i>
                     </button>
                     
                     <button id="searchBtn" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" title="Search studios" aria-label="Search studios">
@@ -59,7 +65,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 dark:bg-black transition-colors duration-300">
         <!-- Hero Section -->
         <div id="heroSection" class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">Find Your Perfect Recording Studio</h1>
@@ -117,149 +123,144 @@
         </div>
     </div>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Sign In to PluggedIn</h3>
-                    <button id="closeAuthModal" class="text-gray-400 hover:text-gray-600" title="Close authentication modal" aria-label="Close authentication modal">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
+    <!-- Auth Modal (Unified) -->
+    <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-[2000] flex items-center justify-center p-4">
+        <div class="relative mx-auto p-8 border-0 w-full max-w-md shadow-2xl rounded-3xl bg-white dark:bg-black transition-all duration-300 transform">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white" id="authTitle">Sign In</h3>
+                <button id="closeAuthModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2" title="Close sign in modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="authContent">
+                <!-- Error Message Container (Updated) -->
+                <div id="authErrorMsg" class="hidden mb-6 p-4 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium border border-red-100 dark:border-red-800/30 flex items-center">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <span id="authErrorText"></span>
                 </div>
-                <div id="authContent">
-                    <!-- Error Message Container -->
-                    <div id="authErrorMsg" class="hidden text-xs text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded mb-4 font-bold border border-red-200 dark:border-red-900/50"></div>
-                    
-                    <!-- Google Auth (ID fixed for JS) -->
-                    <button type="button" id="googleSignInBtn" class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-4" aria-label="Sign in with Google">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="w-5 h-5 mr-2" aria-hidden="true">
-                        <span class="font-medium">Continue with Google</span>
+
+                <!-- Google Sign In Button - Premium Style -->
+                <div class="mb-8">
+                    <button type="button" id="googleSignInBtn" 
+                            class="w-full flex items-center justify-center py-4 px-4 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-200 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-slate-900 transition-all transform active:scale-95">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
                     </button>
                     
-                    <form id="authForm" class="space-y-4" autocomplete="on">
-                        <!-- Full Name (Sign Up Only) -->
-                        <div id="signUpFields" class="hidden space-y-4">
-                            <!-- Name -->
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
-                                    <input type="text" id="firstName" name="firstName" autocomplete="given-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
-                                    <input type="text" id="lastName" name="lastName" autocomplete="family-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                </div>
-                            </div>
-                            
-                            <!-- Address -->
-                            <div>
-                                <label for="address" class="block text-sm font-medium text-gray-700">Street Address</label>
-                                <input type="text" id="address" name="address" autocomplete="street-address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <div class="col-span-1">
-                                    <label for="regCity" class="block text-sm font-medium text-gray-700">City</label>
-                                    <input type="text" id="regCity" name="city" autocomplete="address-level2" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label for="regState" class="block text-sm font-medium text-gray-700">State</label>
-                                    <input type="text" id="regState" name="state" autocomplete="address-level1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label for="regZip" class="block text-sm font-medium text-gray-700">Zip</label>
-                                    <input type="text" id="regZip" name="zip" autocomplete="postal-code" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                </div>
-                            </div>
+                    <div class="relative mt-8 mb-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
                         </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" id="email" name="email" required autocomplete="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-3 bg-white dark:bg-black text-gray-500 font-medium">Or email address</span>
                         </div>
-                        <div class="relative">
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input type="password" id="password" name="password" required autocomplete="new-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10">
-                            <button type="button" class="password-toggle absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Toggle password visibility">
-                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <svg class="w-5 h-5 eye-off-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L5.136 5.136m10.364 10.364L21.864 21M9.914 5.582A10.051 10.051 0 0112 5c4.478 0 8.268 2.942 9.542 7a10.056 10.056 0 01-1.112 2.458"/></svg>
-                            </button>
-                            <div id="passwordHelp" class="hidden text-xs text-gray-500 mt-1">Password must be at least 6 characters.</div>
+                    </div>
+                </div>
+
+                <!-- Email/Password Form -->
+                <form id="authForm" class="auth-view space-y-4">
+                    <!-- Name fields (only shown for sign up) -->
+                    <div id="nameField" class="hidden flex gap-4">
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="firstName" name="firstName" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                            <label for="firstName" class="premium-label text-sm text-gray-500">First Name</label>
                         </div>
-                        <div class="flex items-center justify-between" id="signInExtras">
-                            <div class="flex items-center">
-                                <input id="remember" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="remember" class="ml-2 block text-sm text-gray-900">Remember me</label>
-                            </div>
-                            <button type="button" id="forgotPasswordLink" class="text-sm font-medium text-blue-600 hover:text-blue-500">Forgot password?</button>
+                        <div class="premium-field-group flex-1">
+                            <input type="text" id="lastName" name="lastName" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                            <label for="lastName" class="premium-label text-sm text-gray-500">Last Name</label>
                         </div>
-                        <!-- Confirm Password (Sign Up Only) -->
-                        <div id="confirmPasswordField" class="hidden relative">
-                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                            <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10">
-                            <button type="button" class="password-toggle absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Toggle password visibility">
-                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <svg class="w-5 h-5 eye-off-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L5.136 5.136m10.364 10.364L21.864 21M9.914 5.582A10.051 10.051 0 0112 5c4.478 0 8.268 2.942 9.542 7a10.056 10.056 0 01-1.112 2.458"/></svg>
-                            </button>
-                        </div>
-                        <!-- User Type (Sign Up Only) -->
-                        <div id="userTypeField" class="hidden">
-                            <span class="block text-sm font-medium text-gray-700 mb-1">I am a...</span>
-                            <div class="flex space-x-4">
-                                <label class="flex items-center">
-                                    <input type="radio" name="userType" value="studio" class="form-radio text-blue-600" checked>
-                                    <span class="ml-2 text-sm">Studio Owner</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="userType" value="artist" class="form-radio text-blue-600">
-                                    <span class="ml-2 text-sm">Artist / Client</span>
-                                </label>
-                            </div>
-                        </div>
-                        <!-- Terms Acceptance (Sign Up Only) -->
-                        <div id="signUpOptions" class="hidden">
-                            <label class="flex items-center">
-                                <input type="checkbox" id="agreeTerms" class="form-checkbox text-blue-600" required>
-                                <span class="ml-2 text-xs text-gray-700">I accept the <a href="terms.html" target="_blank" class="text-blue-600 underline">Terms</a> and <a href="privacy.html" target="_blank" class="text-blue-600 underline">Privacy</a></span>
+                    </div>
+                    
+                    <div class="premium-field-group">
+                        <input type="email" id="email" name="email" required autocomplete="email" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                        <label for="email" class="premium-label text-sm text-gray-500">Email Address</label>
+                    </div>
+                    
+                    <div id="passwordFieldContainer" class="premium-field-group relative">
+                        <input type="password" id="password" name="password" required autocomplete="current-password" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3 pr-12" placeholder=" ">
+                        <label for="password" class="premium-label text-sm text-gray-500">Password</label>
+                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('password', this)">
+                            <i class="fas fa-eye text-sm eye-icon"></i>
+                            <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Confirm Password field (only shown for sign up) -->
+                    <div id="confirmPasswordField" class="hidden premium-field-group relative">
+                        <input type="password" id="confirmPassword" name="confirm-password" autocomplete="new-password" class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3 pr-12" placeholder=" ">
+                        <label for="confirmPassword" class="premium-label text-sm text-gray-500">Confirm Password</label>
+                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('confirmPassword', this)">
+                            <i class="fas fa-eye text-sm eye-icon"></i>
+                            <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- User Type Selection (only shown for sign up) -->
+                    <div id="userTypeField" class="hidden mb-6">
+                        <label class="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">Account Type</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <label class="flex items-center p-3 border border-gray-100 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors cursor-pointer">
+                                <input type="radio" name="userType" value="client" class="h-4 w-4 text-black focus:ring-black border-gray-300" checked>
+                                <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 font-medium">Artist / Client</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-100 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors cursor-pointer">
+                                <input type="radio" name="userType" value="studio" class="h-4 w-4 text-black focus:ring-black border-gray-300">
+                                <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 font-medium">Studio Owner</span>
                             </label>
                         </div>
-                        <div>
-                            <button type="submit" id="signInSubmit" 
-                                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative">
-                                <span id="submitBtnText">Sign In</span>
-                                <span id="submitBtnSpinner" class="hidden absolute right-4 top-1/2 -translate-y-1/2">
-                                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                                    </svg>
-                                </span>
-                            </button>
-                        </div>
-                        <div class="text-center">
-                            <span id="switchText" class="text-sm text-gray-600">Don't have an account? </span>
-                            <button type="button" id="switchToSignUp" class="text-sm font-medium text-blue-600 hover:text-blue-500">Sign up</button>
-                        </div>
-                    </form>
+                    </div>
 
-                    <!-- Forgot Password View -->
-                    <div id="forgotPasswordView" class="hidden space-y-4">
-                        <p class="text-sm text-gray-600 mb-4">
-                            Enter the email address associated with your account and we'll send you a link to reset your password.
-                        </p>
-                        <div>
-                            <label for="forgotEmail" class="block text-sm font-medium text-gray-700">Email Address</label>
-                            <input type="email" id="forgotEmail" name="forgotEmail" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <div id="signInExtras" class="flex items-center justify-between mb-2">
+                        <div class="flex items-center">
+                            <input id="remember" type="checkbox" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
+                            <label for="remember" class="ml-2 block text-sm text-gray-600 dark:text-gray-400">Remember me</label>
                         </div>
-                        <button type="button" id="resetPasswordSubmit" 
-                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Send Reset Link
-                        </button>
-                        <div class="text-center mt-4">
-                            <button type="button" id="backToSignIn" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                                Back to Sign In
-                            </button>
+                        <button type="button" onclick="window.authManager.showForgotView()" class="text-sm font-bold text-black dark:text-white hover:underline">Forgot password?</button>
+                    </div>
+                    
+                    <div id="signUpOptions" class="hidden mb-4">
+                        <div class="flex items-start">
+                            <input id="agreeTerms" type="checkbox" class="mt-1 h-4 w-4 text-black focus:ring-black border-gray-300 rounded" required>
+                            <label for="agreeTerms" class="ml-3 block text-sm text-gray-600 dark:text-gray-400">
+                                I agree to the <a href="#" class="text-black dark:text-white font-bold underline">Terms</a> and <a href="#" class="text-black dark:text-white font-bold underline">Privacy Policy</a>
+                            </label>
                         </div>
+                    </div>
+
+                    <button type="submit" id="signInSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 transition-all transform active:scale-[0.98]">
+                        <span id="submitBtnText">Sign In</span>
+                    </button>
+                    
+                    <div class="text-center pt-4">
+                        <span id="switchText" class="text-sm text-gray-600 dark:text-gray-400">Don't have an account? </span>
+                        <button type="button" id="switchToSignUp" class="text-sm font-bold text-black dark:text-white hover:underline transition-colors">Sign up</button>
+                    </div>
+                </form>
+
+                <!-- Forgot Password View -->
+                <div id="forgotPasswordView" class="hidden space-y-6">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Enter your email and we'll send you a reset link.
+                    </p>
+                    <div class="premium-field-group">
+                        <input type="email" id="forgotEmail" name="forgotEmail" required class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
+                        <label for="forgotEmail" class="premium-label text-sm text-gray-500">Email Address</label>
+                    </div>
+                    <button type="button" id="resetPasswordSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 transition-all">
+                        Send Reset Link
+                    </button>
+                    <div class="text-center">
+                        <button type="button" id="backToSignIn" class="text-sm font-bold text-black dark:text-white hover:underline">Back to Sign In</button>
                     </div>
                 </div>
             </div>
@@ -267,6 +268,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/script.js"></script>
     <script src="js/webapp-supabase.js"></script>
     <script src="js/webapp-auth.js"></script>
     <script src="js/webapp-studios.js"></script>

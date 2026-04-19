@@ -176,27 +176,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const htmlElement = document.documentElement;
     const body = document.body;
 
-    function updateThemeUI(isDark) {
-        if (!themeToggle) return;
-        const icon = themeToggle.querySelector('i');
-        if (icon) {
-            icon.className = isDark ? 'fas fa-sun text-xl text-yellow-400' : 'fas fa-moon text-xl text-gray-400';
-        }
+    function applyThemeUI(isDark) {
+        // Update favicons based on theme
+        const themeFolder = isDark ? 'dark' : 'light';
+        document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(link => {
+            const sizes = link.getAttribute('sizes');
+            if (sizes) {
+                link.href = `favicon/${themeFolder}/apple-icon-${sizes}.png`;
+            } else {
+                link.href = `favicon/${themeFolder}/apple-icon.png`;
+            }
+        });
     }
 
-    // Initialize Theme
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    
-    if (currentTheme === 'dark') {
-        htmlElement.classList.add('dark');
-        body.classList.add('dark-mode');
-        updateThemeUI(true);
-    } else {
-        htmlElement.classList.remove('dark');
-        body.classList.remove('dark-mode');
-        updateThemeUI(false);
+    // Initialize Theme (immediately apply state from storage/browser)
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+        
+        if (isDark) {
+            htmlElement.classList.add('dark');
+            body.classList.add('dark-mode');
+        } else {
+            htmlElement.classList.remove('dark');
+            body.classList.remove('dark-mode');
+        }
+        applyThemeUI(isDark);
     }
 
     if (themeToggle) {
@@ -204,10 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const isDark = htmlElement.classList.toggle('dark');
             body.classList.toggle('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateThemeUI(isDark);
-            updateFavicons(isDark);
+            applyThemeUI(isDark);
         });
     }
+    
+    // Run initialization
+    initTheme();
 
     // Function to update favicons based on theme
     function updateFavicons(isDarkMode) {

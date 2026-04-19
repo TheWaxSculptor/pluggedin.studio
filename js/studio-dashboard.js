@@ -98,14 +98,14 @@ class StudioDashboard {
     switchTab(tabId) {
         // Update active tab button
         document.querySelectorAll('.dashboard-tab').forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-100', 'text-blue-700');
-            btn.classList.add('text-gray-700', 'hover:bg-gray-100');
+            btn.classList.remove('active', 'bg-blue-100', 'text-blue-700', 'dark:bg-blue-900/30', 'dark:text-blue-300', 'font-bold');
+            btn.classList.add('text-gray-700', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-800');
         });
 
         const activeTab = document.getElementById(`${tabId}Tab`);
         if (activeTab) {
-            activeTab.classList.add('active', 'bg-blue-100', 'text-blue-700');
-            activeTab.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            activeTab.classList.add('active', 'bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-700', 'dark:text-blue-300', 'font-bold');
+            activeTab.classList.remove('text-gray-700', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-800');
         }
 
         // Show/hide content
@@ -207,6 +207,9 @@ class StudioDashboard {
             case 'analytics':
                 this.loadAnalyticsDetails();
                 break;
+            case 'financials':
+                this.loadFinancialsDetails();
+                break;
         }
     }
 
@@ -215,66 +218,54 @@ class StudioDashboard {
         if (!studioContent || !this.studioData) return;
 
         studioContent.innerHTML = `
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-semibold">Studio Details</h2>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        Edit Studio
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="text-lg font-medium mb-4">Basic Information</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Studio Name</label>
-                                <p class="mt-1 text-sm text-gray-900">${this.studioData.name}</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Location</label>
-                                <p class="mt-1 text-sm text-gray-900">${this.studioData.location}</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Hourly Rate</label>
-                                <p class="mt-1 text-sm text-gray-900">${utils.formatCurrency(this.studioData.hourly_rate)}</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Capacity</label>
-                                <p class="mt-1 text-sm text-gray-900">${this.studioData.capacity} people</p>
-                            </div>
-                        </div>
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-8 border dark:border-slate-800">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Studio Details</h2>
+                        <button class="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg active:scale-95">
+                            Edit Studio
+                        </button>
                     </div>
-
-                    <div>
-                        <h3 class="text-lg font-medium mb-4">Description</h3>
-                        <p class="text-sm text-gray-900">${this.studioData.description}</p>
-                        
-                        <div class="mt-6">
-                            <h4 class="text-sm font-medium text-gray-700 mb-2">Statistics</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Equipment Items:</span>
-                                    <span class="text-gray-900">${this.studioData.equipment_count}</span>
+    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Basic Information</h3>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                    <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Studio Name</label>
+                                    <p class="text-gray-900 dark:text-white font-medium">${this.studioData.name}</p>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Status:</span>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        ${this.studioData.status}
-                                    </span>
+                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                    <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Location</label>
+                                    <p class="text-gray-900 dark:text-white font-medium">${this.studioData.location}</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Hourly Rate</label>
+                                        <p class="text-gray-900 dark:text-white font-medium">${utils.formatCurrency(this.studioData.hourly_rate)}</p>
+                                    </div>
+                                    <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Capacity</label>
+                                        <p class="text-gray-900 dark:text-white font-medium">${this.studioData.capacity} people</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="mt-6 pt-6 border-t border-gray-100">
-                            <h4 class="text-sm font-medium text-gray-700 mb-2">Booking Integrations</h4>
-                            <div id="studioIntegrationsSummary" class="space-y-2">
-                                <p class="text-xs text-gray-400 italic">No external calendars linked</p>
+    
+                        <div>
+                            <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">About Your Space</h3>
+                            <div class="p-6 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 h-full">
+                                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">${this.studioData.description}</p>
+                                
+                                <div class="mt-8 pt-6 border-t dark:border-slate-700">
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4">Integrations</h4>
+                                    <div id="studioIntegrationsSummary" class="space-y-3">
+                                        <p class="text-xs text-gray-400 italic">No external calendars linked</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         `;
 
         // Update integrations summary if possible
@@ -365,6 +356,137 @@ class StudioDashboard {
                 </div>
             </div>
         `;
+    }
+
+    async loadFinancialsDetails() {
+        const container = document.getElementById('financialsContent');
+        if (!container) return;
+
+        const studioId = localStorage.getItem('currentStudioId') || '1';
+        
+        // Show loading state
+        container.innerHTML = `
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-8 border dark:border-slate-800 text-center py-12">
+                <div class="animate-spin h-8 w-8 border-b-2 border-black dark:border-white mx-auto mb-4 rounded-full"></div>
+                <p class="text-gray-500 dark:text-gray-400">Loading financial data...</p>
+            </div>
+        `;
+
+        try {
+            const [financials, payouts, studioInfo] = await Promise.all([
+                db.getStudioFinancials(studioId),
+                db.getStudioPayouts(studioId),
+                db.getStudio(studioId)
+            ]);
+
+            this.processAnalytics(financials);
+            this.payoutsData = payouts;
+            this.studioData = studioInfo;
+
+            const isConnected = studioInfo.stripe_onboarding_complete;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Stripe Status Card -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-8 border dark:border-slate-800">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-16 h-16 ${isConnected ? 'bg-green-100 dark:bg-green-900/30' : 'bg-blue-100 dark:bg-blue-900/30'} rounded-2xl flex items-center justify-center text-3xl">
+                                    ${isConnected ? '✅' : '💳'}
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Payout Method</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        ${isConnected ? 'Your bank account is linked via Stripe' : 'Connect your bank account to receive payouts'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button onclick="stripeConnect.initiateOnboarding()" class="px-8 py-3.5 ${isConnected ? 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white' : 'bg-black dark:bg-white text-white dark:text-black'} rounded-xl font-bold hover:opacity-90 transition-all shadow-xl active:scale-95">
+                                ${isConnected ? 'Manage Stripe Account' : 'Connect with Stripe'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Earnings Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-8 border border-gray-100 dark:border-slate-800">
+                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Gross Earnings</label>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">${utils.formatCurrency(this.analyticsData.totalGross)}</p>
+                            <p class="text-[10px] text-gray-400 mt-2 font-medium">Total revenue before fees</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-8 border border-gray-100 dark:border-slate-800">
+                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Platform Fees (10%)</label>
+                            <p class="text-3xl font-bold text-red-600 dark:text-red-400">-${utils.formatCurrency(this.analyticsData.totalGross * 0.10)}</p>
+                            <p class="text-[10px] text-gray-400 mt-2 font-medium">Auto-deducted upon booking</p>
+                        </div>
+                        <div class="bg-black dark:bg-white rounded-2xl p-8 shadow-2xl">
+                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest mb-1">Available for Payout</label>
+                            <p class="text-3xl font-bold text-white dark:text-black">${utils.formatCurrency(this.analyticsData.netEarnings)}</p>
+                            <p class="text-[10px] text-blue-200 dark:text-blue-700 mt-2 font-bold uppercase tracking-tighter">Ready to transfer</p>
+                        </div>
+                    </div>
+
+                    <!-- Payout History -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border dark:border-slate-800 overflow-hidden">
+                        <div class="p-8 border-b dark:border-slate-800">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Payout History</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            ${this.payoutsData && this.payoutsData.length > 0 ? `
+                                <table class="min-w-full divide-y dark:divide-slate-800">
+                                    <thead class="bg-gray-50 dark:bg-slate-800/20">
+                                        <tr>
+                                            <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Date</th>
+                                            <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status</th>
+                                            <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Method</th>
+                                            <th class="px-8 py-4 text-right text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y dark:divide-slate-800">
+                                        ${this.payoutsData.map(payout => `
+                                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                                                <td class="px-8 py-5 text-sm text-gray-900 dark:text-gray-200 font-medium">
+                                                    ${utils.formatDate(payout.created_at)}
+                                                </td>
+                                                <td class="px-8 py-5">
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                                                        payout.status === 'paid' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                                                        payout.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+                                                        'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                                                    }">
+                                                        ${payout.status}
+                                                    </span>
+                                                </td>
+                                                <td class="px-8 py-5 text-sm text-gray-500 dark:text-gray-400">
+                                                    ${payout.payout_method || 'Bank Transfer'}
+                                                </td>
+                                                <td class="px-8 py-5 text-right text-sm font-bold text-gray-900 dark:text-white">
+                                                    ${utils.formatCurrency(payout.amount / 100)}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            ` : `
+                                <div class="p-12 text-center">
+                                    <div class="text-4xl mb-4">🏜️</div>
+                                    <p class="text-gray-500 dark:text-gray-400 font-medium">No payouts recorded yet.</p>
+                                    <p class="text-xs text-gray-400 mt-1">Earnings will appear here after your first completed booking.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading financials:', error);
+            container.innerHTML = `
+                <div class="bg-red-50 dark:bg-red-900/20 p-8 rounded-2xl border border-red-100 dark:border-red-900/30 text-center">
+                    <p class="text-red-700 dark:text-red-400 font-bold">Error loading financial data</p>
+                    <button onclick="studioDashboard.loadFinancialsDetails()" class="mt-4 text-sm font-bold underline">Try Again</button>
+                </div>
+            `;
+        }
     }
 
     loadAnalyticsDetails() {

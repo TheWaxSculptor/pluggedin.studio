@@ -254,7 +254,7 @@ class StudiosManager {
         return `
             <div class="studio-card group cursor-pointer" onclick="window.studiosManager.showStudioDetails(${JSON.stringify(studio).replace(/"/g, '&quot;')})">
                 <div class="relative mb-3">
-                    <img src="${studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'}" 
+                    <img src="${studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
                          alt="${studio.name}" class="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-transform duration-200">
                     <button class="absolute top-3 right-3 p-2 hover:scale-110 transition-transform" 
                             onclick="event.stopPropagation(); toggleFavorite('${studio.id}')" 
@@ -266,17 +266,17 @@ class StudiosManager {
                 </div>
                 <div class="space-y-1">
                     <div class="flex justify-between items-start">
-                        <h3 class="font-medium text-gray-900 truncate pr-2">${studio.name}</h3>
+                        <h3 class="font-medium text-gray-900 dark:text-white truncate pr-2">${studio.name}</h3>
                         <div class="flex items-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-black fill-current" viewBox="0 0 20 20">
+                            <svg class="w-4 h-4 text-yellow-500 fill-current" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span class="text-sm text-gray-900 ml-1">${studio.rating || '4.8'}</span>
+                            <span class="text-sm text-gray-900 dark:text-gray-200 ml-1">${studio.rating || '4.8'}</span>
                         </div>
                     </div>
-                    <p class="text-gray-500 text-sm">${studio.location}</p>
-                    <p class="text-gray-500 text-sm">${studio.description || 'Professional recording studio'}</p>
-                    <p class="text-gray-900 font-medium"><span class="font-semibold">$${studio.price || '75'}</span> per hour</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">${studio.location}</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">${studio.description || 'Professional recording studio'}</p>
+                    <p class="text-gray-900 dark:text-white font-medium"><span class="font-semibold">$${studio.price || '75'}</span> per hour</p>
                 </div>
             </div>
         `;

@@ -219,13 +219,13 @@ class FeaturedStudiosManager {
         const price = studio.hourlyRate ? utils.formatCurrency(studio.hourlyRate) : 'Contact for pricing';
         
         return `
-            <div class="studio-card flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white cursor-pointer">
+            <div class="studio-card flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-slate-800 cursor-pointer border border-transparent dark:border-slate-700">
                 <div class="relative h-48 overflow-hidden">
                     <img 
-                        src="${studio.coverImage || studio.cover_image || studio.image || 'images/studio-placeholder.jpg'}" 
+                        src="${studio.coverImage || studio.cover_image || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
                         alt="${studio.name}" 
                         class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                        onerror="this.src='images/studio-placeholder.jpg'"
+                        onerror="this.src='https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'"
                     >
                     ${studio.type === 'Professional' ? 
                         `<div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded-full">
@@ -235,19 +235,19 @@ class FeaturedStudiosManager {
                 </div>
                 <div class="p-4">
                     <div class="flex justify-between items-center">
-                        <h3 class="font-semibold text-lg line-clamp-1">${studio.name}</h3>
+                        <h3 class="font-semibold text-lg line-clamp-1 text-gray-900 dark:text-white">${studio.name}</h3>
                         <div class="flex items-center">
-                            <span class="text-sm font-medium mr-1">${rating.toFixed(1)}</span>
+                            <span class="text-sm font-medium mr-1 text-gray-900 dark:text-white">${rating.toFixed(1)}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                         </div>
                     </div>
-                    <p class="text-gray-500 text-sm mt-1 line-clamp-1">
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 line-clamp-1">
                         ${studio.location || 'Location not specified'}
                     </p>
                     <div class="flex items-center justify-between mt-3">
-                        <p class="font-semibold">${price} <span class="text-gray-500 text-sm font-normal">/ hour</span></p>
+                        <p class="font-semibold text-gray-900 dark:text-white">${price} <span class="text-gray-500 dark:text-gray-400 text-sm font-normal">/ hour</span></p>
                     </div>
                 </div>
             </div>

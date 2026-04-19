@@ -58,11 +58,12 @@ nav button#registerBtnHeader:not(.dark *) {
 }
 
 /* Piano Brand Assets - Professional Sync */
-.logo-light { display: none !important; }
-.logo-dark { display: block !important; }
+/* Piano Brand Assets - Professional Sync */
+.logo-light { display: block !important; }
+.logo-dark { display: none !important; }
 
-.dark .logo-light { display: block !important; }
-.dark .logo-dark { display: none !important; }
+.dark .logo-light { display: none !important; }
+.dark .logo-dark { display: block !important; }
 
 .inline-block.dark\:hidden { display: inline-block !important; }
 .dark .inline-block.dark\:hidden { display: none !important; }
@@ -2426,12 +2427,12 @@ nav, .glass-panel {
 .dark #themeToggle .fa-sun { display: block; }
 .dark #themeToggle .fa-moon { display: none; }
 
-/* Logo Swapping System */
-.logo-light { display: none; }
-.logo-dark { display: block; }
+/* Logo Swapping System - Responsive Overrides */
+.logo-light { display: block; }
+.logo-dark { display: none; }
 
-.dark .logo-light { display: block; }
-.dark .logo-dark { display: none; }
+.dark .logo-light { display: none; }
+.dark .logo-dark { display: block; }
 
 /* Mobile Section Refinements */
 @media (max-width: 768px) {

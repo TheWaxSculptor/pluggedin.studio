@@ -38,8 +38,23 @@ body {
     color: var(--text-primary) !important;
 }
 
-.dark nav button.bg-white {
-    color: #000000 !important; /* Force pure black text on white button in dark mode */
+/* Professional Registration Button - Light Mode Fix */
+nav button#registerBtnHeader:not(.dark *) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    z-index: 1002 !important;
+    position: relative !important;
+}
+
+.dark nav button#registerBtnHeader {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    z-index: 1002 !important;
+    position: relative !important;
 }
 
 /* Piano Brand Assets - Professional Sync */
@@ -1212,9 +1227,10 @@ body.dark-mode .loader {
 }
 
 .loader-hidden {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 0 !important;
+    visibility: hidden !important;
     display: none !important;
+    pointer-events: none !important;
 }
 
 .loader-content {

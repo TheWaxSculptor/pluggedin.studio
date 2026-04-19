@@ -8,20 +8,33 @@
     <link rel="stylesheet" href="css/pluggedin.bundle.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script>
-        // Theme and UI Configuration (Immediate Execution to prevent flash)
-        (function() {
-            const theme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = theme === 'dark' || (!theme && prefersDark);
+            })();
+        </script>
+        <script>
+            // Supabase Configuration & Initialization
+            const SUPABASE_CONFIG = {
+                url: 'https://dovsqgkxxdpdkagzpykn.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdnNxZ2t4eGRwZGthZ3pweWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI1NjEsImV4cCI6MjA5MTU5ODU2MX0.SBQQ5IwYy16tmxmGAkS6co8rNl5kPsPjAlOXLHSnQw8'
+            };
+            window.SUPABASE_CONFIG = SUPABASE_CONFIG;
             
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                    // Standardize cross-interface database access
+                    window.db = {
+                        supabase: window.supabaseClient,
+                        tableNames: {
+                            users: 'users',
+                            studio_registrations: 'studio_registrations'
+                        }
+                    };
+                    console.log('✅ Supabase Client Initialized in app.html');
+                }
+            } catch (e) {
+                console.error('❌ Error initializing Supabase:', e);
             }
-        })();
-    </script>
+        </script>
 
 </head>
 <body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -1122,6 +1135,40 @@
             // Show/hide conditional fields based on user type
             updateConditionalFields();
         }
+
+        // --- AUTHENTICATION HANDLERS ---
+
+        async function signInWithGoogle() {
+            console.log('Initiating Google Sign-In...');
+            const supabase = window.db?.supabase || window.supabaseClient;
+            if (!supabase) {
+                console.error('Supabase client not initialized');
+                alert('Connection error. Please refresh the page and try again.');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin + '/app.html' }
+                });
+                if (error) throw error;
+            } catch (error) {
+                console.error('Google Sign-In Error:', error);
+                alert('Sign-In failed: ' + error.message);
+            }
+        }
+
+        function showAuthModal() {
+            console.log('Showing Auth Modal');
+            const modal = document.getElementById('authModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            if (modal) modal.classList.add('hidden');
+        }
         
         function toggleUserType(type) {
             selectedUserType = type;
@@ -1366,6 +1413,39 @@
         
         // Set up event listeners when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('App DOM Fully Loaded - Wiring Listeners');
+            
+            // Navbar Sign-In Button
+            const authBtn = document.getElementById('authBtn');
+            if (authBtn) {
+                authBtn.addEventListener('click', () => {
+                    console.log('Auth Button Clicked');
+                    showAuthModal();
+                });
+            }
+
+            // Navbar Register Button
+            const registerBtnHeader = document.getElementById('registerBtnHeader');
+            if (registerBtnHeader) {
+                registerBtnHeader.addEventListener('click', () => {
+                    console.log('Register Header Button Clicked');
+                    showRegisterModal();
+                });
+            }
+
+            // Google Sign-In Button
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            if (googleSignInBtn) {
+                googleSignInBtn.addEventListener('click', () => {
+                    console.log('Google Sign-In Button Clicked');
+                    signInWithGoogle();
+                });
+            }
+
+            // Modal Close Buttons
+            const closeAuthModalBtn = document.getElementById('closeAuthModal');
+            if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
+
             // Password strength checker
             const passwordInput = document.getElementById('registerPassword');
             if (passwordInput) {

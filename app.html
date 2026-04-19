@@ -1050,22 +1050,26 @@
                     <h3 class="font-bold text-lg mb-4">Step 3: Create Password</h3>
                     
                     <div class="premium-field-group">
-                        <input type="password" id="registerPassword" name="password" autocomplete="new-password" class="premium-input" placeholder=" " required onkeyup="checkPasswordStrength(this.value)">
-                        <label for="registerPassword" class="premium-label">Password <span class="required-asterisk">*</span></label>
-                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerPassword', this)" title="Toggle password visibility">
-                            <i class="fas fa-eye text-sm eye-icon"></i>
-                            <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
-                        </button>
+                        <div class="password-field-wrapper relative">
+                            <input type="password" id="registerPassword" name="password" autocomplete="new-password" class="premium-input pr-12" placeholder=" " required onkeyup="checkPasswordStrength(this.value)">
+                            <label for="registerPassword" class="premium-label">Password <span class="required-asterisk">*</span></label>
+                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerPassword', this)" title="Toggle password visibility">
+                                <i class="fas fa-eye text-sm eye-icon"></i>
+                                <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
+                            </button>
+                        </div>
                         <p id="passwordStrength" class="text-xs mt-2 font-semibold"></p>
                     </div>
                     
                     <div class="premium-field-group mt-6">
-                        <input type="password" id="registerConfirmPassword" name="confirm-password" autocomplete="new-password" class="premium-input" placeholder=" " required>
-                        <label for="registerConfirmPassword" class="premium-label">Confirm Password <span class="required-asterisk">*</span></label>
-                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerConfirmPassword', this)" title="Toggle password visibility">
-                            <i class="fas fa-eye text-sm eye-icon"></i>
-                            <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
-                        </button>
+                        <div class="password-field-wrapper relative">
+                            <input type="password" id="registerConfirmPassword" name="confirm-password" autocomplete="new-password" class="premium-input pr-12" placeholder=" " required>
+                            <label for="registerConfirmPassword" class="premium-label">Confirm Password <span class="required-asterisk">*</span></label>
+                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerConfirmPassword', this)" title="Toggle password visibility">
+                                <i class="fas fa-eye text-sm eye-icon"></i>
+                                <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="space-y-4 mt-6">
@@ -1119,7 +1123,7 @@
             // Validate current step before proceeding (unless skipping validation)
             if (!skipValidation && step > currentStep) {
                 const currentStepElement = document.getElementById(`formStep${currentStep}`);
-                const requiredFields = currentStepElement.querySelectorAll('input[required]');
+                const requiredFields = currentStepElement.querySelectorAll('input[required], select[required]');
                 
                 let isValid = true;
                 requiredFields.forEach(field => {
@@ -1130,6 +1134,7 @@
                         field.classList.remove('border-red-500');
                     }
                 });
+
                 
                 if (!isValid) {
                     alert('Please fill out all required fields marked with *');

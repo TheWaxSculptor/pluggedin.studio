@@ -90,7 +90,14 @@ class AuthManager {
             switchAuthBtn.addEventListener('click', () => this.toggleAuthMode());
         }
         if (switchToSignUp) {
-            switchToSignUp.addEventListener('click', () => this.toggleAuthMode());
+            switchToSignUp.addEventListener('click', () => {
+                this.hideAuthModal();
+                if (typeof window.showRegisterModal === 'function') {
+                    window.showRegisterModal();
+                } else {
+                    this.toggleAuthMode();
+                }
+            });
         }
 
         // Google Sign In

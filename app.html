@@ -544,17 +544,45 @@
 
                 <!-- Email/Password Form -->
                 <form id="authForm" class="auth-view">
-                    <!-- Name fields (only shown for sign up) -->
-                    <div id="nameField" class="hidden flex gap-4 mb-0">
-                        <div class="premium-field-group flex-1">
-                            <input type="text" id="firstName" class="premium-input" placeholder=" " required>
-                            <label for="firstName" class="premium-label">First Name</label>
+                    <!-- Extended Registration Fields (only shown for sign up) -->
+                    <div id="signUpFields" class="hidden flex-col gap-0 mb-0">
+                        <div class="flex gap-4">
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="firstName" class="premium-input" placeholder=" ">
+                                <label for="firstName" class="premium-label">First Name</label>
+                            </div>
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="lastName" class="premium-input" placeholder=" ">
+                                <label for="lastName" class="premium-label">Last Name</label>
+                            </div>
                         </div>
-                        <div class="premium-field-group flex-1">
-                            <input type="text" id="lastName" class="premium-input" placeholder=" " required>
-                            <label for="lastName" class="premium-label">Last Name</label>
+
+                        <div class="premium-field-group">
+                            <input type="text" id="address" class="premium-input" placeholder=" ">
+                            <label for="address" class="premium-label">Street Address</label>
+                        </div>
+
+                        <div class="premium-field-group">
+                            <input type="text" id="address2" class="premium-input" placeholder=" ">
+                            <label for="address2" class="premium-label">Apt, Suite, etc. (optional)</label>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="premium-field-group flex-[2]">
+                                <input type="text" id="regCity" class="premium-input" placeholder=" ">
+                                <label for="regCity" class="premium-label">City</label>
+                            </div>
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="regState" class="premium-input" placeholder=" ">
+                                <label for="regState" class="premium-label">State</label>
+                            </div>
+                            <div class="premium-field-group flex-1">
+                                <input type="text" id="regZip" class="premium-input" placeholder=" ">
+                                <label for="regZip" class="premium-label">Zip</label>
+                            </div>
                         </div>
                     </div>
+
                     
                     <div class="premium-field-group">
                         <input type="email" id="email" name="email" required class="premium-input" placeholder=" " autocomplete="email">

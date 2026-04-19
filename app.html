@@ -1224,6 +1224,7 @@
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const address = document.getElementById('registerAddress').value;
+            const address2 = document.getElementById('registerAddress2').value;
             const city = document.getElementById('registerCity').value;
             const state = document.getElementById('registerState').value;
             const zip = document.getElementById('registerZip').value;
@@ -1233,7 +1234,7 @@
             const marketingConsent = document.getElementById('marketingConsent').checked;
 
             const fullName = `${firstName} ${lastName}`.trim();
-            const fullAddress = `${address}, ${city}, ${state} ${zip}`.trim();
+            const fullAddress = `${address}${address2 ? ', ' + address2 : ''}, ${city}, ${state} ${zip}`.trim();
             
             // Get user type specific fields
             let additionalData = {};
@@ -1304,6 +1305,7 @@
                         user_type: selectedUserType,
                         phone: phone || null,
                         address: address || null,
+                        address_line_2: address2 || null,
                         city: city || null,
                         state: state || null,
                         zip: zip || null,

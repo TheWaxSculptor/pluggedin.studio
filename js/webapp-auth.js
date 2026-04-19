@@ -320,6 +320,7 @@ class AuthManager {
         const lastName = document.getElementById('lastName')?.value || '';
         const fullName = `${firstName} ${lastName}`.trim();
         const address = document.getElementById('address')?.value || '';
+        const address2 = document.getElementById('address2')?.value || '';
         const city = document.getElementById('regCity')?.value || '';
         const state = document.getElementById('regState')?.value || '';
         const zip = document.getElementById('regZip')?.value || '';
@@ -335,6 +336,7 @@ class AuthManager {
                     last_name: lastName,
                     full_name: fullName,
                     address: address,
+                    address_line_2: address2,
                     city: city,
                     state: state,
                     zip: zip,

@@ -1422,42 +1422,8 @@
             });
         }
         
-        // Set up event listeners when DOM is loaded
+        // Password strength listener for registration form
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('App DOM Fully Loaded - Wiring Listeners');
-            
-            // Navbar Sign-In Button
-            const authBtn = document.getElementById('authBtn');
-            if (authBtn) {
-                authBtn.addEventListener('click', () => {
-                    console.log('Auth Button Clicked');
-                    showAuthModal();
-                });
-            }
-
-            // Navbar Register Button
-            const registerBtnHeader = document.getElementById('registerBtnHeader');
-            if (registerBtnHeader) {
-                registerBtnHeader.addEventListener('click', () => {
-                    console.log('Register Header Button Clicked');
-                    showRegisterModal();
-                });
-            }
-
-            // Google Sign-In Button
-            const googleSignInBtn = document.getElementById('googleSignInBtn');
-            if (googleSignInBtn) {
-                googleSignInBtn.addEventListener('click', () => {
-                    console.log('Google Sign-In Button Clicked');
-                    signInWithGoogle();
-                });
-            }
-
-            // Modal Close Buttons
-            const closeAuthModalBtn = document.getElementById('closeAuthModal');
-            if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
-
-            // Password strength checker
             const passwordInput = document.getElementById('registerPassword');
             if (passwordInput) {
                 passwordInput.addEventListener('input', function() {

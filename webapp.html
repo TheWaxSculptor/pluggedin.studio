@@ -30,8 +30,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="h-8 w-auto">
-                    <span class="ml-2 text-xl font-bold text-gray-900">PluggedIn Studio</span>
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light h-8 w-auto">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark h-8 w-auto">
+                    <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">PluggedIn Studio</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-50 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle dark mode" aria-label="Toggle dark mode">
@@ -44,7 +45,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
-                    <button id="authBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                    <button id="authBtn" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-md hover:bg-slate-800 dark:hover:bg-gray-100 transition-colors">
                         Sign In
                     </button>
                     <div id="userMenu" class="hidden relative">
@@ -237,7 +238,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="signInSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 transition-all transform active:scale-[0.98]">
+                    <button type="submit" id="signInSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition-all transform active:scale-[0.98]">
                         <span id="submitBtnText">Sign In</span>
                     </button>
                     
@@ -256,7 +257,7 @@
                         <input type="email" id="forgotEmail" name="forgotEmail" required class="premium-input bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl w-full px-4 py-3" placeholder=" ">
                         <label for="forgotEmail" class="premium-label text-sm text-gray-500">Email Address</label>
                     </div>
-                    <button type="button" id="resetPasswordSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 transition-all">
+                    <button type="button" id="resetPasswordSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition-all">
                         Send Reset Link
                     </button>
                     <div class="text-center">

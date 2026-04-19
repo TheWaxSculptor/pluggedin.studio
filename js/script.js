@@ -197,10 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isDark) {
             htmlElement.classList.add('dark');
-            body.classList.add('dark-mode');
         } else {
             htmlElement.classList.remove('dark');
-            body.classList.remove('dark-mode');
         }
         applyThemeUI(isDark);
     }
@@ -208,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             const isDark = htmlElement.classList.toggle('dark');
-            body.classList.toggle('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             applyThemeUI(isDark);
         });

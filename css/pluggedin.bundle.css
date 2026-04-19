@@ -1,14 +1,41 @@
-/* Global Pitch Black Dark Mode Standard */
-html.dark body { 
-    background-color: #000 !important;
-    color: #f3f4f6 !important;
+/* Global Theme System - High Fidelity Restoration */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --piano-white: #ffffff;
+    --piano-black: #000000;
+    --border-color: #e5e7eb;
+    --accent: #2563eb;
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.1);
 }
 
-html.dark main, 
-html.dark section,
-html.dark .bg-white,
-html.dark .bg-gray-50 {
-    background-color: #000 !important;
+html.dark {
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --piano-white: #fdfdfd;
+    --piano-black: #000000;
+    --border-color: #1f2937;
+    --accent: #3b82f6;
+    --glass-bg: rgba(0, 0, 0, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Global Responsive Constraints */
+img, svg, picture, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* PluggedIn Web App Styles */
@@ -2313,6 +2340,78 @@ body.dark-mode .comparison-table .legend {
         font-size: 0.85rem;
         margin-top: 0.5rem;
     }
+}
+
+/* High-Fidelity Piano Search Bar Restoration */
+.piano-key {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.white-key {
+    background-color: var(--piano-white) !important;
+    color: #1a1a1a !important;
+    border: 1px solid var(--border-color);
+}
+
+.dark .white-key {
+    background-color: #fcfcfc !important; /* Keep it light for branding */
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.black-key {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .black-key {
+    background-color: #000000 !important;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+}
+
+/* Premium Navigation & Glassmorphism */
+nav, .glass-panel {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+/* Theme Toggle Icons */
+#themeToggle .fa-sun { display: none; }
+#themeToggle .fa-moon { display: block; }
+
+.dark #themeToggle .fa-sun { display: block; }
+.dark #themeToggle .fa-moon { display: none; }
+
+/* Logo Swapping System */
+.logo-light { display: none; }
+.logo-dark { display: block; }
+
+.dark .logo-light { display: block; }
+.dark .logo-dark { display: none; }
+
+/* Mobile Section Refinements */
+@media (max-width: 768px) {
+    .py-16 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+    .py-12 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+    .text-4xl { font-size: 1.875rem !important; line-height: 2.25rem !important; }
+    .text-3xl { font-size: 1.5rem !important; line-height: 2rem !important; }
+}
+
+/* Global Section & Card Overrides */
+html.dark main, 
+html.dark section,
+html.dark .bg-white,
+html.dark .bg-gray-50 {
+    background-color: var(--bg-primary) !important;
+}
+
+html.dark .bg-gray-100,
+html.dark .bg-gray-50/50 {
+    background-color: var(--bg-secondary) !important;
 }
 
 /* Password Toggle styling */

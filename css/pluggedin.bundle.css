@@ -15,11 +15,12 @@
 html.dark {
     --bg-primary: #000000;
     --bg-secondary: #0a0a0a;
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --accent-color: #ffffff;
+    --border-color: #27272a;
     --piano-white: #fdfdfd;
     --piano-black: #000000;
-    --border-color: #1f2937;
     --accent: #3b82f6;
     --glass-bg: rgba(0, 0, 0, 0.8);
     --glass-border: rgba(255, 255, 255, 0.1);
@@ -29,6 +30,16 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Explicit Navigation & Button contrast */
+.nav-link, nav button:not(.bg-white) {
+    color: var(--text-primary) !important;
+}
+
+.dark nav button.bg-white {
+    color: #000000 !important; /* Force black text on white button in dark mode */
 }
 
 /* Global Responsive Constraints */
@@ -2402,6 +2413,19 @@ nav, .glass-panel {
 }
 
 /* Global Section & Card Overrides */
+html.dark h1, 
+html.dark h2, 
+html.dark h3, 
+html.dark h4 { 
+    color: #ffffff !important; 
+    filter: drop-shadow(0 0 1px rgba(255,255,255,0.1));
+}
+
+html.dark p, 
+html.dark span:not(.text-black):not(.dark\:text-black) {
+    color: var(--text-primary) !important;
+}
+
 html.dark main, 
 html.dark section,
 html.dark .bg-white,

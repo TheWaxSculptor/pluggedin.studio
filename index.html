@@ -10,17 +10,20 @@
     <meta http-equiv="Expires" content="0">
     <title>PluggedIn.studio - Beta Access</title>
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="PluggedIn.studio Beta - Connect with professional and home recording studios worldwide. Book sessions, find equipment, and discover your perfect recording space.">
-    <meta name="keywords" content="recording studio, music production, studio booking, home studio, professional studio, music creators, audio production">
-    <meta name="author" content="PluggedIn.studio">
-    
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="PluggedIn.studio - Beta Access">
-    <meta property="og:description" content="Connect with professional and home recording studios worldwide. Now in Beta!">
-    <meta property="og:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
-    <meta property="og:url" content="https://pluggedin.studio">
-    <meta property="og:type" content="website">
+    <script>
+        // Theme and UI Configuration (Extreme Early Execution to prevent flash)
+        (function() {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = theme === 'dark' || (!theme && prefersDark);
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
@@ -46,7 +49,6 @@
     <link rel="stylesheet" href="css/button-fixes.css?v=1.0">
     <link rel="stylesheet" href="css/pluggedin.bundle.css">
     
-    <!-- Core Layout Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -174,16 +176,16 @@
                 <div class="flex justify-between items-center h-full">
                     <div class="flex items-center">
                         <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
-                            <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light h-10 md:h-12 w-auto object-contain">
-                            <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark h-10 md:h-12 w-auto object-contain">
+                            <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="hidden dark:inline-block h-10 md:h-12 w-auto object-contain">
+                            <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="inline-block dark:hidden h-10 md:h-12 w-auto object-contain">
                         </a>
                     </div>
                 </div>
             </div>
         </nav>
         
-        <h1>NOW IN BETA!</h1>
-        <p class="tagline">Connect with professional and home recording studios worldwide. Book sessions, find equipment, and discover your perfect recording space.</p>
+        <h1 class="text-gray-900 dark:text-white transition-colors">NOW IN BETA!</h1>
+        <p class="tagline text-gray-700 dark:text-gray-300 transition-colors">Connect with professional and home recording studios worldwide. Book sessions, find equipment, and discover your perfect recording space.</p>
         
         <!-- Beta Access Button -->
         <div class="beta-access-container">
@@ -217,8 +219,8 @@
             }
         </style>
         
-        <div class="studio-signup" id="studio-signup">
-            <h2>List Your Studio (Beta)</h2>
+        <div class="studio-signup bg-white dark:bg-black p-8 rounded-2xl shadow-xl transition-colors border dark:border-white/5" id="studio-signup">
+            <h2 class="text-gray-900 dark:text-white">List Your Studio (Beta)</h2>
             <p class="signup-description">Studio owners: Join our beta and start connecting with artists looking for professional and home recording spaces.</p>
             
             <form id="studio-form" class="studio-registration-form">

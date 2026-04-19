@@ -29,6 +29,9 @@ class PluggedInApp {
             // Initialize core modules
             await this.initializeModules();
             
+            // Initialize theme immediately to prevent flash
+            this.initTheme();
+            
             // Setup global event listeners
             this.setupGlobalEventListeners();
             
@@ -44,6 +47,49 @@ class PluggedInApp {
         } catch (error) {
             console.error('Error during app initialization:', error);
             this.showErrorState();
+        }
+    }
+
+    initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+        
+        this.applyTheme(currentTheme === 'dark');
+    }
+
+    applyTheme(isDark) {
+        const html = document.documentElement;
+        if (isDark) {
+            html.classList.add('dark');
+            document.body.classList.add('dark-mode');
+        } else {
+            html.classList.remove('dark');
+            document.body.classList.remove('dark-mode');
+        }
+        this.updateThemeIcons(isDark);
+        this.updateLogo(isDark);
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    updateLogo(isDark) {
+        const logo = document.querySelector('nav img');
+        if (logo) {
+            logo.src = isDark ? 'PluggedIn_Studio_Light.png' : 'PluggedIn_Studio_Dark.png';
+        }
+    }
+
+    updateThemeIcons(isDark) {
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        if (sunIcon && moonIcon) {
+            if (isDark) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
         }
     }
 
@@ -74,12 +120,25 @@ class PluggedInApp {
         
         // Handle search
         this.setupSearch();
+
+        // Handle Theme Toggle
+        this.setupThemeToggle();
         
         // Handle responsive behavior
         this.setupResponsiveBehavior();
         
         // Handle keyboard shortcuts
         this.setupKeyboardShortcuts();
+    }
+
+    setupThemeToggle() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const isDark = !document.documentElement.classList.contains('dark');
+                this.applyTheme(isDark);
+            });
+        }
     }
 
     setupNavigation() {

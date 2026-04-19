@@ -3,16 +3,19 @@
     --secondary-color: #000000;
     --text-color: #000000;
     --bg-color: #ffffff;
-    --bg-dark: #121212;
-    --dark-primary: #ffffff;
-    --dark-secondary: #e0e0e0;
-    --dark-text: #ffffff;
-    --dark-hover: #2c2c2c;
-    --accent-color: #000000;
+    --bg-dark: #09090b;
+    --surface-dark: #18181b;
+    --border-dark: #27272a;
+    --dark-primary: #fafafa;
+    --dark-secondary: #a1a1aa;
+    --dark-text: #fafafa;
+    --dark-hover: #27272a;
+    --accent-color: #3b82f6;
     --error-color: #ff4444;
-    --subtle-color: rgba(0, 0, 0, 0.7);
+    --subtle-color: rgba(255, 255, 255, 0.7);
 }
 
+/* Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -29,8 +32,8 @@ body {
     display: flex;
     flex-direction: column;
     transition: background-color 0.3s ease;
-    letter-spacing: -0.02em;
-    position: relative; /* Enable proper z-index stacking */
+    letter-spacing: -0.01em;
+    position: relative;
 }
 
 body.dark-mode {
@@ -40,36 +43,40 @@ body.dark-mode {
 
 /* Global Dark Mode support using .dark class on html */
 .dark body, 
-.dark main, 
+.dark main {
+    background-color: var(--bg-dark) !important;
+    color: var(--dark-text) !important;
+}
+
 .dark div.bg-white, 
-.dark div.bg-gray-50,
-.dark section.bg-white {
-    background-color: #000000 !important;
-    color: #f8f9fa !important;
+.dark section.bg-white,
+.dark div.bg-gray-50 {
+    background-color: var(--surface-dark) !important;
+    color: var(--dark-text) !important;
 }
 
 .dark .text-gray-900, 
 .dark .text-gray-800, 
 .dark h1, .dark h2, .dark h3 {
-    color: #ffffff !important;
+    color: var(--dark-primary) !important;
 }
 
 .dark .text-gray-600, 
 .dark .text-gray-500, 
 .dark p, .dark label {
-    color: #cbd5e0 !important;
+    color: var(--dark-secondary) !important;
 }
 
 .dark .border, 
 .dark .border-gray-200, 
 .dark .border-gray-300 {
-    border-color: #2d3748 !important;
+    border-color: var(--border-dark) !important;
 }
 
 .dark input, .dark select, .dark textarea {
-    background-color: #1a1a1a !important;
-    color: #ffffff !important;
-    border-color: #333 !important;
+    background-color: #0c0c0e !important;
+    color: var(--dark-text) !important;
+    border-color: var(--border-dark) !important;
 }
 
 /* Ensure the navbar stays dark if it was already dark */

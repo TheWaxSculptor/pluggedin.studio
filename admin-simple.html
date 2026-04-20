@@ -110,12 +110,14 @@
         </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
-        // Initialize Supabase
+        // Initialize Supabase using centralized config
         const supabase = window.supabase.createClient(
-            'https://dovsqgkxxdpdkagzpykn.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZka3JmeXpjeGhuaGFub2R4b3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MTIwNTksImV4cCI6MjA2NDI4ODA1OX0.tbdvE-7bkxJ09fUxH2Ds9z1k-ricXU4ezDHqeseytao'
+            window.SUPABASE_CONFIG.url,
+            window.SUPABASE_CONFIG.anonKey
         );
+
 
         async function loadRealData() {
             console.log('🚀 Loading real admin data...');

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /studio-dashboard.html
+Disallow: /privacy.html
+Disallow: /terms.html
+
+Sitemap: https://pluggedin.studio/sitemap.xml

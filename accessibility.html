@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Statement - PluggedIn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <nav class="bg-white/80 dark:bg-black/80 backdrop-blur-md border-b dark:border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="app.html" class="flex items-center">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="h-10 w-auto logo-light">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="h-10 w-auto logo-dark hidden">
+                </a>
+                <a href="app.html" class="text-sm font-medium hover:text-blue-600 transition-colors">Back to App</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-16">
+        <section class="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border dark:border-slate-800">
+            <h1 class="text-4xl font-extrabold mb-8">Accessibility Statement</h1>
+            
+            <div class="space-y-8 text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+                <p>PluggedIn Studio is committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards.</p>
+
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Conformance Status</h2>
+                    <p>The Web Content Accessibility Guidelines (WCAG) defines requirements for designers and developers to improve accessibility for people with disabilities. PluggedIn Studio is partially conformant with WCAG 2.1 level AA.</p>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Feedback</h2>
+                    <p>We welcome your feedback on the accessibility of PluggedIn Studio. Please let us know if you encounter accessibility barriers:</p>
+                    <ul class="list-disc ml-6 mt-4 space-y-2">
+                        <li>Email: <a href="mailto:support@pluggedin.studio" class="text-blue-600 dark:text-blue-400 underline">support@pluggedin.studio</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Technical Specifications</h2>
+                    <p>Accessibility of PluggedIn Studio relies on the following technologies to work with the particular combination of web browser and any assistive technologies or plugins installed on your computer:</p>
+                    <ul class="list-disc ml-6 mt-4 space-y-2">
+                        <li>HTML</li>
+                        <li>WAI-ARIA</li>
+                        <li>CSS</li>
+                        <li>JavaScript</li>
+                    </ul>
+                </div>
+
+                <div class="pt-8 border-t dark:border-slate-800">
+                    <p class="text-sm text-gray-500">Last Updated: April 19, 2026</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 text-center text-sm text-gray-500">
+        <p>&copy; 2026 PluggedIn Studio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Simple theme sync
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.querySelectorAll('.logo-dark').forEach(l => l.classList.remove('hidden'));
+            document.querySelectorAll('.logo-light').forEach(l => l.classList.add('hidden'));
+        }
+    </script>
+</body>
+</html>

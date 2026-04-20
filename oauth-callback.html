@@ -66,11 +66,12 @@
         <button class="close-btn" id="closeBtn" onclick="window.close()" style="display: none;">Close Window</button>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
-        // Initialize Supabase client
-        const supabaseUrl = 'https://your-project.supabase.co';
-        const supabaseKey = 'your-anon-key';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Use global config for initialization
+        const supabase = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+
+
 
         async function handleOAuthCallback() {
             const urlParams = new URLSearchParams(window.location.search);

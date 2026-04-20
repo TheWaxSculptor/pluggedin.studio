@@ -2,8 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explore Studios - PluggedIn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="canonical" href="https://pluggedin.studio/explore">
+    
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <title>Explore Recording Studios - PluggedIn</title>
+    <meta name="description" content="Discover professional recording studios, home setups, and mixing suites. Filter by location, equipment, and price to find the perfect space for your next session.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pluggedin.studio/explore">
+    <meta property="og:title" content="Explore Recording Studios - PluggedIn">
+    <meta property="og:description" content="Discover professional recording studios, home setups, and mixing suites. Filter by location and equipment.">
+    <meta property="og:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pluggedin.studio/explore">
+    <meta property="twitter:title" content="Explore Recording Studios - PluggedIn">
+    <meta property="twitter:description" content="Discover professional recording studios, home setups, and mixing suites. Filter by location and equipment.">
+    <meta property="twitter:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Professional Recording Studios",
+          "description": "High-end commercial facilities"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Home Studio Setups",
+          "description": "Budget-friendly music production spaces"
+        }
+      ]
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -30,7 +75,7 @@
             <div class="flex justify-between items-center h-32 min-h-[8rem]">
                 <div class="flex items-center">
                     <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
-                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-32 w-auto max-h-40 object-contain">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-32 w-auto max-h-40 object-contain" width="300" height="128" loading="lazy">
                     </a>
                 </div>
                 <div class="flex items-center space-x-4" role="menubar">
@@ -99,7 +144,9 @@
         </section>
     </main>
 
-    <!-- Scripts -->
+    <!-- Web App Config & Utils -->
+    <script src="js/config.js"></script>
+    <script src="js/webapp-utils.js"></script>
     <script src="js/webapp-supabase.js"></script>
     <script src="js/webapp-auth.js"></script>
     <script>
@@ -256,7 +303,24 @@
                 document.getElementById('studiosCount').textContent = `(${sortedStudios.length})`;
                 
                 const container = document.getElementById('studiosGrid');
-                container.innerHTML = sortedStudios.map(studio => this.createStudioCard(studio)).join('');
+                if (sortedStudios.length === 0) {
+                    window.utils.renderEmptyState(
+                        container, 
+                        'No studios found', 
+                        'Try clear your filters or searching in a different city.', 
+                        'fa-search',
+                        'Clear Filters',
+                        () => {
+                            this.selectedCity = 'All';
+                            this.selectedTags.clear();
+                            this.renderCities();
+                            this.renderTags();
+                            this.renderStudios();
+                        }
+                    );
+                } else {
+                    container.innerHTML = sortedStudios.map(studio => this.createStudioCard(studio)).join('');
+                }
             }
 
             getFilteredStudios() {
@@ -287,7 +351,7 @@
             createStudioCard(studio) {
                 return `
                     <div class="studio-card bg-white rounded-lg shadow-sm overflow-hidden">
-                        <img src="${studio.image}" alt="${studio.name}" class="w-full h-48 object-cover">
+                        <img src="${studio.image}" alt="${studio.name}" class="w-full h-48 object-cover" width="400" height="300" loading="lazy">
                         <div class="p-4">
                             <div class="flex items-start justify-between mb-2">
                                 <h3 class="text-lg font-semibold text-gray-900 truncate">${studio.name}</h3>
@@ -492,22 +556,7 @@
             }
 
             showNotification(message, type = 'info') {
-                const colors = {
-                    success: 'bg-green-100 border-green-400 text-green-700',
-                    error: 'bg-red-100 border-red-400 text-red-700',
-                    info: 'bg-blue-100 border-blue-400 text-blue-700'
-                };
-                
-                const notificationDiv = document.createElement('div');
-                notificationDiv.className = `${colors[type]} px-4 py-3 rounded mb-4 border-l-4`;
-                notificationDiv.innerHTML = `<span>${message}</span>`;
-                
-                const container = document.querySelector('main');
-                container.insertBefore(notificationDiv, container.firstChild);
-                
-                setTimeout(() => {
-                    notificationDiv.remove();
-                }, 5000);
+                window.showNotification(message, type);
             }
         }
 
@@ -516,5 +565,45 @@
             new ExploreManager();
         });
     </script>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white pt-16 pb-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400 border-t border-gray-800 pt-8 mt-8">
+                <div class="flex space-x-6 mb-4 md:mb-0">
+                    <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="accessibility.html" class="hover:text-white transition-colors">Accessibility Statement</a>
+                </div>
+                <div>
+                    <p>&copy; 2026 PluggedIn.studio. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="app.html" class="mobile-nav-item" aria-label="Home">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
+        </a>
+        <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Bookings</span>
+        </a>
+        <a href="messages.html" class="mobile-nav-item" aria-label="Messages">
+            <i class="fas fa-comment-dots"></i>
+            <span>Messages</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" aria-label="Profile">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
 </body>
 </html>

@@ -2,39 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="canonical" href="https://pluggedin.studio/app">
+    
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <title>PluggedIn Studio - Book Your Perfect Recording Space</title>
+    <meta name="description" content="Explore and book the world's best recording studios, mixing suites, and podcast spaces. Filter by equipment, location, and price to find your perfect session home.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pluggedin.studio/app">
+    <meta property="og:title" content="PluggedIn Studio - Book Your Perfect Recording Space">
+    <meta property="og:description" content="Explore and book the world's best recording studios, mixing suites, and podcast spaces. Filter by equipment, location, and price to find your perfect session home.">
+    <meta property="og:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pluggedin.studio/app">
+    <meta property="twitter:title" content="PluggedIn Studio - Book Your Perfect Recording Space">
+    <meta property="twitter:description" content="Explore and book the world's best recording studios, mixing suites, and podcast spaces. Filter by equipment, location, and price to find your perfect session home.">
+    <meta property="twitter:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "PluggedIn Studio App",
+      "description": "Premium Booking Platform for Recording Studios",
+      "url": "https://pluggedin.studio/app",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://pluggedin.studio/explore?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/pluggedin.bundle.css">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="manifest" href="site.webmanifest">
+    
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PluggedIn">
+    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+    
+    <!-- Production Readiness: Analytics tracking can be toggled via config.js -->
+    <script>
+        // Analytics initialization logic (Standardized for Production)
+        if (window.APP_CONFIG?.enableAnalytics) {
+            console.log('📊 Analytics enabled');
+        }
+    </script>
+    
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
             })();
         </script>
-        <script>
-            // Supabase Configuration & Initialization
-            const SUPABASE_CONFIG = {
-                url: 'https://dovsqgkxxdpdkagzpykn.supabase.co',
-                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdnNxZ2t4eGRwZGthZ3pweWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI1NjEsImV4cCI6MjA5MTU5ODU2MX0.SBQQ5IwYy16tmxmGAkS6co8rNl5kPsPjAlOXLHSnQw8'
-            };
-            window.SUPABASE_CONFIG = SUPABASE_CONFIG;
-            
-            try {
-                if (window.supabase && window.supabase.createClient) {
-                    window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-                    // Standardize cross-interface database access
-                    window.db = {
-                        supabase: window.supabaseClient,
-                        tableNames: {
-                            users: 'users',
-                            studio_registrations: 'studio_registrations'
-                        }
-                    };
-                    console.log('✅ Supabase Client Initialized in app.html');
-                }
-            } catch (e) {
-                console.error('❌ Error initializing Supabase:', e);
-            }
-        </script>
+    <script src="js/config.js"></script>
+    <!-- Supabase Initialization Handled by js/webapp-supabase.js -->
 
 </head>
 <body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -43,11 +74,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div style="display: flex; justify-content: space-between; align-items: center; height: 80px;">
                 <div class="flex items-center">
-                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light" style="height:64px;width:auto;display:inline-block;">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark" style="height:64px;width:auto;display:none;">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" width="200" height="64">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" width="200" height="64">
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme">
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme" aria-label="Toggle dark mode">
                         <i class="fas fa-moon text-xl"></i>
                         <i class="fas fa-sun text-xl"></i>
                     </button>
@@ -397,7 +428,7 @@
                     <!-- Featured Studio for Quick Booking -->
                     <div class="bg-white rounded-lg overflow-hidden shadow-md" id="featuredBookingStudio">
                         <div class="relative pb-48 overflow-hidden">
-                            <img id="featuredStudioImg" class="absolute inset-0 h-full w-full object-cover" src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" alt="Featured recording studio">
+                            <img id="featuredStudioImg" class="absolute inset-0 h-full w-full object-cover" src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" alt="Featured recording studio" width="1200" height="675" loading="lazy">
                         </div>
                         <div class="p-6">
                             <h3 id="featuredStudioName" class="text-xl font-semibold text-gray-900 mb-2">Loading Featured Studio...</h3>
@@ -695,7 +726,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Company Info -->
                 <div class="md:col-span-1">
-                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="h-16 w-auto mb-4">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="h-16 w-auto mb-4" width="200" height="64" loading="lazy">
                     <p class="text-gray-300 text-sm mb-4">Connecting artists with professional and home recording studios worldwide.</p>
                     <div class="flex space-x-4">
                         <a href="https://instagram.com/PluggedIn.StudioApp" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors" aria-label="Follow us on Instagram">
@@ -813,9 +844,10 @@
                 <!-- Bottom Bar -->
                 <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
                     <div class="flex space-x-6 mb-4 md:mb-0">
-                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-                        <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>
+                        <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
+                        <a href="cookie-policy.html" class="hover:text-white transition-colors">Cookie Policy</a>
+                        <a href="accessibility.html" class="hover:text-white transition-colors">Accessibility Statement</a>
                     </div>
                     <div>
                         <p>&copy; 2025 Electatech - PluggedIn.studio. All rights reserved.</p>
@@ -832,7 +864,9 @@
             tailwind.config = window.tailwindConfig;
         }
     </script>
-    <script src="js/core.bundle.js"></script>
+    <!-- Supabase Configuration -->
+    <script src="js/config.js"></script>
+    <script src="js/webapp-utils.js"></script>
     <script src="js/webapp-supabase.js"></script>
     <script src="js/webapp-auth.js"></script>
     <script src="js/webapp-booking.js"></script>
@@ -912,8 +946,9 @@
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required>
+                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required aria-describedby="emailHint">
                         <label for="registerEmail" class="premium-label">Email <span class="required-asterisk">*</span></label>
+                        <p id="emailHint" class="sr-only">Enter a valid email address to receive your confirmation link.</p>
                     </div>
                     
                     <div class="premium-field-group">
@@ -1051,14 +1086,14 @@
                     
                     <div class="premium-field-group">
                         <div class="password-field-wrapper relative">
-                            <input type="password" id="registerPassword" name="password" autocomplete="new-password" class="premium-input pr-12" placeholder=" " required onkeyup="checkPasswordStrength(this.value)">
+                            <input type="password" id="registerPassword" name="password" autocomplete="new-password" class="premium-input pr-12" placeholder=" " required aria-describedby="passwordStrength" onkeyup="checkPasswordStrength(this.value)">
                             <label for="registerPassword" class="premium-label">Password <span class="required-asterisk">*</span></label>
                             <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerPassword', this)" title="Toggle password visibility">
                                 <i class="fas fa-eye text-sm eye-icon"></i>
                                 <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
                             </button>
                         </div>
-                        <p id="passwordStrength" class="text-xs mt-2 font-semibold"></p>
+                        <p id="passwordStrength" class="text-xs mt-2 font-semibold" aria-live="polite"></p>
                     </div>
                     
                     <div class="premium-field-group mt-6">
@@ -1137,7 +1172,7 @@
 
                 
                 if (!isValid) {
-                    alert('Please fill out all required fields marked with *');
+                    showNotification('Please fill out all required fields marked with *', 'warning');
                     return;
                 }
                 
@@ -1147,7 +1182,7 @@
                     const confirmPassword = document.getElementById('registerConfirmPassword').value;
                     
                     if (password !== confirmPassword) {
-                        alert('Passwords do not match');
+                        showNotification('Passwords do not match', 'error');
                         return;
                     }
                 }
@@ -1183,7 +1218,7 @@
             const supabase = window.db?.supabase || window.supabaseClient;
             if (!supabase) {
                 console.error('Supabase client not initialized');
-                alert('Connection error. Please refresh the page and try again.');
+                showNotification('Connection error. Please refresh the page and try again.', 'error');
                 return;
             }
 
@@ -1305,7 +1340,7 @@
             // Validate the form
             const termsAccepted = document.getElementById('termsAccept').checked;
             if (!termsAccepted) {
-                alert('You must accept the Terms of Service and Privacy Policy');
+                showNotification('You must accept the Terms of Service and Privacy Policy', 'warning');
                 return;
             }
             
@@ -1358,12 +1393,12 @@
             
             // Validate required fields
             if (!firstName || !lastName || !email || !password || !confirmPassword) {
-                alert('Please fill out all required fields');
+                showNotification('Please fill out all required fields', 'warning');
                 return;
             }
             
             if (password !== confirmPassword) {
-                alert('Passwords do not match');
+                showNotification('Passwords do not match', 'error');
                 return;
             }
             
@@ -1410,7 +1445,7 @@
             .then(({ data, error }) => {
                 if (error) {
                     console.error('Registration error:', error);
-                    alert('Registration failed: ' + error.message);
+                    showNotification('Registration failed: ' + error.message, 'error');
                     registerBtn.innerHTML = originalBtnText;
                     registerBtn.disabled = false;
                     return;
@@ -1451,7 +1486,7 @@
                         }
                         
                         // Success message and close modal
-                        alert('Registration successful! Check your email to confirm your account.');
+                        showNotification('Registration successful! Check your email to confirm your account.', 'success');
                         closeRegisterModal();
                         
                         // Restore button
@@ -1474,5 +1509,24 @@
     </script>
     <script src="js/webapp-auth.js"></script>
     <script src="js/script.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="app.html" class="mobile-nav-item active" aria-label="Home">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
+        </a>
+        <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Bookings</span>
+        </a>
+        <a href="messages.html" class="mobile-nav-item" aria-label="Messages">
+            <i class="fas fa-comment-dots"></i>
+            <span>Messages</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" aria-label="Profile">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
 </body>
 </html>

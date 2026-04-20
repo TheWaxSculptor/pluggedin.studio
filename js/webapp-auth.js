@@ -11,6 +11,7 @@ class AuthManager {
         this.client = window.supabaseClient || window.supabase || (window.db && window.db.supabase);
         this.setupEventListeners();
         this.checkAuthState();
+        this.checkCookieConsent();
         
         // Subscribe to auth changes
         if (this.client) {
@@ -19,8 +20,16 @@ class AuthManager {
                 this.currentUser = session ? session.user : null;
                 if (this.currentUser) {
                     this.updateUIForAuthenticatedUser();
+                    
+                    // --- Phase 5: Email Verification Check ---
+                    if (!this.currentUser.email_confirmed_at) {
+                        this.showVerificationBanner();
+                    } else {
+                        this.hideVerificationBanner();
+                    }
                 } else {
                     this.updateUIForUnauthenticatedUser();
+                    this.hideVerificationBanner();
                 }
             });
         }
@@ -578,6 +587,104 @@ class AuthManager {
         help.className = 'password-match-help mt-1 text-xs ' + (p1 === p2 ? 'text-green-500' : 'text-red-500');
         help.textContent = p1 === p2 ? 'Passwords match!' : 'Passwords do not match';
         if (!help.parentElement) field.appendChild(help);
+    }
+
+    showVerificationBanner() {
+        // Remove existing if any
+        this.hideVerificationBanner();
+        
+        const banner = document.createElement('div');
+        banner.id = 'verificationBanner';
+        banner.className = 'verification-banner';
+        banner.innerHTML = `
+            <p>Your email is not verified. Please check your inbox.</p>
+            <button id="resendVerificationBtn">Resend Verification Email</button>
+        `;
+        
+        // Insert after navigation
+        const nav = document.querySelector('nav');
+        if (nav) {
+            nav.insertAdjacentElement('afterend', banner);
+        } else {
+            document.body.prepend(banner);
+        }
+        
+        const resendBtn = document.getElementById('resendVerificationBtn');
+        if (resendBtn) {
+            resendBtn.addEventListener('click', () => this.resendVerification());
+        }
+    }
+
+    hideVerificationBanner() {
+        const existing = document.getElementById('verificationBanner');
+        if (existing) existing.remove();
+    }
+
+    async resendVerification() {
+        if (!this.client || !this.currentUser) return;
+        
+        try {
+            const { error } = await this.client.auth.resend({
+                type: 'signup',
+                email: this.currentUser.email
+            });
+            
+            if (error) throw error;
+            
+            const resendBtn = document.getElementById('resendVerificationBtn');
+            if (resendBtn) {
+                resendBtn.textContent = 'Email Sent!';
+                resendBtn.disabled = true;
+                resendBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            console.log('Verification email resent successfully');
+        } catch (e) {
+            console.error('Error resending verification:', e.message);
+            alert('Failed to resend email: ' + e.message);
+        }
+    }
+
+    checkCookieConsent() {
+        const consent = localStorage.getItem('cookie_consent');
+        if (!consent) {
+            setTimeout(() => this.showCookieBanner(), 2000);
+        }
+    }
+
+    showCookieBanner() {
+        const banner = document.createElement('div');
+        banner.id = 'cookieBanner';
+        banner.className = 'cookie-banner';
+        banner.style.display = 'block';
+        banner.innerHTML = `
+            <div class="flex flex-col gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="p-4 bg-blue-100 dark:bg-blue-900/40 rounded-2xl text-blue-600 dark:text-blue-400">
+                        <i class="fas fa-cookie-bite text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 dark:text-white">Cookie Preferences</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">We use cookies to enhance your experience and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button id="acceptCookiesBtn" class="flex-1 bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity">Accept All</button>
+                    <a href="privacy.html" class="flex-1 text-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Privacy Policy</a>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(banner);
+        
+        const acceptBtn = document.getElementById('acceptCookiesBtn');
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem('cookie_consent', 'accepted');
+                banner.style.transform = 'translateY(120%)';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 500);
+            });
+        }
     }
 }
 

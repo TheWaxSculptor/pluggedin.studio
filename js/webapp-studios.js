@@ -208,17 +208,52 @@ class StudiosManager {
         const studioGrid = document.getElementById('studioGrid');
         const emptyState = document.getElementById('emptyState');
 
-        if (loadingState) loadingState.classList.remove('hidden');
-        if (studioGrid) studioGrid.innerHTML = '';
+        // Note: loadingState might be a separate spinner, we'll hide it if we use skeletons
+        if (loadingState) loadingState.classList.add('hidden');
         if (emptyState) emptyState.classList.add('hidden');
+
+        if (studioGrid) {
+            studioGrid.innerHTML = Array(6).fill(0).map(() => `
+                <div class="studio-card rounded-xl overflow-hidden border border-gray-100 dark:border-slate-800">
+                    <div class="skeleton skeleton-img w-full h-64"></div>
+                    <div class="p-4 space-y-3">
+                        <div class="flex justify-between">
+                            <div class="skeleton skeleton-title" style="width: 70%"></div>
+                            <div class="skeleton skeleton-text" style="width: 15%"></div>
+                        </div>
+                        <div class="skeleton skeleton-text" style="width: 40%"></div>
+                        <div class="skeleton skeleton-text" style="width: 100%"></div>
+                        <div class="skeleton skeleton-text" style="width: 30%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
     }
 
     showEmptyState() {
-        const loadingState = document.getElementById('loadingState');
+        const studioGrid = document.getElementById('studioGrid');
         const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
 
         if (loadingState) loadingState.classList.add('hidden');
-        if (emptyState) emptyState.classList.remove('hidden');
+        if (emptyState) emptyState.classList.add('hidden'); // We use our own high-fidelity one in the grid
+
+        if (studioGrid) {
+            studioGrid.classList.remove('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+            studioGrid.classList.add('block'); // For centering
+            studioGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="empty-state-title">No studios found</h3>
+                    <p class="empty-state-description">We couldn't find any studios matching your current filters. Try adjusting your search or clear all filters to see more options.</p>
+                    <button onclick="window.clearAllActiveFilters();" class="empty-state-cta">
+                        Clear all filters
+                    </button>
+                </div>
+            `;
+        }
     }
 
     renderStudios() {
@@ -254,8 +289,9 @@ class StudiosManager {
         return `
             <div class="studio-card group cursor-pointer" onclick="window.studiosManager.showStudioDetails(${JSON.stringify(studio).replace(/"/g, '&quot;')})">
                 <div class="relative mb-3">
-                    <img src="${studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
-                         alt="${studio.name}" class="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-transform duration-200">
+                    <img src="${studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
+                         alt="${studio.name}" class="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-transform duration-200"
+                         loading="lazy">
                     <button class="absolute top-3 right-3 p-2 hover:scale-110 transition-transform" 
                             onclick="event.stopPropagation(); toggleFavorite('${studio.id}')" 
                             aria-label="Add to favorites">
@@ -285,14 +321,21 @@ class StudiosManager {
     async showStudioDetails(studio) {
         this.selectedStudio = studio;
         
+        // Add loading state to card if possible
+        const studioCard = document.querySelector(`[onclick*="${studio.id}"]`);
+        if (studioCard) studioCard.style.opacity = '0.7';
+        
         try {
-            // Get full studio details including availability
+            // Get full studio details including availability from dynamic DB layer
             const fullStudio = await db.getStudio(studio.id);
+            
+            if (studioCard) studioCard.style.opacity = '1';
             this.renderStudioModal(fullStudio);
             this.showStudioModal();
         } catch (error) {
+            if (studioCard) studioCard.style.opacity = '1';
             console.error('Error loading studio details:', error);
-            utils.showNotification('Error loading studio details', 'error');
+            utils.showNotification('Error loading studio details. Please check your connection.', 'error');
         }
     }
 

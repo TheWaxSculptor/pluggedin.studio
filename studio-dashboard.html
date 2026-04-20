@@ -4,7 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Owner Dashboard - PluggedIn</title>
-    <link rel="stylesheet" href="css/app.css">
+    <meta name="description" content="Manage your recording studio, track bookings, and sync your professional calendar with PluggedIn Studio's owner dashboard.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pluggedin.studio/studio-dashboard">
+    <meta property="og:title" content="Studio Owner Dashboard - PluggedIn">
+    <meta property="og:description" content="Manage your recording studio, track bookings, and sync your professional calendar with PluggedIn Studio's owner dashboard.">
+    <meta property="og:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pluggedin.studio/studio-dashboard">
+    <meta property="twitter:title" content="Studio Owner Dashboard - PluggedIn">
+    <meta property="twitter:description" content="Manage your recording studio, track bookings, and sync your professional calendar with PluggedIn Studio's owner dashboard.">
+    <meta property="twitter:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,11 +53,11 @@
                     <span class="ml-4 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full border dark:border-blue-800">Studio Owner</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-50 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme">
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-50 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme" aria-label="Toggle dark mode">
                         <i class="fas fa-moon text-xl"></i>
                         <i class="fas fa-sun text-xl"></i>
                     </button>
-                    <a href="webapp.html" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium">Back to App</a>
+                    <a href="app.html" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium">Back to App</a>
                     <div id="userMenu" class="relative">
                         <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" title="User menu" aria-label="User menu">
                             <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border border-white dark:border-slate-800">
@@ -253,6 +271,16 @@
                 </div>
             </div>
         </div>
+
+        <!-- Dashboard Footer (Legal) -->
+        <footer class="mt-12 py-8 border-t dark:border-slate-800 text-center">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-6 text-sm text-gray-400">
+                <a href="privacy.html" class="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy Policy</a>
+                <a href="terms.html" class="hover:text-gray-900 dark:hover:text-white transition-colors">Terms of Service</a>
+                <a href="accessibility.html" class="hover:text-gray-900 dark:hover:text-white transition-colors">Accessibility Statement</a>
+                <p>&copy; 2026 PluggedIn.studio</p>
+            </div>
+        </footer>
     </div>
 
     <!-- Integration Setup Modal -->
@@ -278,12 +306,33 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/script.js"></script>
+    <!-- Web App Config & Utils -->
+    <script src="js/config.js"></script>
+    <script src="js/webapp-utils.js"></script>
     <script src="js/webapp-supabase.js"></script>
     <script src="js/webapp-auth.js"></script>
     <script src="js/studio-dashboard.js"></script>
     <script src="js/calendar-backend.js"></script>
     <script src="js/calendar-integrations.js"></script>
     <script src="js/stripe-connect.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="app.html" class="mobile-nav-item" aria-label="Home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#bookings" class="mobile-nav-item" onclick="window.dashboard.switchTab('bookings')" aria-label="My Bookings">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Bookings</span>
+        </a>
+        <a href="messages.html" class="mobile-nav-item" aria-label="Messages">
+            <i class="fas fa-comment-dots"></i>
+            <span>Messages</span>
+        </a>
+        <a href="#studio" class="mobile-nav-item" onclick="window.dashboard.switchTab('studio')" aria-label="Studio Details">
+            <i class="fas fa-music"></i>
+            <span>Studio</span>
+        </a>
+    </nav>
 </body>
 </html>

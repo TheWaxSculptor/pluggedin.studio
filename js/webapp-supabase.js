@@ -4,19 +4,33 @@ var db = {};
 var utils = {};
 
 // Supabase Configuration for PluggedIn Web App
-// Using actual Supabase project credentials
-
-// Get config from supabase-config.js
 // Initialize Supabase client globally
 (function() {
-    const SUPABASE_URL = window.SUPABASE_CONFIG?.url || 'https://dovsqgkxxdpdkagzpykn.supabase.co';
-    const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdnNxZ2t4eGRwZGthZ3pweWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI1NjEsImV4cCI6MjA5MTU5ODU2MX0.SBQQ5IwYy16tmxmGAkS6co8rNl5kPsPjAlOXLHSnQw8';
+    const SUPABASE_URL = window.SUPABASE_CONFIG?.url;
+    const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey;
+
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        console.error('❌ Supabase Config missing! Ensure js/config.js is loaded.');
+        return;
+    }
 
     try {
         if (window.supabase && window.supabase.createClient) {
-            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            window.supabaseClient = client;
-            supabaseClient = client; // Set top-level var
+            // Only create if not already exists
+            if (!window.supabaseClient) {
+                window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+            supabaseClient = window.supabaseClient;
+            
+            // Standardize cross-interface database access
+            if (!window.db) {
+                window.db = {
+                    supabase: window.supabaseClient,
+                    tableNames: {} // Will be populated by detectTableNames
+                };
+            }
+            db = window.db;
+
             console.log('✅ Supabase Client Initialized');
         } else {
             console.error('❌ Supabase library not found in window');
@@ -33,14 +47,19 @@ let authStateListeners = [];
 // Subscribe to auth changes if client is ready
 if (supabaseClient) {
     supabaseClient.auth.onAuthStateChange((event, session) => {
-        console.log('Auth state changed:', event, session);
+        // Redundant with AuthManager but kept for legacy webapp-supabase compatibility
+        // We will coordinate notifications in Phase 2
+        console.debug('Auth state changed (webapp-supabase):', event);
         
         currentUser = session ? session.user : null;
         
         // Notify all listeners
-        authStateListeners.forEach(listener => listener(event, session));
+        authStateListeners.forEach(listener => {
+            try { listener(event, session); } catch(e) { console.error('Error in auth listener:', e); }
+        });
     });
 }
+
 
 // Add auth state listener
 function addAuthStateListener(callback) {
@@ -90,29 +109,32 @@ function updateUIForUnauthenticatedUser() {
 }
 
 // Table name detection - handles different naming conventions
-const tableNames = {
-    studios: null,
-    equipment: null,
-    users: null,
-    bookings: null,
-    payments: null,
-    reviews: null
+// Global registry for detected table names
+const tableNames = {};
+window.DB_STATUS = {
+    initialized: false,
+    mapping: tableNames,
+    errors: [],
+    lastSync: null
+};
+
+// Map of canonical keys to their possible database variants
+const variations = {
+    studios: ['studios', 'studio_registrations', 'studio', 'Studio', 'STUDIOS'],
+    equipment: ['equipment', 'equipments', 'Equipment', 'EQUIPMENT', 'gear', 'instruments'],
+    users: ['users', 'user', 'User', 'USERS'],
+    bookings: ['bookings', 'booking', 'Booking', 'BOOKINGS'],
+    payments: ['payments', 'payment', 'Payment', 'PAYMENTS'],
+    reviews: ['reviews', 'review', 'Review', 'REVIEWS'],
+    conversations: ['conversations', 'conversation'],
+    messages: ['messages', 'message'],
+    payouts: ['payouts', 'payout', 'StudioPayouts'],
+    availabilities: ['availabilities', 'availability']
 };
 
 // Detect actual table names in the database
 async function detectTableNames() {
-    const variations = {
-        studios: ['studios', 'studio_registrations', 'studio', 'Studio', 'STUDIOS'],
-        equipment: ['equipment', 'equipments', 'Equipment', 'EQUIPMENT', 'gear', 'instruments'],
-        users: ['users', 'user', 'User', 'USERS'],
-        bookings: ['bookings', 'booking', 'Booking', 'BOOKINGS'],
-        payments: ['payments', 'payment', 'Payment', 'PAYMENTS'],
-        reviews: ['reviews', 'review', 'Review', 'REVIEWS'],
-        conversations: ['conversations', 'conversation'],
-        messages: ['messages', 'message'],
-        availabilities: ['availabilities', 'availability']
-    };
-    
+    console.group('🔍 PluggedIn Database Sync');
     for (const [key, variants] of Object.entries(variations)) {
         for (const variant of variants) {
             try {
@@ -122,7 +144,7 @@ async function detectTableNames() {
                 
                 if (!error) {
                     tableNames[key] = variant;
-                    console.log(`✅ Found table: ${key} -> ${variant}`);
+                    console.log(`✅ ${key.padEnd(15)} -> ${variant}`);
                     break;
                 }
             } catch (e) {
@@ -131,9 +153,13 @@ async function detectTableNames() {
         }
         
         if (!tableNames[key]) {
-            console.warn(`⚠️ Table not found: ${key}`);
+            console.warn(`⚠️ ${key.padEnd(15)} -> NOT FOUND (Will use fallback)`);
+            window.DB_STATUS.errors.push(`Table not found: ${key}`);
         }
     }
+    window.DB_STATUS.initialized = true;
+    window.DB_STATUS.lastSync = new Date().toISOString();
+    console.groupEnd();
 }
 
 // Initialize table detection
@@ -142,6 +168,11 @@ detectTableNames().then(() => {
 }).catch(err => {
     console.warn('⚠️ Table detection failed:', err);
 });
+
+// Helper to resolve table names dynamically with fallback
+function getTableName(key) {
+    return tableNames[key] || key;
+}
 
 // Database helper functions
 const dbMethods = {
@@ -177,24 +208,104 @@ const dbMethods = {
     },
     
     async getStudio(id) {
+        const client = window.supabaseClient || supabaseClient;
+        const studioTable = getTableName('studios');
+        
+        // 1. Try fetching everything in one go (Optimal)
+        const relations = [];
+        if (tableNames.equipment) relations.push(`${tableNames.equipment}(*)`);
+        if (tableNames.availabilities) relations.push(`${tableNames.availabilities}(*)`);
+        
+        let selectString = '*';
+        if (relations.length > 0) {
+            selectString = `*, ${relations.join(', ')}`;
+        }
+
+        try {
+            const { data, error } = await client
+                .from(studioTable)
+                .select(selectString)
+                .eq('id', id)
+                .single();
+            
+            if (!error && data) {
+                // Map relation variants to standard keys
+                if (tableNames.equipment && tableNames.equipment !== 'equipment') {
+                    data.equipment = data[tableNames.equipment];
+                }
+                if (tableNames.availabilities && tableNames.availabilities !== 'availabilities') {
+                    data.availabilities = data[tableNames.availabilities];
+                }
+                return data;
+            }
+            
+            // If it's a specific Postgres relation error, fall back to core data
+            if (error && (error.code === 'PGRST200' || error.code === 'PGRST107')) {
+                console.warn(`⚠️ Relational query failed on ${studioTable}, falling back to core data...`);
+                const { data: coreData, error: coreError } = await client
+                    .from(studioTable)
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (coreError) throw coreError;
+                
+                // Attempt to fetch equipment separately
+                if (tableNames.equipment) {
+                    try {
+                        const { data: eqData } = await client.from(getTableName('equipment')).select('*').eq('studio_id', id);
+                        coreData.equipment = eqData || [];
+                    } catch (e) { coreData.equipment = []; }
+                }
+
+                return coreData;
+            } else if (error) {
+                throw error;
+            }
+        } catch (err) {
+            console.error(`❌ Critical error fetching studio from ${studioTable}:`, err);
+            throw err;
+        }
+    },
+
+    async updateStudio(id, updates) {
+        const tableName = tableNames.studios || 'studios';
         const { data, error } = await supabaseClient
-            .from('studios')
-            .select(`
-                *,
-                equipment(*),
-                availabilities(*)
-            `)
+            .from(tableName)
+            .update(updates)
             .eq('id', id)
+            .select()
             .single();
         
         if (error) throw error;
         return data;
     },
+
+    async uploadFile(bucket, path, file) {
+        const { data, error } = await supabaseClient
+            .storage
+            .from(bucket)
+            .upload(path, file, {
+                cacheControl: '3600',
+                upsert: true
+            });
+        
+        if (error) throw error;
+        
+        // Get public URL
+        const { data: { publicUrl } } = supabaseClient
+            .storage
+            .from(bucket)
+            .getPublicUrl(data.path);
+            
+        return publicUrl;
+    },
     
     // Bookings
     async createBooking(bookingData) {
+        const tableName = getTableName('bookings');
         const { data, error } = await supabaseClient
-            .from('bookings')
+            .from(tableName)
             .insert([bookingData])
             .select()
             .single();
@@ -204,11 +315,13 @@ const dbMethods = {
     },
     
     async getUserBookings(userId) {
+        const bookingTable = getTableName('bookings');
+        const studioTable = getTableName('studios');
         const { data, error } = await supabaseClient
-            .from('bookings')
+            .from(bookingTable)
             .select(`
                 *,
-                studios(name, location)
+                ${studioTable}(name, location)
             `)
             .eq('user_id', userId)
             .order('start_time', { ascending: false });
@@ -219,8 +332,9 @@ const dbMethods = {
     
     // User profile
     async getUserProfile(userId) {
+        const tableName = getTableName('users');
         const { data, error } = await supabaseClient
-            .from('users')
+            .from(tableName)
             .select('*')
             .eq('id', userId)
             .single();
@@ -230,8 +344,9 @@ const dbMethods = {
     },
     
     async updateUserProfile(userId, updates) {
+        const tableName = getTableName('users');
         const { data, error } = await supabaseClient
-            .from('users')
+            .from(tableName)
             .update(updates)
             .eq('id', userId)
             .select()
@@ -243,47 +358,28 @@ const dbMethods = {
 
     // Equipment
     async getEquipment(filters = {}) {
-        console.log('🎵 Starting getEquipment function...');
-        
-        // Use 'equipment' table with explicit public schema
-        const tableName = 'equipment';
-        console.log(`🔍 Querying equipment table: ${tableName}`);
-        
-        // Try querying with explicit schema reference
+        const tableName = getTableName('equipment');
         let query = supabaseClient
             .from(tableName)
             .select('*');
         
         if (filters.category && filters.category !== 'all') {
             query = query.eq('category', filters.category);
-            console.log(`🏷️ Filtering by category: ${filters.category}`);
         }
         
         if (filters.search) {
             query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,brand.ilike.%${filters.search}%,model.ilike.%${filters.search}%`);
-            console.log(`🔍 Searching for: ${filters.search}`);
         }
         
-        try {
-            const { data, error } = await query.order('name');
-            
-            if (error) {
-                console.error('❌ Equipment loading error:', error);
-                throw error;
-            }
-            
-            console.log(`✅ Successfully loaded ${data?.length || 0} equipment items`);
-            console.log('📦 Equipment data:', data);
-            return data || [];
-        } catch (error) {
-            console.error('❌ Exception in getEquipment:', error);
-            throw error;
-        }
+        const { data, error } = await query.order('name');
+        if (error) throw error;
+        return data || [];
     },
 
     async addEquipment(equipmentData) {
+        const tableName = getTableName('equipment');
         const { data, error } = await supabaseClient
-            .from('equipment')
+            .from(tableName)
             .insert([equipmentData])
             .select()
             .single();
@@ -293,11 +389,15 @@ const dbMethods = {
     },
 
     async getPayments(userId, filters = {}) {
+        const tableName = getTableName('payments');
+        const bookingsTable = getTableName('bookings');
+        const studiosTable = getTableName('studios');
+        
         let query = supabaseClient
-            .from('payments')
+            .from(tableName)
             .select(`
                 *,
-                bookings(id, studio_id, studios(name))
+                ${bookingsTable}(id, studio_id, ${studiosTable}(name))
             `)
             .eq('user_id', userId);
         
@@ -312,23 +412,27 @@ const dbMethods = {
 
     // Studio Analytics & Financials
     async getStudioFinancials(studioId) {
+        const paymentsTable = getTableName('payments');
+        const bookingsTable = getTableName('bookings');
+        
         // Fetch all successful payments for bookings belonging to this studio
         const { data, error } = await supabaseClient
-            .from('payments')
+            .from(paymentsTable)
             .select(`
                 *,
-                bookings!inner(id, studio_id)
+                ${bookingsTable}!inner(id, studio_id)
             `)
-            .eq('bookings.studio_id', studioId);
+            .eq(`${bookingsTable}.studio_id`, studioId);
 
         if (error) throw error;
         return data || [];
     },
 
     async getStudioPayouts(studioId) {
+        const tableName = getTableName('payouts');
         // Fetch payout history (assuming a payouts table or similar log)
         const { data, error } = await supabaseClient
-            .from('payouts')
+            .from(tableName)
             .select('*')
             .eq('studio_id', studioId)
             .order('created_at', { ascending: false });
@@ -341,8 +445,9 @@ const dbMethods = {
     },
 
     async createPayment(paymentData) {
+        const tableName = getTableName('payments');
         const { data, error } = await supabaseClient
-            .from('payments')
+            .from(tableName)
             .insert([paymentData])
             .select()
             .single();
@@ -352,8 +457,9 @@ const dbMethods = {
     },
 
     async updatePayment(paymentId, updates) {
+        const tableName = getTableName('payments');
         const { data, error } = await supabaseClient
-            .from('payments')
+            .from(tableName)
             .update(updates)
             .eq('id', paymentId)
             .select()
@@ -365,12 +471,16 @@ const dbMethods = {
 
     // Reviews
     async getStudioReviews(studioId) {
+        const reviewsTable = getTableName('reviews');
+        const usersTable = getTableName('users');
+        const bookingsTable = getTableName('bookings');
+        
         const { data, error } = await supabaseClient
-            .from('reviews')
+            .from(reviewsTable)
             .select(`
                 *,
-                users(name, avatar_url),
-                bookings(id, verified)
+                ${usersTable}(name, avatar_url),
+                ${bookingsTable}(id, verified)
             `)
             .eq('studio_id', studioId)
             .order('created_at', { ascending: false });
@@ -380,12 +490,14 @@ const dbMethods = {
     },
 
     async createReview(reviewData) {
+        const tableName = getTableName('reviews');
+        const usersTable = getTableName('users');
         const { data, error } = await supabaseClient
-            .from('reviews')
+            .from(tableName)
             .insert([reviewData])
             .select(`
                 *,
-                users(name, avatar_url)
+                ${usersTable}(name, avatar_url)
             `)
             .single();
         
@@ -395,12 +507,16 @@ const dbMethods = {
 
     // Messages
     async getConversations(userId) {
+        const conversationsTable = getTableName('conversations');
+        const usersTable = getTableName('users');
+        const messagesTable = getTableName('messages');
+        
         const { data, error } = await supabaseClient
-            .from('conversations')
+            .from(conversationsTable)
             .select(`
                 *,
-                participants!inner(user_id, users(name, avatar_url)),
-                messages(content, created_at, read)
+                participants!inner(user_id, ${usersTable}(name, avatar_url)),
+                ${messagesTable}(content, created_at, read)
             `)
             .eq('participants.user_id', userId)
             .order('updated_at', { ascending: false });
@@ -408,13 +524,15 @@ const dbMethods = {
         if (error) throw error;
         return data;
     },
-
+ 
     async getMessages(conversationId) {
+        const messagesTable = getTableName('messages');
+        const usersTable = getTableName('users');
         const { data, error } = await supabaseClient
-            .from('messages')
+            .from(messagesTable)
             .select(`
                 *,
-                users(name, avatar_url)
+                ${usersTable}(name, avatar_url)
             `)
             .eq('conversation_id', conversationId)
             .order('created_at', { ascending: true });
@@ -422,32 +540,36 @@ const dbMethods = {
         if (error) throw error;
         return data;
     },
-
+ 
     async sendMessage(messageData) {
+        const messagesTable = getTableName('messages');
+        const usersTable = getTableName('users');
         const { data, error } = await supabaseClient
-            .from('messages')
+            .from(messagesTable)
             .insert([messageData])
             .select(`
                 *,
-                users(name, avatar_url)
+                ${usersTable}(name, avatar_url)
             `)
             .single();
         
         if (error) throw error;
         return data;
-    },
-
-    // Active Sessions
+    },      // Active Sessions
     async getActiveSession(userId) {
+        const sessionsTable = getTableName('active_sessions');
+        const bookingsTable = getTableName('bookings');
+        const studiosTable = getTableName('studios');
+        
         const { data, error } = await supabaseClient
-            .from('active_sessions')
+            .from(sessionsTable)
             .select(`
                 *,
-                bookings(
+                ${bookingsTable}(
                     id,
                     start_time,
                     end_time,
-                    studios(name, address, room_number)
+                    ${studiosTable}(name, address, room_number)
                 )
             `)
             .eq('user_id', userId)
@@ -457,10 +579,11 @@ const dbMethods = {
         if (error && error.code !== 'PGRST116') throw error;
         return data;
     },
-
+ 
     async endSession(sessionId) {
+        const sessionsTable = getTableName('active_sessions');
         const { data, error } = await supabaseClient
-            .from('active_sessions')
+            .from(sessionsTable)
             .update({ 
                 status: 'completed',
                 ended_at: new Date().toISOString()
@@ -572,8 +695,9 @@ const dbMethods = {
     },
 
     async getAdminUsers(filters = {}) {
+        const tableName = getTableName('users');
         let query = supabaseClient
-            .from('users')
+            .from(tableName)
             .select('*');
         
         if (filters.role && filters.role !== 'all') {
@@ -586,11 +710,13 @@ const dbMethods = {
     },
 
     async getAdminStudios() {
+        const studioTable = getTableName('studios');
+        const usersTable = getTableName('users');
         const { data, error } = await supabaseClient
-            .from('studios')
+            .from(studioTable)
             .select(`
                 *,
-                users(name, email)
+                ${usersTable}(name, email)
             `)
             .order('created_at', { ascending: false });
         
@@ -599,12 +725,15 @@ const dbMethods = {
     },
 
     async getAdminBookings(filters = {}) {
+        const bookingTable = getTableName('bookings');
+        const usersTable = getTableName('users');
+        const studiosTable = getTableName('studios');
         let query = supabaseClient
-            .from('bookings')
+            .from(bookingTable)
             .select(`
                 *,
-                users(name, email),
-                studios(name)
+                ${usersTable}(name, email),
+                ${studiosTable}(name)
             `);
         
         if (filters.status && filters.status !== 'all') {
@@ -621,8 +750,9 @@ const dbMethods = {
         const activities = [];
         
         // Recent users
+        const usersTable = getTableName('users');
         const { data: recentUsers } = await supabaseClient
-            .from('users')
+            .from(usersTable)
             .select('id, name, created_at')
             .order('created_at', { ascending: false })
             .limit(5);
@@ -639,8 +769,9 @@ const dbMethods = {
         });
         
         // Recent studios
+        const studiosTable = getTableName('studios');
         const { data: recentStudios } = await supabaseClient
-            .from('studios')
+            .from(studiosTable)
             .select('id, name, created_at')
             .order('created_at', { ascending: false })
             .limit(5);
@@ -657,12 +788,16 @@ const dbMethods = {
         });
         
         // Recent bookings
+        const bookingsTable = getTableName('bookings');
+        const usersTable = getTableName('users');
+        const studiosTable = getTableName('studios');
+        
         const { data: recentBookings } = await supabaseClient
-            .from('bookings')
+            .from(bookingsTable)
             .select(`
                 id, created_at,
-                users(name),
-                studios(name)
+                ${usersTable}(name),
+                ${studiosTable}(name)
             `)
             .order('created_at', { ascending: false })
             .limit(5);
@@ -672,7 +807,7 @@ const dbMethods = {
                 id: `booking-${booking.id}`,
                 type: 'booking_created',
                 title: 'New booking made',
-                description: `${booking.users?.name} booked ${booking.studios?.name}`,
+                description: `${booking[usersTable]?.name} booked ${booking[studiosTable]?.name}`,
                 timestamp: new Date(booking.created_at),
                 color: 'orange'
             });

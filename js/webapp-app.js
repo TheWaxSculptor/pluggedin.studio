@@ -9,6 +9,17 @@ class PluggedInApp {
     async init() {
         if (this.isInitialized) return;
         
+        // --- Phase 10: Global Error Boundary ---
+        window.addEventListener('error', (event) => {
+            console.error('Global Error caught:', event.error);
+            this.showErrorState();
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled Rejection caught:', event.reason);
+            this.showErrorState();
+        });
+
         try {
             // Wait for DOM to be ready
             if (document.readyState === 'loading') {

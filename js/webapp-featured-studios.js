@@ -66,11 +66,19 @@ class FeaturedStudiosManager {
             // Show loading state
             const container = document.getElementById('featuredStudiosCarousel');
             if (container) {
-                container.innerHTML = `
-                    <div class="w-full flex justify-center items-center py-8">
-                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+                // Show shimmering skeletons while loading
+                container.innerHTML = Array(4).fill(0).map(() => `
+                    <div class="flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden border border-gray-100 dark:border-slate-800">
+                        <div class="skeleton skeleton-img w-full h-48"></div>
+                        <div class="p-4 space-y-3">
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text" style="width: 40%"></div>
+                            <div class="flex justify-between items-center mt-3">
+                                <div class="skeleton skeleton-text" style="width: 30%"></div>
+                            </div>
+                        </div>
                     </div>
-                `;
+                `).join('');
             }
 
             // Load studios from database
@@ -84,6 +92,7 @@ class FeaturedStudiosManager {
                 
             this.filteredStudios = [...this.studios];
             this.renderFeaturedStudios();
+            this.generateSchemaMarkup();
         } catch (error) {
             console.error('Error loading featured studios:', error);
             const container = document.getElementById('featuredStudiosCarousel');
@@ -222,10 +231,11 @@ class FeaturedStudiosManager {
             <div class="studio-card flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-slate-800 cursor-pointer border border-transparent dark:border-slate-700">
                 <div class="relative h-48 overflow-hidden">
                     <img 
-                        src="${studio.coverImage || studio.cover_image || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
+                        src="${studio.image_url || studio.coverImage || studio.cover_image || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
                         alt="${studio.name}" 
                         class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                         onerror="this.src='https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'"
+                        loading="lazy"
                     >
                     ${studio.type === 'Professional' ? 
                         `<div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded-full">
@@ -303,6 +313,46 @@ class FeaturedStudiosManager {
         } else {
             console.error('Studios Manager not initialized');
         }
+    }
+
+    generateSchemaMarkup() {
+        if (!this.studios || this.studios.length === 0) return;
+
+        // Remove old schema if exists
+        const oldSchema = document.getElementById('studio-schema-markup');
+        if (oldSchema) oldSchema.remove();
+
+        const schema = {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "itemListElement": this.studios.map((studio, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                    "@type": "LocalBusiness",
+                    "@id": `https://pluggedin.studio/app.html#studio-${studio.id}`,
+                    "name": studio.name,
+                    "image": studio.image_url || studio.image,
+                    "priceRange": "$$",
+                    "address": {
+                        "@type": "PostalAddress",
+                        "addressLocality": studio.location?.split(',')[0].trim() || 'Unknown',
+                        "addressCountry": "US"
+                    },
+                    "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": studio.rating || 5.0,
+                        "reviewCount": studio.review_count || 1
+                    }
+                }
+            }))
+        };
+
+        const script = document.createElement('script');
+        script.id = 'studio-schema-markup';
+        script.type = 'application/ld+json';
+        script.text = JSON.stringify(schema);
+        document.head.appendChild(script);
     }
 }
 

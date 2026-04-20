@@ -121,9 +121,10 @@ class CalendarBackendService {
         try {
             // Encrypt sensitive data before storing
             const encryptedCredentials = await this.encryptCredentials(credentials);
+            const tableName = db.getTableName('studio_integrations');
 
             const { error } = await this.supabase
-                .from('studio_integrations')
+                .from(tableName)
                 .upsert({
                     studio_id: studioId,
                     platform: platform,
@@ -157,8 +158,9 @@ class CalendarBackendService {
             const testResult = await this.makeApiCall(platform, 'test', credentials);
             
             // Update integration status
+            const tableName = db.getTableName('studio_integrations');
             await this.supabase
-                .from('studio_integrations')
+                .from(tableName)
                 .update({
                     status: testResult.success ? 'active' : 'error',
                     last_tested: new Date().toISOString(),
@@ -194,8 +196,9 @@ class CalendarBackendService {
             await this.updateLocalAvailability(studioId, processedData);
 
             // Update last sync timestamp
+            const tableName = db.getTableName('studio_integrations');
             await this.supabase
-                .from('studio_integrations')
+                .from(tableName)
                 .update({
                     last_sync: new Date().toISOString(),
                     sync_status: 'success'
@@ -432,8 +435,9 @@ class CalendarBackendService {
     }
 
     async getIntegrationCredentials(studioId, platform) {
+        const tableName = db.getTableName('studio_integrations');
         const { data, error } = await this.supabase
-            .from('studio_integrations')
+            .from(tableName)
             .select('credentials')
             .eq('studio_id', studioId)
             .eq('platform', platform)
@@ -504,10 +508,11 @@ class CalendarBackendService {
     async updateLocalAvailability(studioId, availabilityData) {
         // Update local cache of external availability records in Supabase
         const now = new Date().toISOString();
+        const tableName = db.getTableName('studio_external_availability');
         
         // delete existing records for this studio for the current/future dates to avoid duplicates
         await this.supabase
-            .from('studio_external_availability')
+            .from(tableName)
             .delete()
             .eq('studio_id', studioId)
             .gte('start_time', now);
@@ -525,8 +530,9 @@ class CalendarBackendService {
             }));
 
         if (busySlots.length > 0) {
+            const tableName = db.getTableName('studio_external_availability');
             const { error } = await this.supabase
-                .from('studio_external_availability')
+                .from(tableName)
                 .upsert(busySlots);
             
             if (error) throw error;

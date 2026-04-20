@@ -36,10 +36,11 @@ body {
     position: relative;
 }
 
-body.dark-mode {
+body.dark-mode, html.dark body {
     background-color: var(--bg-dark);
     color: var(--dark-text);
 }
+
 
 /* Global Dark Mode support using .dark class on html */
 .dark body, 
@@ -320,13 +321,14 @@ body.dark-mode .logo-container {
     display: none;
 }
 
-body.dark-mode .light-logo {
+body.dark-mode .light-logo, html.dark .light-logo {
     display: none;
 }
 
-body.dark-mode .dark-logo {
+body.dark-mode .dark-logo, html.dark .dark-logo {
     display: block;
 }
+
 
 h1 {
     font-size: 3.5rem;

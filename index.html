@@ -4,11 +4,62 @@
     <!-- GitHub Pages Fix -->
     <base href="/">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="canonical" href="https://pluggedin.studio/">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>PluggedIn.studio - Beta Access</title>
+    <meta name="description" content="Book professional and home recording studios worldwide. Connect with music producers, find premium equipment, and take your music to the next level.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pluggedin.studio/">
+    <meta property="og:title" content="PluggedIn.studio - Beta Access">
+    <meta property="og:description" content="Book professional and home recording studios worldwide. Connect with music producers, find premium equipment, and take your music to the next level.">
+    <meta property="og:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "PluggedIn Studio",
+      "image": "https://pluggedin.studio/PluggedIn_Studio_Light.png",
+      "@id": "https://pluggedin.studio/",
+      "url": "https://pluggedin.studio/",
+      "telephone": "",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "",
+        "addressLocality": "Global",
+        "postalCode": "",
+        "addressCountry": "US"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 0,
+        "longitude": 0
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "opens": "00:00",
+        "closes": "23:59"
+      },
+      "sameAs": [
+        "https://twitter.com/pluggedinstudio"
+      ]
+    }
+    </script>
     
     <script>
         // Theme and UI Configuration (Extreme Early Execution to prevent flash)
@@ -27,8 +78,8 @@
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PluggedIn.studio - Coming Soon">
-    <meta name="twitter:description" content="The next generation platform for music creators is almost here.">
+    <meta name="twitter:title" content="PluggedIn.studio - Now in Beta">
+    <meta name="twitter:description" content="The next generation platform for music creators is live. Explore and book studios now.">
     <meta name="twitter:image" content="https://pluggedin.studio/PluggedIn_Studio_Light.png">
     
     <!-- Favicon and App Icons -->
@@ -490,7 +541,7 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="js/supabase-config.js?v=1.0"></script>
+    <script src="js/config.js?v=1.0"></script>
     <script src="js/script.js?v=1.5"></script>
     <script src="js/content-keeper.js?v=1.0"></script>
     <!-- GitHub Pages Fix Script -->

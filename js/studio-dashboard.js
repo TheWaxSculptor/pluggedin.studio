@@ -75,7 +75,7 @@ class StudioDashboard {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 // Redirect to login if not authenticated
-                window.location.href = 'webapp.html';
+                window.location.href = 'app.html';
                 return;
             }
 
@@ -83,7 +83,7 @@ class StudioDashboard {
             this.updateUserInfo(session.user);
         } catch (error) {
             console.error('Error checking auth state:', error);
-            window.location.href = 'webapp.html';
+            window.location.href = 'app.html';
         }
     }
 
@@ -130,11 +130,13 @@ class StudioDashboard {
             const studioId = localStorage.getItem('currentStudioId') || '1';
             
             // Load initial dashboard data from DB
-            const [financials, payouts] = await Promise.all([
+            const [financials, payouts, studioInfo] = await Promise.all([
                 db.getStudioFinancials(studioId),
-                db.getStudioPayouts(studioId)
+                db.getStudioPayouts(studioId),
+                db.getStudio(studioId)
             ]);
 
+            this.studioData = studioInfo;
             this.processAnalytics(financials);
             this.payoutsData = payouts;
 
@@ -215,61 +217,208 @@ class StudioDashboard {
 
     loadStudioDetails() {
         const studioContent = document.getElementById('studioContent');
-        if (!studioContent || !this.studioData) return;
+        if (!studioContent) return;
+
+        if (!this.studioData) {
+            // Show shimmering skeletons for studio details
+            studioContent.innerHTML = `
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-8 border dark:border-slate-800">
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="skeleton skeleton-title" style="width: 200px"></div>
+                        <div class="skeleton" style="width: 120px; height: 40px; border-radius: 12px"></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            <div class="skeleton skeleton-img w-full"></div>
+                        </div>
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="skeleton" style="height: 60px; border-radius: 12px"></div>
+                                <div class="skeleton" style="height: 60px; border-radius: 12px"></div>
+                                <div class="skeleton" style="height: 60px; border-radius: 12px"></div>
+                                <div class="skeleton" style="height: 60px; border-radius: 12px"></div>
+                            </div>
+                            <div class="skeleton" style="height: 120px; border-radius: 12px"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        const imageUrl = this.studioData.image_url || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
 
         studioContent.innerHTML = `
                 <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-8 border dark:border-slate-800">
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white">Studio Details</h2>
-                        <button class="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg active:scale-95">
-                            Edit Studio
-                        </button>
+                        <div class="flex space-x-3">
+                             <button id="editStudioBtn" class="bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all active:scale-95">
+                                Edit Details
+                            </button>
+                        </div>
                     </div>
     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Basic Information</h3>
-                            <div class="space-y-4">
-                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
-                                    <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Studio Name</label>
-                                    <p class="text-gray-900 dark:text-white font-medium">${this.studioData.name}</p>
-                                </div>
-                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
-                                    <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Location</label>
-                                    <p class="text-gray-900 dark:text-white font-medium">${this.studioData.location}</p>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
-                                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Hourly Rate</label>
-                                        <p class="text-gray-900 dark:text-white font-medium">${utils.formatCurrency(this.studioData.hourly_rate)}</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Image Upload & Preview -->
+                        <div class="lg:col-span-1">
+                            <h3 class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">Studio Photo</h3>
+                            <div class="relative group aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-slate-800 hover:border-blue-500 transition-colors">
+                                <img id="studioImagePreview" src="${imageUrl}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer" onclick="document.getElementById('studioImageInput').click()">
+                                    <div class="text-center text-white">
+                                        <div class="text-2xl mb-2">📸</div>
+                                        <div class="text-sm font-bold">Update Photo</div>
                                     </div>
-                                    <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
-                                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Capacity</label>
-                                        <p class="text-gray-900 dark:text-white font-medium">${this.studioData.capacity} people</p>
-                                    </div>
+                                </div>
+                                <input type="file" id="studioImageInput" class="hidden" accept="image/*" onchange="window.studioDashboard.handleImageUpload(event)">
+                                
+                                <!-- Upload Overlay -->
+                                <div id="uploadOverlay" class="hidden absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center">
+                                    <div class="animate-spin h-8 w-8 border-b-2 border-white rounded-full mb-4"></div>
+                                    <p class="text-white text-sm font-bold">Uploading...</p>
                                 </div>
                             </div>
+                            <p class="mt-3 text-xs text-gray-400">Accepted types: <span class="text-gray-600 dark:text-gray-300 font-medium">JPG, PNG, WebP</span>. Max size: <span class="text-gray-600 dark:text-gray-300 font-medium">5MB</span>.</p>
+                            <p class="mt-1 text-xs text-gray-400 italic">Recommended resolution: 1920x1080px.</p>
                         </div>
-    
-                        <div>
-                            <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">About Your Space</h3>
-                            <div class="p-6 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 h-full">
-                                <p class="text-gray-600 dark:text-gray-400 leading-relaxed">${this.studioData.description}</p>
-                                
-                                <div class="mt-8 pt-6 border-t dark:border-slate-700">
-                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4">Integrations</h4>
-                                    <div id="studioIntegrationsSummary" class="space-y-3">
-                                        <p class="text-xs text-gray-400 italic">No external calendars linked</p>
-                                    </div>
+
+                        <!-- Basic Information -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Studio Name</label>
+                                    <input id="edit_name" type="text" value="${this.studioData.name}" class="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0" readonly>
                                 </div>
+                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Location</label>
+                                    <input id="edit_location" type="text" value="${this.studioData.location || ''}" class="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0" readonly>
+                                </div>
+                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Hourly Rate ($)</label>
+                                    <input id="edit_hourly_rate" type="number" value="${this.studioData.hourly_rate || 0}" class="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0" readonly>
+                                </div>
+                                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Capacity</label>
+                                    <input id="edit_capacity" type="number" value="${this.studioData.capacity || 0}" class="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0" readonly>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800">
+                                <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Description</label>
+                                <textarea id="edit_description" class="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0 resize-none h-24" readonly>${this.studioData.description || ''}</textarea>
+                            </div>
+
+                            <div id="saveActionArea" class="hidden flex justify-end">
+                                <button id="saveStudioBtn" class="bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-xl active:scale-95">
+                                    Save Changes
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
         `;
 
-        // Update integrations summary if possible
+        // Bind events
+        document.getElementById('editStudioBtn').addEventListener('click', () => this.toggleStudioEdit());
+        document.getElementById('saveStudioBtn').addEventListener('click', () => this.saveStudioDetails());
+
         this.updateIntegrationsSummary();
+    }
+
+    async handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validation
+        if (!file.type.startsWith('image/')) {
+            utils.showNotification('Please upload a valid image (JPG, PNG, or WebP).', 'error');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            utils.showNotification('Image size must be less than 5MB', 'error');
+            return;
+        }
+
+        const overlay = document.getElementById('uploadOverlay');
+        const preview = document.getElementById('studioImagePreview');
+        
+        try {
+            overlay.classList.remove('hidden');
+            
+            const studioId = this.studioData.id;
+            const fileExt = file.name.split('.').pop();
+            const filePath = `studio-${studioId}/${Math.random()}.${fileExt}`;
+            
+            const publicUrl = await db.uploadFile('studio-pictures', filePath, file);
+            
+            // Update the studio record in DB
+            await db.updateStudio(studioId, { image_url: publicUrl });
+            
+            // Update local state and UI
+            this.studioData.image_url = publicUrl;
+            preview.src = publicUrl;
+            
+            utils.showNotification('Studio photo updated successfully!', 'success');
+        } catch (error) {
+            console.error('Upload error:', error);
+            utils.showNotification('Error uploading image', 'error');
+        } finally {
+            overlay.classList.add('hidden');
+        }
+    }
+
+    toggleStudioEdit() {
+        const inputs = ['edit_name', 'edit_location', 'edit_hourly_rate', 'edit_capacity', 'edit_description'];
+        const isEditing = document.getElementById('saveActionArea').classList.contains('hidden');
+        
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.readOnly = !isEditing;
+                if (isEditing) {
+                    el.classList.add('border-b', 'border-blue-500/50');
+                } else {
+                    el.classList.remove('border-b', 'border-blue-500/50');
+                }
+            }
+        });
+
+        document.getElementById('saveActionArea').classList.toggle('hidden');
+        document.getElementById('editStudioBtn').textContent = isEditing ? 'Cancel' : 'Edit Details';
+    }
+
+    async saveStudioDetails() {
+        const updates = {
+            name: document.getElementById('edit_name').value,
+            location: document.getElementById('edit_location').value,
+            hourly_rate: parseFloat(document.getElementById('edit_hourly_rate').value),
+            capacity: parseInt(document.getElementById('edit_capacity').value),
+            description: document.getElementById('edit_description').value
+        };
+
+        const saveBtn = document.getElementById('saveStudioBtn');
+        const originalText = saveBtn.textContent;
+
+        try {
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            
+            await db.updateStudio(this.studioData.id, updates);
+            
+            // Update local state
+            Object.assign(this.studioData, updates);
+            
+            utils.showNotification('Studio details updated successfully!', 'success');
+            this.toggleStudioEdit(); // Close edit mode
+        } catch (error) {
+            console.error('Save error:', error);
+            utils.showNotification('Error saving details', 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
     }
 
     async updateIntegrationsSummary() {
@@ -309,53 +458,41 @@ class StudioDashboard {
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            ${this.bookingsData.map(booking => `
+                    ${this.bookingsData && this.bookingsData.length > 0 ? `
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        ${booking.client_name}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        ${utils.formatDate(booking.start_time)}<br>
-                                        ${utils.formatTime(booking.start_time)}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        ${booking.duration} hours
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        ${utils.formatCurrency(booking.total_cost)}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                                            booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-red-100 text-red-800'
-                                        }">
-                                            ${booking.status}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">View</button>
-                                        <button class="text-gray-600 hover:text-gray-900">Edit</button>
-                                    </td>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${this.bookingsData.map(booking => `
+                                    <tr>
+                                        <!-- ... existing tr content ... -->
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : `
+                        <div id="emptyBookings"></div>
+                    `}
                 </div>
             </div>
         `;
+
+        if (!this.bookingsData || this.bookingsData.length === 0) {
+            window.utils.renderEmptyState(
+                document.getElementById('emptyBookings'),
+                'No Bookings Yet',
+                'When artists book your studio, they will appear here.',
+                'fa-calendar-check'
+            );
+        }
     }
 
     async loadFinancialsDetails() {
@@ -569,10 +706,8 @@ class StudioDashboard {
 
     async signOut() {
         try {
-            const { error } = await supabaseClient.auth.signOut();
-            if (error) throw error;
-
-            window.location.href = 'webapp.html';
+            await supabaseClient.auth.signOut();
+            window.location.href = 'app.html';
         } catch (error) {
             console.error('Sign out error:', error);
             utils.showNotification('Error signing out', 'error');

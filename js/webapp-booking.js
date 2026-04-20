@@ -29,8 +29,9 @@ class BookingManager {
 
     async fetchStudioIntegrations() {
         try {
+            const tableName = db.getTableName('studio_integrations');
             const { data, error } = await db.supabase
-                .from('studio_integrations')
+                .from(tableName)
                 .select('*')
                 .eq('studio_id', this.selectedStudio.id)
                 .eq('status', 'active');
@@ -234,15 +235,18 @@ class BookingManager {
         timeSlotsContainer.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 animate-pulse font-bold tracking-widest text-xs uppercase">Analyzing Studio Schedule...</div>';
 
         try {
-            // 1. Fetch external busy slots for this date
+            // 1. Fetch external busy slots for this date (Dynamic Table)
+            const tableName = db.getTableName('studio_external_availability');
             const { data: externalBusy, error } = await db.supabase
-                .from('studio_external_availability')
+                .from(tableName)
                 .select('*')
                 .eq('studio_id', this.selectedStudio.id)
                 .gte('start_time', `${this.selectedDate}T00:00:00Z`)
                 .lte('end_time', `${this.selectedDate}T23:59:59Z`);
 
-            if (error) console.error('Error fetching external availability:', error);
+            if (error) {
+                console.warn(`External availability lookup skipped for ${tableName}`);
+            }
 
             // 2. Generate initial slots
             let timeSlots = this.generateTimeSlots();

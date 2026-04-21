@@ -797,8 +797,6 @@ Object.assign(window.db, {
         
         // Recent bookings
         const bookingsTable = getTableName('bookings');
-        const usersTable = getTableName('users');
-        const studiosTable = getTableName('studios');
         
         const { data: recentBookings } = await supabaseClient
             .from(bookingsTable)

@@ -169,8 +169,11 @@ async function runTableDetection() {
 }
 
 // Attach methods to window.db immediately to avoid race conditions
+function getTableName(key) {
+    return tableNames[key] || key;
+}
+
 Object.assign(window.db, {
-    getTableName: (key) => tableNames[key] || key,
     // Studios
     async getStudios(filters = {}) {
         const client = window.supabaseClient || supabaseClient;

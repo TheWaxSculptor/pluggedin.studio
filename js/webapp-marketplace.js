@@ -86,7 +86,7 @@ class MarketplaceManager {
                 chip.classList.remove('active');
                 chip.classList.add('bg-white', 'dark:bg-zinc-900');
             }
-        
+        });
     }
 
     debounceSearch() {
@@ -183,7 +183,6 @@ class MarketplaceManager {
     }
 }
 
-}
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {

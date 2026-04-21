@@ -10,8 +10,6 @@ window.SUPABASE_CONFIG = {
 };
 
 // Global App Settings
-window.HUB_STUDIO_ID = '446e21fc-b61d-4fbc-8912-37bc3a612232';
-
 window.APP_CONFIG = {
     name: 'PluggedIn Studio',
     version: '1.2.0-stable',

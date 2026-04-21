@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         q.nextElementSibling.classList.remove('active');
                     }
                 }
-            
+            });
             
             // Toggle this question
             if (isActive) {
@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('active');
                 answer.classList.add('active');
             }
-        
-    
+        });
+    });
     
     // Accessibility enhancement: Allow keyboard navigation
     faqQuestions.forEach(question => {
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 question.click();
             }
-        
+        });
         
         // Add appropriate ARIA attributes
         question.setAttribute('aria-expanded', 'false');
@@ -64,6 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
         question.addEventListener('click', function() {
             const expanded = this.classList.contains('active');
             this.setAttribute('aria-expanded', expanded);
-        
-    
-
+        });
+    });
+});

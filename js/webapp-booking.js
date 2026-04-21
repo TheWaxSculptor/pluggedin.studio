@@ -17,7 +17,7 @@ class BookingManager {
         // Listen for booking initiation from studios module
         document.addEventListener('initiate-booking', (e) => {
             this.startBookingFlow(e.detail.studio);
-        
+        });
     }
 
     async startBookingFlow(studio) {
@@ -29,8 +29,8 @@ class BookingManager {
 
     async fetchStudioIntegrations() {
         try {
-            const tableName = window.db.getTableName('studio_integrations');
-            const { data, error } = await window.db.supabase
+            const tableName = db.getTableName('studio_integrations');
+            const { data, error } = await db.supabase
                 .from(tableName)
                 .select('*')
                 .eq('studio_id', this.selectedStudio.id)
@@ -217,7 +217,7 @@ class BookingManager {
                 if (e.target === modal || (content && !content.contains(e.target))) {
                     this.hideBookingModal();
                 }
-            
+            });
         }
     }
 
@@ -236,8 +236,8 @@ class BookingManager {
 
         try {
             // 1. Fetch external busy slots for this date (Dynamic Table)
-            const tableName = window.db.getTableName('studio_external_availability');
-            const { data: externalBusy, error } = await window.db.supabase
+            const tableName = db.getTableName('studio_external_availability');
+            const { data: externalBusy, error } = await db.supabase
                 .from(tableName)
                 .select('*')
                 .eq('studio_id', this.selectedStudio.id)
@@ -260,13 +260,13 @@ class BookingManager {
                         const busyStart = new Date(busy.start_time);
                         const busyEnd = new Date(busy.end_time);
                         return slotStart >= busyStart && slotStart < busyEnd;
-                    
+                    });
 
                     if (isConflict) {
                         return { ...slot, available: false, label: 'Outside Sync' };
                     }
                     return slot;
-                
+                });
             }
 
             // Small delay for premium feel
@@ -288,7 +288,7 @@ class BookingManager {
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true
-            
+            });
             
             // Randomly mark some slots as unavailable for demo
             const isAvailable = Math.random() > 0.3;
@@ -297,7 +297,7 @@ class BookingManager {
                 time,
                 displayTime,
                 isAvailable
-            
+            });
         }
         return slots;
     }
@@ -322,14 +322,14 @@ class BookingManager {
         // Add click listeners to available slots
         timeSlotsContainer.querySelectorAll('.time-slot-btn:not([disabled])').forEach(button => {
             button.addEventListener('click', () => this.selectTimeSlot(button));
-        
+        });
     }
 
     selectTimeSlot(button) {
         // Remove previous selection
         document.querySelectorAll('.time-slot-btn').forEach(btn => {
             btn.classList.remove('selected');
-        
+        });
 
         // Add selection to clicked button
         button.classList.add('selected');
@@ -422,7 +422,7 @@ class BookingManager {
             };
 
             // Create booking in database
-            const booking = await window.db.createBooking(bookingData);
+            const booking = await db.createBooking(bookingData);
             
             // 2-Way Sync: Push to external calendars
             if (this.selectedStudio.integrations && this.selectedStudio.integrations.length > 0) {
@@ -435,12 +435,12 @@ class BookingManager {
                                 start: bookingData.start_time,
                                 end: bookingData.end_time,
                                 description: `Booking Request from PluggedIn\nNotes: ${bookingData.notes || 'None'}`
-                            
+                            });
                         } catch (e) {
                             console.error(`Failed to push booking to ${integration.platform}`, e);
                         }
                     }
-                
+                });
             }
 
             utils.showNotification('Booking requested successfully!', 'success');
@@ -486,7 +486,7 @@ class BookingManager {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
                 confirmationModal.remove();
-            
+            });
         }
 
         // Auto-remove after 8 seconds
@@ -513,4 +513,4 @@ class BookingManager {
 // Initialize booking manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.bookingManager = new BookingManager();
-
+});

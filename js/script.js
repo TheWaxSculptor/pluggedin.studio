@@ -16,14 +16,14 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeWhitepaper();
     }
-
+});
 
 // Close modal on outside click
 document.getElementById('whitepaperModal')?.addEventListener('click', function(e) {
     if (e.target === this) {
         closeWhitepaper();
     }
-
+});
 
 // Make functions globally available
 window.openWhitepaper = openWhitepaper;
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.container > *').forEach(el => {
         el.style.display = el.tagName === 'DIV' ? 'block' : '';
         el.style.visibility = 'visible';
-    
+    });
     // Loading indicator
     const loader = document.getElementById('page-loader');
     
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             loader.classList.add('loader-hidden');
         }, 500); // Small delay for smoother transition
-    
+    });
     
     // Studio form handling with Supabase integration
     const studioForm = document.getElementById('studio-form');
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Prefer': 'return=minimal'
                 },
                 body: JSON.stringify(studioData)
-            
+            });
             
             if (!response.ok) {
                 const errorText = await response.text();
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Re-enable button
             submitButton.disabled = false;
             submitButton.textContent = originalText;
-        
+        });
     }
     
     // Theme Management
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 link.href = `favicon/${themeFolder}/apple-icon.png`;
             }
-        
+        });
     }
 
     // Initialize Theme (immediately apply state from storage/browser)
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isDark = htmlElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             applyThemeUI(isDark);
-        
+        });
     }
     
     // Run initialization
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('link[rel="apple-touch-icon"][sizes]').forEach(link => {
             const size = link.getAttribute('sizes');
             link.href = `favicon/${themeFolder}/apple-icon-${size}.png`;
-        
+        });
     }
     
     // Handle subscription form with improved validation
@@ -250,12 +250,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             emailInput.setCustomValidity('Please enter a valid email address');
         }
-    
+    });
     
     // Initialize EmailJS
     (function() {
         emailjs.init('WpKgdxlt2TVymbQ1O');
-    
+    })();
 
     subscribeForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -309,8 +309,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Re-enable button
             submitButton.disabled = false;
             submitButton.textContent = originalText;
-        
-    
+        });
+    });
     
     // Accessibility enhancement: make ESC key close success message
     document.addEventListener('keydown', (e) => {
@@ -319,6 +319,4 @@ document.addEventListener('DOMContentLoaded', () => {
             subscribeForm.style.display = 'flex';
         }
     });
-
-})();
-
+});

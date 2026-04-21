@@ -536,9 +536,9 @@
                             // Update Twitter theme
                             updateTwitterTheme();
                         }, 100);
-                    
+                    });
                 }
-            
+            });
         </script>
     </div>
     
@@ -555,7 +555,7 @@
                 el.style.display = el.tagName === 'DIV' ? 'block' : '';
                 el.style.visibility = 'visible';
                 el.style.opacity = '1';
-            
+            });
             
             // Hide loader immediately
             var loader = document.getElementById('page-loader');
@@ -563,7 +563,7 @@
                 loader.classList.add('loader-hidden');
                 loader.style.display = 'none';
             }
-        })();
+        });
     </script>
 </body>
 </html>

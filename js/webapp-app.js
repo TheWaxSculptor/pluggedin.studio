@@ -1,7 +1,3 @@
-// Ensure robust access to global helpers
-const db = window.db;
-const utils = window.utils;
-
 // Main App Controller for PluggedIn Web App
 
 class PluggedInApp {
@@ -17,12 +13,12 @@ class PluggedInApp {
         window.addEventListener('error', (event) => {
             console.error('Global Error caught:', event.error);
             this.showErrorState();
-        
+        });
         
         window.addEventListener('unhandledrejection', (event) => {
             console.error('Unhandled Rejection caught:', event.reason);
             this.showErrorState();
-        
+        });
 
         try {
             // Wait for DOM to be ready
@@ -152,7 +148,7 @@ class PluggedInApp {
             themeToggle.addEventListener('click', () => {
                 const isDark = !document.documentElement.classList.contains('dark');
                 this.applyTheme(isDark);
-            
+            });
         }
     }
 
@@ -162,14 +158,14 @@ class PluggedInApp {
         if (logo) {
             logo.addEventListener('click', () => {
                 this.navigateToHome();
-            
+            });
             logo.style.cursor = 'pointer';
         }
 
         // Handle browser back/forward
         window.addEventListener('popstate', (e) => {
             this.handlePopState(e);
-        
+        });
     }
 
     setupSearch() {
@@ -185,12 +181,12 @@ class PluggedInApp {
                 } else {
                     locationSearch.focus();
                 }
-            
+            });
 
             // Search suggestions (future enhancement)
             locationSearch.addEventListener('input', (e) => {
                 this.handleSearchInput(e.target.value);
-            
+            });
         }
     }
 
@@ -198,7 +194,7 @@ class PluggedInApp {
         // Handle window resize
         window.addEventListener('resize', () => {
             this.handleWindowResize();
-        
+        });
 
         // Initial responsive setup
         this.handleWindowResize();
@@ -219,7 +215,7 @@ class PluggedInApp {
             if (e.key === 'Escape') {
                 this.closeAllModals();
             }
-        
+        });
     }
 
     async checkInitialAuthState() {
@@ -247,7 +243,7 @@ class PluggedInApp {
 
     navigateToHome() {
         // Scroll to top and reset any filters
-        window.scrollTo({ top: 0, behavior: 'smooth' 
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         // Clear search
         const locationSearch = document.getElementById('locationSearch');
@@ -315,7 +311,7 @@ class PluggedInApp {
         const modals = document.querySelectorAll('[id$="Modal"]:not(.hidden)');
         modals.forEach(modal => {
             modal.classList.add('hidden');
-        
+        });
     }
 
     showErrorState() {

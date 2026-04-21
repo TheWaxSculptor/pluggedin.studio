@@ -17,7 +17,7 @@ class BookingManager {
         // Listen for booking initiation from studios module
         document.addEventListener('initiate-booking', (e) => {
             this.startBookingFlow(e.detail.studio);
-        
+        });
     }
 
     startBookingFlow(studio) {
@@ -168,7 +168,7 @@ class BookingManager {
                 if (e.target === modal) {
                     this.hideBookingModal();
                 }
-            
+            });
         }
     }
 
@@ -204,7 +204,7 @@ class BookingManager {
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true
-            
+            });
             
             // Randomly mark some slots as unavailable for demo
             const isAvailable = Math.random() > 0.3;
@@ -213,7 +213,7 @@ class BookingManager {
                 time,
                 displayTime,
                 isAvailable
-            
+            });
         }
         return slots;
     }
@@ -239,14 +239,14 @@ class BookingManager {
         // Add click listeners to available slots
         timeSlotsContainer.querySelectorAll('.time-slot:not([disabled])').forEach(button => {
             button.addEventListener('click', () => this.selectTimeSlot(button));
-        
+        });
     }
 
     selectTimeSlot(button) {
         // Remove previous selection
         document.querySelectorAll('.time-slot').forEach(btn => {
             btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-        
+        });
 
         // Add selection to clicked button
         button.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
@@ -377,7 +377,7 @@ class BookingManager {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
                 confirmationModal.remove();
-            
+            });
         }
 
         // Auto-remove after 5 seconds
@@ -404,7 +404,7 @@ class BookingManager {
 // Initialize booking manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.bookingManager = new BookingManager();
-
+});
 /**
  * PluggedIn.studio - Availability Calendar Component
  * Provides real-time studio availability checking for both professional and home studios
@@ -463,8 +463,8 @@ class AvailabilityCalendar {
                     duration: slot.duration_hours,
                     price: slot.price_per_hour,
                     available: slot.is_available
-                
-            
+                });
+            });
 
         } catch (error) {
             console.warn('Error loading availability:', error);
@@ -494,9 +494,9 @@ class AvailabilityCalendar {
                         duration: Math.random() > 0.5 ? 2 : 4, // 2 or 4 hour slots
                         price: prices[Math.floor(Math.random() * prices.length)],
                         available: true
-                    
+                    });
                 }
-            
+            });
 
             this.availableSlots.set(dateKey, daySlots);
         }
@@ -577,7 +577,7 @@ class AvailabilityCalendar {
         currentMonth.textContent = this.currentDate.toLocaleDateString('en-US', { 
             month: 'long', 
             year: 'numeric' 
-        
+        });
 
         const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
         const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
@@ -640,14 +640,14 @@ class AvailabilityCalendar {
             prevBtn.addEventListener('click', () => {
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
                 this.renderCalendarDays();
-            
+            });
         }
 
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
                 this.renderCalendarDays();
-            
+            });
         }
 
         // Day selection
@@ -662,7 +662,7 @@ class AvailabilityCalendar {
                     this.renderTimeSlots(dateKey);
                 }
             }
-        
+        });
 
         // Keyboard navigation
         this.container.addEventListener('keydown', (e) => {
@@ -670,7 +670,7 @@ class AvailabilityCalendar {
                 e.preventDefault();
                 e.target.click();
             }
-        
+        });
     }
         const slots = this.availableSlots.get(dateKey) || [];
         const availableSlots = slots.filter(slot => slot.available).length;
@@ -702,9 +702,9 @@ class AvailabilityCalendar {
                     time: time,
                     price: parseFloat(price),
                     duration: parseInt(duration)
-                
-            
-        
+                });
+            });
+        });
     }
 
     /**
@@ -727,8 +727,8 @@ class AvailabilityCalendar {
         const slotStatus = new Map();
         allPossibleTimes.forEach(time => {
             // Default all slots to unavailable
-            slotStatus.set(time, { available: false, price: 0, duration: 0 
-        
+            slotStatus.set(time, { available: false, price: 0, duration: 0 });
+        });
         
         // Update with actual availability data
         daySlots.forEach(slot => {
@@ -736,8 +736,8 @@ class AvailabilityCalendar {
                 available: slot.available,
                 price: slot.price,
                 duration: slot.duration
-            
-        
+            });
+        });
 
         let slotsHTML = '';
         if (daySlots.length === 0) {
@@ -813,9 +813,9 @@ class AvailabilityCalendar {
                     time: time,
                     price: parseFloat(price),
                     duration: parseInt(duration)
-                
-            
-        
+                });
+            });
+        });
     }
     
     /**
@@ -870,20 +870,20 @@ class AvailabilityCalendar {
         // Handle modal actions
         modal.querySelector('#cancelBooking').addEventListener('click', () => {
             document.body.removeChild(modal);
-        
+        });
 
         modal.querySelector('#confirmBooking').addEventListener('click', () => {
             // Here you would integrate with your booking system
             alert('Booking confirmed! You will be redirected to payment.');
             document.body.removeChild(modal);
-        
+        });
 
         // Close on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 document.body.removeChild(modal);
             }
-        
+        });
     }
 }
 
@@ -913,7 +913,7 @@ class CalendarIntegration {
             this.setupEventListeners();
             this.loadFeaturedStudio();
             this.loadTopBookedStudios();
-        
+        });
     }
 
     /**
@@ -936,9 +936,9 @@ class CalendarIntegration {
                     duration: e.detail.duration,
                     price: e.detail.price
                 }
-            
+            });
             document.dispatchEvent(bookingEvent);
-        
+        });
     }
 
     /**
@@ -951,7 +951,7 @@ class CalendarIntegration {
             
             try {
                 // Try to get studios from Supabase
-                studios = await window.db.getStudios({ limit: 5, featured: true 
+                studios = await window.db.getStudios({ limit: 5, featured: true });
             } catch (error) {
                 console.warn('Error loading studios from Supabase:', error);
                 // Fallback to sample data
@@ -1036,7 +1036,7 @@ class CalendarIntegration {
         this.availabilityCalendar.init(this.featuredStudioId, calendarEl);
         
         // Scroll to the calendar
-        container.scrollIntoView({ behavior: 'smooth' 
+        container.scrollIntoView({ behavior: 'smooth' });
     }
     
     /**
@@ -1050,7 +1050,7 @@ class CalendarIntegration {
             // Try to get booking data from Supabase
             let bookings = [];
             try {
-                bookings = await window.db.getBookings({ limit: 50 
+                bookings = await window.db.getBookings({ limit: 50 });
             } catch (error) {
                 console.warn('Error loading bookings from Supabase:', error);
             }
@@ -1060,12 +1060,12 @@ class CalendarIntegration {
             bookings.forEach(booking => {
                 const studioId = booking.studio_id;
                 studioBookingCounts[studioId] = (studioBookingCounts[studioId] || 0) + 1;
-            
+            });
             
             // Sort studios by booking count
             const sortedStudioIds = Object.keys(studioBookingCounts).sort((a, b) => {
                 return studioBookingCounts[b] - studioBookingCounts[a];
-            
+            });
             
             // Get top 3 studios
             let topStudios = [];
@@ -1145,10 +1145,10 @@ class CalendarIntegration {
             studioCard.querySelector('.book-studio-btn').addEventListener('click', () => {
                 // Redirect to studio detail page or show modal
                 window.location.href = `studio.html?id=${studio.id}`;
-            
+            });
             
             container.appendChild(studioCard);
-        
+        });
     }
     
     /**
@@ -1255,7 +1255,7 @@ class ExternalCalendarIntegration {
         document.addEventListener('DOMContentLoaded', () => {
             // Add integration button to booking section if user is studio owner
             this.addIntegrationButton();
-        
+        });
     }
 
     /**
@@ -1295,7 +1295,7 @@ class ExternalCalendarIntegration {
         // Add click handler
         integrationBtn.addEventListener('click', () => {
             this.showIntegrationModal();
-        
+        });
     }
 
     /**
@@ -1351,7 +1351,7 @@ class ExternalCalendarIntegration {
         // Setup event handlers
         modal.querySelector('#closeIntegrationModal').addEventListener('click', () => {
             document.body.removeChild(modal);
-        
+        });
         
         // Setup provider buttons
         modal.querySelectorAll('.provider-btn').forEach(btn => {
@@ -1359,15 +1359,15 @@ class ExternalCalendarIntegration {
                 const providerId = btn.dataset.provider;
                 this.connectProvider(providerId);
                 document.body.removeChild(modal);
-            
-        
+            });
+        });
         
         // Close on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 document.body.removeChild(modal);
             }
-        
+        });
     }
     
     /**
@@ -1431,7 +1431,7 @@ class ExternalCalendarIntegration {
         // Setup event listeners
         confirmDialog.querySelector('#cancelAuth').addEventListener('click', () => {
             document.body.removeChild(confirmDialog);
-        
+        });
         
         confirmDialog.querySelector('#continueAuth').addEventListener('click', () => {
             document.body.removeChild(confirmDialog);
@@ -1440,7 +1440,7 @@ class ExternalCalendarIntegration {
             // with proper client_id, redirect_uri, and scope parameters
             // For demo purposes, we'll simulate a successful connection
             this.simulateSuccessfulConnection(providerId);
-        
+        });
     }
     
     /**
@@ -1485,7 +1485,7 @@ class ExternalCalendarIntegration {
         // Setup event listeners
         embedDialog.querySelector('#closeEmbedDialog').addEventListener('click', () => {
             document.body.removeChild(embedDialog);
-        
+        });
         
         embedDialog.querySelector('#saveEmbedCode').addEventListener('click', () => {
             const embedCode = embedDialog.querySelector('#embedCode').value.trim();
@@ -1495,7 +1495,7 @@ class ExternalCalendarIntegration {
                 document.body.removeChild(embedDialog);
                 this.simulateSuccessfulConnection(providerId);
             }
-        
+        });
     }
     
     /**
@@ -1549,7 +1549,7 @@ class ExternalCalendarIntegration {
         // Setup event listeners
         instructionsDialog.querySelector('#closeInstructionsDialog').addEventListener('click', () => {
             document.body.removeChild(instructionsDialog);
-        
+        });
         
         instructionsDialog.querySelector('#saveApiKey').addEventListener('click', () => {
             const apiKey = instructionsDialog.querySelector('#apiKey').value.trim();
@@ -1559,7 +1559,7 @@ class ExternalCalendarIntegration {
                 document.body.removeChild(instructionsDialog);
                 this.simulateSuccessfulConnection(providerId);
             }
-        
+        });
     }
     
     /**
@@ -1602,7 +1602,7 @@ class ExternalCalendarIntegration {
             
             // Update UI to show connection status
             this.updateConnectionStatus(providerId);
-        
+        });
     }
     
     /**
@@ -1677,7 +1677,7 @@ class CalendarBackendService {
                 scope: config.scope,
                 state: state,
                 response_type: 'code'
-            
+            });
 
             const authUrl = `${config.authUrl}?${params.toString()}`;
             
@@ -1706,7 +1706,7 @@ class CalendarBackendService {
                     if (!popup.closed) popup.close();
                     reject(new Error('OAuth timeout'));
                 }, 300000);
-            
+            });
 
         } catch (error) {
             console.error('OAuth initiation error:', error);
@@ -1734,7 +1734,7 @@ class CalendarBackendService {
                     redirect_uri: `${this.baseUrl}/oauth-callback.html`,
                     grant_type: 'authorization_code'
                 })
-            
+            });
 
             const tokenData = await response.json();
             
@@ -1774,7 +1774,7 @@ class CalendarBackendService {
                     status: 'active',
                     connected_at: new Date().toISOString(),
                     last_sync: null
-                
+                });
 
             if (error) throw error;
 
@@ -2094,7 +2094,7 @@ class CalendarBackendService {
                     is_available: slot.available,
                     source: 'external_sync',
                     updated_at: new Date().toISOString()
-                
+                });
         }
     }
 
@@ -2235,7 +2235,7 @@ class CalendarIntegrationsManager {
                 if (e.target === modal) {
                     this.hideIntegrationModal();
                 }
-            
+            });
         }
     }
 
@@ -2596,7 +2596,7 @@ class CalendarIntegrationsManager {
                 await this.backendService.storeIntegrationCredentials(studioId, type, {
                     ...config,
                     auth_type: 'api_key'
-                
+                });
                 
                 // Test the connection
                 await this.backendService.testConnection(studioId, type);
@@ -2763,7 +2763,7 @@ class CalendarIntegrationsManager {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.calendarIntegrations = new CalendarIntegrationsManager();
-
+});
 /**
  * Location Autocomplete functionality for PluggedIn.studio
  * Provides location suggestions as the user types
@@ -2802,7 +2802,7 @@ class LocationAutocomplete {
             if (!this.inputElement.contains(e.target) && !this.suggestionsContainer.contains(e.target)) {
                 this.hideSuggestions();
             }
-        
+        });
     }
     
     onInput(e) {
@@ -2852,7 +2852,7 @@ class LocationAutocomplete {
             li.textContent = location;
             li.addEventListener('click', () => this.selectSuggestion(location));
             ul.appendChild(li);
-        
+        });
         
         this.suggestionsContainer.appendChild(ul);
         this.suggestionsContainer.classList.remove('hidden');
@@ -2867,7 +2867,7 @@ class LocationAutocomplete {
         this.hideSuggestions();
         
         // Trigger a change event
-        const event = new Event('change', { bubbles: true 
+        const event = new Event('change', { bubbles: true });
         this.inputElement.dispatchEvent(event);
     }
 }
@@ -2875,7 +2875,7 @@ class LocationAutocomplete {
 // Initialize on DOM content loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.locationAutocomplete = new LocationAutocomplete();
-
+});
 /**
  * Content Keeper - Ensures content remains visible
  * This script continuously monitors and restores visibility of page elements
@@ -2924,8 +2924,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.style.visibility = 'visible';
                     el.style.opacity = '1';
                 }
-            
-        
+            });
+        });
     }
     
     // Run immediately
@@ -2961,3 +2961,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Run when page is fully loaded
     window.addEventListener('load', ensureVisibility);
+})();

@@ -46,8 +46,8 @@
                     el.style.visibility = 'visible';
                     el.style.opacity = '1';
                 }
-            
-        
+            });
+        });
     }
     
     // Run immediately
@@ -83,3 +83,4 @@
     
     // Run when page is fully loaded
     window.addEventListener('load', ensureVisibility);
+})();

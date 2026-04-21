@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return sheet.href.includes('faq.css');
             }
             return false;
-        
+        });
         
         // If not loaded, add the CSS
         if (!cssLoaded) {
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return script.src.includes('faq.js');
             }
             return false;
-        
+        });
         
         // If not loaded, add the script
         if (!scriptLoaded) {
@@ -113,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
         ensureJSLoaded(function() {
             // Finally load and insert the FAQ content
             loadAndInsertFAQ();
-        
+        });
     }
     
     // Start the initialization
     init();
-
+});

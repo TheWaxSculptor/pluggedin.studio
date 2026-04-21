@@ -34,7 +34,7 @@ class MarketplaceManager {
             searchInput.addEventListener('input', (e) => {
                 this.filters.search = e.target.value;
                 this.debounceSearch();
-            
+            });
         }
 
         if (searchSubmit) {
@@ -48,7 +48,7 @@ class MarketplaceManager {
                 this.filters.category = e.target.value;
                 this.updateChipUI(this.filters.category);
                 this.loadGear();
-            
+            });
         }
 
         // Category Chips
@@ -63,8 +63,9 @@ class MarketplaceManager {
                 
                 this.updateChipUI(cat);
                 this.loadGear();
-            
-        
+            });
+        });
+
 
         // Theme Toggle Support (Standardized)
         const themeToggle = document.getElementById('themeToggle');
@@ -72,7 +73,7 @@ class MarketplaceManager {
             themeToggle.addEventListener('click', () => {
                 const isDark = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
+            });
         }
     }
 
@@ -182,6 +183,8 @@ class MarketplaceManager {
     }
 }
 
+}
+
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
     const init = () => {
@@ -200,3 +203,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 
+
+});

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - PluggedIn Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white/80 dark:bg-black/80 backdrop-blur-md border-b dark:border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="app.html" class="flex items-center">
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="h-10 w-auto logo-light">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="h-10 w-auto logo-dark hidden">
+                </a>
+                <div class="flex items-center space-x-6">
+                    <a href="app.html" class="text-sm font-medium hover:text-blue-600 transition-colors">Home</a>
+                    <a href="explore.html" class="text-sm font-medium hover:text-blue-600 transition-colors">Explore</a>
+                    <button id="themeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-slate-800">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-24">
+        <header class="text-center mb-16">
+            <h1 class="text-6xl font-black mb-6 tracking-tight">Our Mission</h1>
+            <p class="text-2xl text-gray-500 dark:text-gray-400">Lowering the barrier to professional music production worldwide.</p>
+        </header>
+
+        <article class="prose prose-lg dark:prose-invert max-w-none">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-10 md:p-16 shadow-xl border dark:border-slate-800 mb-12">
+                <h2 class="text-3xl font-bold mb-6">What is PluggedIn?</h2>
+                <p class="mb-6 leading-relaxed">PluggedIn Studio is a global marketplace for music creators. We connect artists and producers with high-quality recording spaces—ranging from professional commercial facilities to unique home studios.</p>
+                <p class="mb-6 leading-relaxed">Our platform is designed to make the process of finding, booking, and managing studio sessions as seamless as possible, so creators can focus on what matters most: the music.</p>
+                
+                <h3 class="text-2xl font-bold mt-12 mb-4">Why we built it</h3>
+                <p class="mb-6 leading-relaxed">The music industry is evolving. Access to professional gear and treated environments shouldn't be limited by local connections or massive budgets. We're building the infrastructure for the next generation of independent music production.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="text-4xl font-black text-blue-600 mb-2">100%</div>
+                    <div class="text-sm text-gray-500 uppercase tracking-widest">Independent</div>
+                </div>
+                <div class="text-center p-6">
+                    <div class="text-4xl font-black text-purple-600 mb-2">Global</div>
+                    <div class="text-sm text-gray-500 uppercase tracking-widest">Community</div>
+                </div>
+                <div class="text-center p-6">
+                    <div class="text-4xl font-black text-green-600 mb-2">Secure</div>
+                    <div class="text-sm text-gray-500 uppercase tracking-widest">Bookings</div>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="bg-black text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <img src="PluggedIn_Studio_Light.png" alt="PluggedIn" class="h-8 w-auto mx-auto mb-6 opacity-50">
+            <div class="flex justify-center space-x-6 text-sm text-gray-400 mb-8">
+                <a href="terms.html" class="hover:text-white">Terms</a>
+                <a href="privacy.html" class="hover:text-white">Privacy</a>
+                <a href="support.html" class="hover:text-white">Support</a>
+            </div>
+            <p class="text-xs text-gray-600">&copy; 2026 PluggedIn Studio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const updateTheme = (isDark) => {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.querySelectorAll('.logo-dark').forEach(l => l.classList.remove('hidden'));
+                document.querySelectorAll('.logo-light').forEach(l => l.classList.add('hidden'));
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.querySelectorAll('.logo-dark').forEach(l => l.classList.add('hidden'));
+                document.querySelectorAll('.logo-light').forEach(l => l.classList.remove('hidden'));
+            }
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = !document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateTheme(isDark);
+        });
+
+        // Initialize theme
+        updateTheme(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    </script>
+</body>
+</html>

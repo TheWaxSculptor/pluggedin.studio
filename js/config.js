@@ -14,6 +14,10 @@ window.APP_CONFIG = {
     name: 'PluggedIn Studio',
     version: '1.2.0-stable',
     isProduction: window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1'),
-    supportEmail: 'support@pluggedin.studio'
+    supportEmail: 'support@pluggedin.studio',
+    hubStudioId: '446e21fc-b61d-4fbc-8912-37bc3a612232'
 };
+
+// Convenience legacy export
+window.HUB_STUDIO_ID = window.APP_CONFIG.hubStudioId;
 

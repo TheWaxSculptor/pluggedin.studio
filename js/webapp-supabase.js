@@ -170,8 +170,12 @@ async function runTableDetection() {
 
 // Attach methods to window.db immediately to avoid race conditions
 function getTableName(key) {
+    const tableNames = (window.db && window.db.tableNames) || {};
     return tableNames[key] || key;
 }
+
+// Global studio cache for join lookups
+let _studioCache = null;
 
 Object.assign(window.db, {
     // Studios
@@ -357,14 +361,26 @@ Object.assign(window.db, {
     async getEquipment(filters = {}) {
         const tableName = getTableName('equipment');
         const studioTable = getTableName('studios');
+        const client = window.supabaseClient || supabaseClient;
         
-        // Select equipment and optionally join with studios to get the studio name
-        let query = supabaseClient
-            .from(tableName)
-            .select(`
-                *,
-                ${studioTable}(name, slug, location)
-            `);
+        if (!client) {
+            console.error('Supabase client not ready for getEquipment');
+            return [];
+        }
+
+        // Try to pre-fetch studios once for the cache
+        if (!_studioCache) {
+            try {
+                const { data: studios } = await client.from(studioTable).select('id, name, slug, location');
+                _studioCache = studios || [];
+            } catch (e) {
+                console.warn('Could not cache studios for equipment join:', e);
+                _studioCache = [];
+            }
+        }
+
+        // Fetch equipment WITHOUT the failing studios(...) join
+        let query = client.from(tableName).select('*');
         
         if (filters.category && filters.category !== 'all') {
             query = query.eq('category', filters.category);
@@ -380,15 +396,19 @@ Object.assign(window.db, {
             throw error;
         }
         
-        // Standardize the studio reference and ensure marketplace sync
-        return (data || []).map(item => ({
-            ...item,
-            studio_name: item[studioTable]?.name || item.studio_name || 'Marketplace Item',
-            studio_slug: item[studioTable]?.slug || item.studio_slug || '',
-            studio_location: item[studioTable]?.location || item.studio_location || 'Global Marketplace',
-            // Default to marketplace studio hub if missing
-            studio_id: item.studio_id || window.HUB_STUDIO_ID 
-        }));
+        // Manual join with cached studios
+        return (data || []).map(item => {
+            const studioId = item.studio_id || window.HUB_STUDIO_ID;
+            const studio = _studioCache.find(s => s.id === studioId) || {};
+            
+            return {
+                ...item,
+                studio_name: studio.name || item.studio_name || (studioId === window.HUB_STUDIO_ID ? 'PluggedIn Hub' : 'Independent Gear'),
+                studio_slug: studio.slug || item.studio_slug || '',
+                studio_location: studio.location || item.studio_location || 'Marketplace',
+                studio_id: studioId
+            };
+        });
     },
 
     async addEquipment(equipmentData) {

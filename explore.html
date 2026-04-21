@@ -147,8 +147,8 @@
     <!-- Web App Config & Utils -->
     <script src="js/config.js"></script>
     <script src="js/webapp-utils.js"></script>
-    <script src="js/webapp-supabase.js?v=fixed4"></script>
-    <script src="js/webapp-auth.js"></script>
+    <script src="js/webapp-supabase.js?v=fixed5"></script>
+    <script src="js/webapp-auth.js?v=fixed5"></script>
     <script>
         // Explore page functionality
         class ExploreManager {
@@ -165,6 +165,12 @@
 
             async init() {
                 this.setupEventListeners();
+                
+                // Wait for DB initialization
+                if (window.DB_READY) {
+                    await window.DB_READY;
+                }
+                
                 await this.loadData();
                 this.renderCities();
                 this.renderFeaturedSections();

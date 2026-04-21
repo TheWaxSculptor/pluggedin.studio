@@ -35,7 +35,7 @@ class FeaturedStudiosManager {
             // Add click events to category pills
             categoryContainer.querySelectorAll('.category-pill').forEach(pill => {
                 pill.addEventListener('click', () => this.filterByCategory(pill.dataset.category));
-            });
+            
         }
 
         // Set up scroll navigation buttons
@@ -57,7 +57,7 @@ class FeaturedStudiosManager {
         if (viewAllBtn) {
             viewAllBtn.addEventListener('click', () => {
                 window.location.href = '/explore.html';
-            });
+            
         }
     }
 
@@ -115,7 +115,7 @@ class FeaturedStudiosManager {
             const isActive = pill.dataset.category === category;
             pill.classList.toggle('active', isActive);
             pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-        });
+        
 
         // Filter studios based on category
         if (category === 'All') {
@@ -132,7 +132,7 @@ class FeaturedStudiosManager {
                         tag.toLowerCase() === category.toLowerCase()
                     ))
                 );
-            });
+            
         }
 
         // Reset scroll position when changing categories
@@ -160,7 +160,7 @@ class FeaturedStudiosManager {
         container.scrollTo({
             left: this.scrollPosition * cardWidth,
             behavior: 'smooth'
-        });
+        
         
         this.updateScrollButtons();
     }
@@ -214,7 +214,7 @@ class FeaturedStudiosManager {
         // Add click listeners to studio cards
         container.querySelectorAll('.studio-card').forEach((card, index) => {
             card.addEventListener('click', () => this.showStudioDetails(this.filteredStudios[index]));
-        });
+        
 
         // Reset scroll position and update buttons
         container.scrollLeft = 0;
@@ -359,4 +359,4 @@ class FeaturedStudiosManager {
 // Initialize featured studios manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.featuredStudiosManager = new FeaturedStudiosManager();
-});
+

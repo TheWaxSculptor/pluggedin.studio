@@ -57,27 +57,26 @@
     <script>
         // Analytics initialization logic (Standardized for Production)
         if (window.APP_CONFIG?.enableAnalytics) {
-            console.log('📊 Analytics enabled');
+            console.log(' Analytics enabled');
         }
     </script>
     
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-            })();
-        </script>
-    <script src="js/config.js"></script>
-    <!-- Supabase Initialization Handled by js/webapp-supabase.js -->
-
 </head>
 <body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <!-- Navigation -->
     <nav style="background: white; border-bottom: 1px solid #e5e7eb; position: relative; z-index: 1001;" class="bg-white dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-800 transition-all duration-300" aria-label="Main Navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div style="display: flex; justify-content: space-between; align-items: center; height: 80px;">
+            <div class="flex justify-between items-center h-16 sm:h-20">
                 <div class="flex items-center">
                     <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" width="200" height="64">
                     <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" width="200" height="64">
                 </div>
                 <div class="flex items-center space-x-4">
+                    <a href="marketplace.html" class="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-all border border-gray-200 dark:border-white/10" title="Gear Marketplace">
+                        <i class="fas fa-guitar"></i>
+                        <span class="text-sm font-bold">Marketplace</span>
+                    </a>
                     <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme" aria-label="Toggle dark mode">
                         <i class="fas fa-moon text-xl"></i>
                         <i class="fas fa-sun text-xl"></i>
@@ -440,7 +439,7 @@
                                     </svg>
                                     <span id="featuredStudioRating" class="text-gray-700 text-sm ml-1">4.9 (120 reviews)</span>
                                 </div>
-                                <span class="mx-2 text-gray-500">•</span>
+                                <span class="mx-2 text-gray-500"></span>
                                 <span id="featuredStudioPrice" class="text-gray-700 text-sm">From $45/hour</span>
                             </div>
                             <button id="viewAvailabilityBtn" class="w-full bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
@@ -865,17 +864,17 @@
         }
     </script>
     <!-- Supabase Configuration -->
-    <script src="js/config.js"></script>
-    <script src="js/webapp-utils.js"></script>
-    <script src="js/webapp-supabase.js"></script>
-    <script src="js/webapp-auth.js"></script>
-    <script src="js/webapp-booking.js"></script>
-    <script src="js/webapp-studios.js"></script>
-    <script src="js/features.bundle.js"></script>
+    <script src="js/config.js?v=restored"></script>
+    <script src="js/webapp-utils.js?v=restored"></script>
+    <script src="js/webapp-supabase.js?v=restored"></script>
+    <script src="js/webapp-auth.js?v=restored"></script>
+    <script src="js/webapp-booking.js?v=restored"></script>
+    <script src="js/webapp-studios.js?v=restored"></script>
+    <script src="js/features.bundle.js?v=restored"></script>
 
     <!-- Register Modal -->
-    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto py-4">
-        <div class="bg-white rounded-lg p-6 max-w-lg w-full max-h-90vh overflow-y-auto">
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[2000] hidden overflow-y-auto pt-20 pb-10">
+        <div class="bg-white dark:bg-black rounded-3xl p-6 sm:p-10 max-w-lg w-[95%] shadow-2xl relative">
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h2 class="text-2xl font-bold">Register Studio</h2>
@@ -1169,7 +1168,6 @@
                         field.classList.remove('border-red-500');
                     }
                 });
-
                 
                 if (!isValid) {
                     showNotification('Please fill out all required fields marked with *', 'warning');
@@ -1456,8 +1454,9 @@
                 }
                 
                 // Also store in studio_registrations table with additional info
-                supabase
-                    .from('studio_registrations')
+                if (window.db && window.db.supabase) {
+                    window.db.supabase
+                        .from('studio_registrations')
                     .insert([
 
                         { 
@@ -1493,6 +1492,13 @@
                         registerBtn.innerHTML = originalBtnText;
                         registerBtn.disabled = false;
                     });
+                } else {
+                    // No extra DB write needed, just show success
+                    showNotification('Registration successful! Check your email to confirm your account.', 'success');
+                    closeRegisterModal();
+                    registerBtn.innerHTML = originalBtnText;
+                    registerBtn.disabled = false;
+                }
             });
         }
         
@@ -1505,10 +1511,9 @@
                 });
             }
         });
-
     </script>
-    <script src="js/webapp-auth.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/webapp-auth.js?v=restored"></script>
+    <script src="js/script.js?v=restored"></script>
     <!-- Mobile Bottom Navigation -->
     <nav class="mobile-bottom-nav">
         <a href="app.html" class="mobile-nav-item active" aria-label="Home">
@@ -1518,6 +1523,10 @@
         <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
             <i class="fas fa-calendar-alt"></i>
             <span>Bookings</span>
+        </a>
+        <a href="marketplace.html" class="mobile-nav-item" aria-label="Gear Marketplace">
+            <i class="fas fa-guitar text-lg"></i>
+            <span>Gear</span>
         </a>
         <a href="messages.html" class="mobile-nav-item" aria-label="Messages">
             <i class="fas fa-comment-dots"></i>

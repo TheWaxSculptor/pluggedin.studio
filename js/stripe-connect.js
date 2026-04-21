@@ -83,4 +83,4 @@ class StripeConnectManager {
 // Initialize and expose globally
 document.addEventListener('DOMContentLoaded', () => {
     window.stripeConnect = new StripeConnectManager();
-});
+

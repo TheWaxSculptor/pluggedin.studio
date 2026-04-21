@@ -1,44 +1,40 @@
 // Global variable declarations for downstream script compatibility
+window.supabaseClient = null;
+window.db = window.db || { tableNames: {} };
+window.utils = window.utils || {};
+
+// Legacy local variables for compatibility within this file
 var supabaseClient = null;
-var db = {};
-var utils = {};
+var db = window.db;
+var utils = window.utils;
 
-// Supabase Configuration for PluggedIn Web App
-// Initialize Supabase client globally
-(function() {
-    const SUPABASE_URL = window.SUPABASE_CONFIG?.url;
-    const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey;
+// Ensure DB_READY is defined immediately at the top level
+window.DB_READY = new Promise((resolve) => {
+    window.resolveDB = resolve;
+});
 
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.error('❌ Supabase Config missing! Ensure js/config.js is loaded.');
-        return;
-    }
 
+// Supabase Configuration
+const SUPABASE_URL = window.SUPABASE_CONFIG?.url;
+const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.error(' Supabase Config missing! Ensure js/config.js is loaded.');
+} else if (window.supabase) {
     try {
-        if (window.supabase && window.supabase.createClient) {
-            // Only create if not already exists
-            if (!window.supabaseClient) {
-                window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-            supabaseClient = window.supabaseClient;
-            
-            // Standardize cross-interface database access
-            if (!window.db) {
-                window.db = {
-                    supabase: window.supabaseClient,
-                    tableNames: {} // Will be populated by detectTableNames
-                };
-            }
-            db = window.db;
-
-            console.log('✅ Supabase Client Initialized');
-        } else {
-            console.error('❌ Supabase library not found in window');
-        }
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabaseClient;
+        
+        // Populate window.db immediately
+        window.db = window.db || { tableNames: {} };
+        window.db.supabase = window.supabaseClient;
+        window.db.from = (table) => window.db.supabase.from(table);
+        
+        console.log(' Supabase Initialized: window.db is ready');
     } catch (e) {
-        console.error('❌ Error initializing Supabase client:', e);
+        console.error(' Error initializing Supabase:', e);
     }
-})();
+}
 
 // Auth state management using global supabaseClient
 let currentUser = null;
@@ -134,7 +130,7 @@ const variations = {
 
 // Detect actual table names in the database
 async function detectTableNames() {
-    console.group('🔍 PluggedIn Database Sync');
+    console.group(' PluggedIn Database Sync');
     for (const [key, variants] of Object.entries(variations)) {
         for (const variant of variants) {
             try {
@@ -144,7 +140,7 @@ async function detectTableNames() {
                 
                 if (!error) {
                     tableNames[key] = variant;
-                    console.log(`✅ ${key.padEnd(15)} -> ${variant}`);
+                    console.log(` ${key.padEnd(15)} -> ${variant}`);
                     break;
                 }
             } catch (e) {
@@ -153,7 +149,7 @@ async function detectTableNames() {
         }
         
         if (!tableNames[key]) {
-            console.warn(`⚠️ ${key.padEnd(15)} -> NOT FOUND (Will use fallback)`);
+            console.warn(` ${key.padEnd(15)} -> NOT FOUND (Will use fallback)`);
             window.DB_STATUS.errors.push(`Table not found: ${key}`);
         }
     }
@@ -162,20 +158,19 @@ async function detectTableNames() {
     console.groupEnd();
 }
 
-// Initialize table detection
-detectTableNames().then(() => {
-    console.log('🎵 Table detection completed:', tableNames);
-}).catch(err => {
-    console.warn('⚠️ Table detection failed:', err);
-});
-
-// Helper to resolve table names dynamically with fallback
-function getTableName(key) {
-    return tableNames[key] || key;
+// Initial table detection logic
+async function runTableDetection() {
+    try {
+        await detectTableNames();
+        console.log(' Database table detection complete:', tableNames);
+    } catch (err) {
+        console.error(' Database table detection failed:', err);
+    }
 }
 
-// Database helper functions
-const dbMethods = {
+// Attach methods to window.db immediately to avoid race conditions
+Object.assign(window.db, {
+    getTableName: (key) => tableNames[key] || key,
     // Studios
     async getStudios(filters = {}) {
         const client = window.supabaseClient || supabaseClient;
@@ -203,7 +198,7 @@ const dbMethods = {
             throw error;
         }
         
-        console.log('✅ Studios data loaded:', data);
+        console.log(' Studios data loaded:', data);
         return data || [];
     },
     
@@ -241,7 +236,7 @@ const dbMethods = {
             
             // If it's a specific Postgres relation error, fall back to core data
             if (error && (error.code === 'PGRST200' || error.code === 'PGRST107')) {
-                console.warn(`⚠️ Relational query failed on ${studioTable}, falling back to core data...`);
+                console.warn(` Relational query failed on ${studioTable}, falling back to core data...`);
                 const { data: coreData, error: coreError } = await client
                     .from(studioTable)
                     .select('*')
@@ -263,7 +258,7 @@ const dbMethods = {
                 throw error;
             }
         } catch (err) {
-            console.error(`❌ Critical error fetching studio from ${studioTable}:`, err);
+            console.error(` Critical error fetching studio from ${studioTable}:`, err);
             throw err;
         }
     },
@@ -325,7 +320,6 @@ const dbMethods = {
             `)
             .eq('user_id', userId)
             .order('start_time', { ascending: false });
-        
         if (error) throw error;
         return data;
     },
@@ -359,9 +353,15 @@ const dbMethods = {
     // Equipment
     async getEquipment(filters = {}) {
         const tableName = getTableName('equipment');
+        const studioTable = getTableName('studios');
+        
+        // Select equipment and optionally join with studios to get the studio name
         let query = supabaseClient
             .from(tableName)
-            .select('*');
+            .select(`
+                *,
+                ${studioTable}(name, slug, location)
+            `);
         
         if (filters.category && filters.category !== 'all') {
             query = query.eq('category', filters.category);
@@ -372,8 +372,20 @@ const dbMethods = {
         }
         
         const { data, error } = await query.order('name');
-        if (error) throw error;
-        return data || [];
+        if (error) {
+            console.error('Error fetching equipment:', error);
+            throw error;
+        }
+        
+        // Standardize the studio reference and ensure marketplace sync
+        return (data || []).map(item => ({
+            ...item,
+            studio_name: item[studioTable]?.name || item.studio_name || 'Marketplace Item',
+            studio_slug: item[studioTable]?.slug || item.studio_slug || '',
+            studio_location: item[studioTable]?.location || item.studio_location || 'Global Marketplace',
+            // Default to marketplace studio hub if missing
+            studio_id: item.studio_id || window.HUB_STUDIO_ID 
+        }));
     },
 
     async addEquipment(equipmentData) {
@@ -436,7 +448,6 @@ const dbMethods = {
             .select('*')
             .eq('studio_id', studioId)
             .order('created_at', { ascending: false });
-
         if (error && error.code !== 'PGRST116') { // Ignore missing table for now, handle gracefully
             console.warn('Payouts table might not be initialized yet');
             return [];
@@ -484,7 +495,6 @@ const dbMethods = {
             `)
             .eq('studio_id', studioId)
             .order('created_at', { ascending: false });
-        
         if (error) throw error;
         return data;
     },
@@ -520,7 +530,6 @@ const dbMethods = {
             `)
             .eq('participants.user_id', userId)
             .order('updated_at', { ascending: false });
-        
         if (error) throw error;
         return data;
     },
@@ -599,7 +608,7 @@ const dbMethods = {
     // Admin functions
     async getAdminStats() {
         try {
-            console.log('🔍 Loading admin stats...');
+            console.log(' Loading admin stats...');
             
             // Use detected table names or fallback to known tables
             const studiosTable = tableNames.studios || 'studios';
@@ -607,7 +616,7 @@ const dbMethods = {
             const bookingsTable = tableNames.bookings || 'bookings';
             const paymentsTable = tableNames.payments || 'payments';
             
-            console.log(`📊 Using tables: studios=${studiosTable}, users=${usersTable}, bookings=${bookingsTable}`);
+            console.log(` Using tables: studios=${studiosTable}, users=${usersTable}, bookings=${bookingsTable}`);
             
             // Query each table individually with error handling
             let totalUsers = 0;
@@ -623,12 +632,12 @@ const dbMethods = {
                 
                 if (!studiosError) {
                     totalStudios = studiosCount || 0;
-                    console.log(`✅ Studios count: ${totalStudios}`);
+                    console.log(` Studios count: ${totalStudios}`);
                 } else {
-                    console.warn('⚠️ Studios query error:', studiosError.message);
+                    console.warn(' Studios query error:', studiosError.message);
                 }
             } catch (e) {
-                console.warn('⚠️ Studios query exception:', e.message);
+                console.warn(' Studios query exception:', e.message);
             }
             
             // Get users count
@@ -639,12 +648,12 @@ const dbMethods = {
                 
                 if (!usersError) {
                     totalUsers = usersCount || 0;
-                    console.log(`✅ Users count: ${totalUsers}`);
+                    console.log(` Users count: ${totalUsers}`);
                 } else {
-                    console.warn('⚠️ Users query error:', usersError.message);
+                    console.warn(' Users query error:', usersError.message);
                 }
             } catch (e) {
-                console.warn('⚠️ Users query exception:', e.message);
+                console.warn(' Users query exception:', e.message);
             }
             
             // Get bookings count
@@ -655,12 +664,12 @@ const dbMethods = {
                 
                 if (!bookingsError) {
                     totalBookings = bookingsCount || 0;
-                    console.log(`✅ Bookings count: ${totalBookings}`);
+                    console.log(` Bookings count: ${totalBookings}`);
                 } else {
-                    console.warn('⚠️ Bookings query error:', bookingsError.message);
+                    console.warn(' Bookings query error:', bookingsError.message);
                 }
             } catch (e) {
-                console.warn('⚠️ Bookings query exception:', e.message);
+                console.warn(' Bookings query exception:', e.message);
             }
             
             // Get revenue (optional - might not have payments table yet)
@@ -672,10 +681,10 @@ const dbMethods = {
                 
                 if (!paymentsError && paymentsData) {
                     totalRevenue = paymentsData.reduce((sum, payment) => sum + (payment.amount || 0), 0);
-                    console.log(`✅ Revenue calculated: $${totalRevenue}`);
+                    console.log(` Revenue calculated: $${totalRevenue}`);
                 }
             } catch (e) {
-                console.warn('⚠️ Payments query exception (this is normal if table doesn\'t exist):', e.message);
+                console.warn(' Payments query exception (this is normal if table doesn\'t exist):', e.message);
             }
             
             const stats = {
@@ -685,11 +694,11 @@ const dbMethods = {
                 totalRevenue
             };
             
-            console.log('📊 Final admin stats:', stats);
+            console.log(' Final admin stats:', stats);
             return stats;
             
         } catch (error) {
-            console.error('❌ Error in getAdminStats:', error);
+            console.error(' Error in getAdminStats:', error);
             throw error;
         }
     },
@@ -719,7 +728,6 @@ const dbMethods = {
                 ${usersTable}(name, email)
             `)
             .order('created_at', { ascending: false });
-        
         if (error) throw error;
         return data;
     },
@@ -818,12 +826,10 @@ const dbMethods = {
             .sort((a, b) => b.timestamp - a.timestamp)
             .slice(0, 10);
     }
-};
 
-// Initialize DB object with current methods
-Object.assign(db, dbMethods);
-db.supabase = supabaseClient; // Ensure supabase client is accessible on db object
-window.db = db;
+}); // END Object.assign(window.db)
+
+// Initialize DB object with current methods already handled above
 
 // Utility functions
 const utilsMethods = {
@@ -869,3 +875,12 @@ const utilsMethods = {
 
 Object.assign(utils, utilsMethods);
 window.utils = utils;
+
+// FINAL STEP: Run detection and then resolve the global promise
+runTableDetection().then(() => {
+    if (window.resolveDB) {
+        console.log(' DB_READY resolve triggered');
+        window.resolveDB(window.db);
+    }
+});
+

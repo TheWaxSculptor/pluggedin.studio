@@ -56,8 +56,8 @@ class AvailabilityCalendar {
                     duration: slot.duration_hours,
                     price: slot.price_per_hour,
                     available: slot.is_available
-                });
-            });
+                
+            
 
         } catch (error) {
             console.warn('Error loading availability:', error);
@@ -87,9 +87,9 @@ class AvailabilityCalendar {
                         duration: Math.random() > 0.5 ? 2 : 4, // 2 or 4 hour slots
                         price: prices[Math.floor(Math.random() * prices.length)],
                         available: true
-                    });
+                    
                 }
-            });
+            
 
             this.availableSlots.set(dateKey, daySlots);
         }
@@ -170,7 +170,7 @@ class AvailabilityCalendar {
         currentMonth.textContent = this.currentDate.toLocaleDateString('en-US', { 
             month: 'long', 
             year: 'numeric' 
-        });
+        
 
         const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
         const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
@@ -233,14 +233,14 @@ class AvailabilityCalendar {
             prevBtn.addEventListener('click', () => {
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
                 this.renderCalendarDays();
-            });
+            
         }
 
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
                 this.renderCalendarDays();
-            });
+            
         }
 
         // Day selection
@@ -255,7 +255,7 @@ class AvailabilityCalendar {
                     this.renderTimeSlots(dateKey);
                 }
             }
-        });
+        
 
         // Keyboard navigation
         this.container.addEventListener('keydown', (e) => {
@@ -263,7 +263,7 @@ class AvailabilityCalendar {
                 e.preventDefault();
                 e.target.click();
             }
-        });
+        
     }
         const slots = this.availableSlots.get(dateKey) || [];
         const availableSlots = slots.filter(slot => slot.available).length;
@@ -295,9 +295,9 @@ class AvailabilityCalendar {
                     time: time,
                     price: parseFloat(price),
                     duration: parseInt(duration)
-                });
-            });
-        });
+                
+            
+        
     }
 
     /**
@@ -320,8 +320,8 @@ class AvailabilityCalendar {
         const slotStatus = new Map();
         allPossibleTimes.forEach(time => {
             // Default all slots to unavailable
-            slotStatus.set(time, { available: false, price: 0, duration: 0 });
-        });
+            slotStatus.set(time, { available: false, price: 0, duration: 0 
+        
         
         // Update with actual availability data
         daySlots.forEach(slot => {
@@ -329,8 +329,8 @@ class AvailabilityCalendar {
                 available: slot.available,
                 price: slot.price,
                 duration: slot.duration
-            });
-        });
+            
+        
 
         let slotsHTML = '';
         if (daySlots.length === 0) {
@@ -406,9 +406,9 @@ class AvailabilityCalendar {
                     time: time,
                     price: parseFloat(price),
                     duration: parseInt(duration)
-                });
-            });
-        });
+                
+            
+        
     }
     
     /**
@@ -463,20 +463,20 @@ class AvailabilityCalendar {
         // Handle modal actions
         modal.querySelector('#cancelBooking').addEventListener('click', () => {
             document.body.removeChild(modal);
-        });
+        
 
         modal.querySelector('#confirmBooking').addEventListener('click', () => {
             // Here you would integrate with your booking system
             alert('Booking confirmed! You will be redirected to payment.');
             document.body.removeChild(modal);
-        });
+        
 
         // Close on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 document.body.removeChild(modal);
             }
-        });
+        
     }
 }
 

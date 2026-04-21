@@ -67,7 +67,6 @@
             const theme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const isDark = theme === 'dark' || (!theme && prefersDark);
-            
             if (isDark) {
                 document.documentElement.classList.add('dark');
             } else {
@@ -230,6 +229,9 @@
                             <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light" style="height:64px;width:auto;display:inline-block;">
                             <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark" style="height:64px;width:auto;display:none;">
                         </a>
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <a href="marketplace.html" class="text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Gear Marketplace</a>
                     </div>
                 </div>
             </div>
@@ -534,9 +536,9 @@
                             // Update Twitter theme
                             updateTwitterTheme();
                         }, 100);
-                    });
+                    
                 }
-            });
+            
         </script>
     </div>
     
@@ -553,7 +555,7 @@
                 el.style.display = el.tagName === 'DIV' ? 'block' : '';
                 el.style.visibility = 'visible';
                 el.style.opacity = '1';
-            });
+            
             
             // Hide loader immediately
             var loader = document.getElementById('page-loader');
@@ -561,7 +563,7 @@
                 loader.classList.add('loader-hidden');
                 loader.style.display = 'none';
             }
-        });
+        })();
     </script>
 </body>
 </html>

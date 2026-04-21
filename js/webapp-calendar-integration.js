@@ -22,7 +22,7 @@ class CalendarIntegration {
             this.setupEventListeners();
             this.loadFeaturedStudio();
             this.loadTopBookedStudios();
-        });
+        
     }
 
     /**
@@ -45,9 +45,9 @@ class CalendarIntegration {
                     duration: e.detail.duration,
                     price: e.detail.price
                 }
-            });
+            
             document.dispatchEvent(bookingEvent);
-        });
+        
     }
 
     /**
@@ -60,7 +60,7 @@ class CalendarIntegration {
             
             try {
                 // Try to get studios from Supabase
-                studios = await window.db.getStudios({ limit: 5, featured: true });
+                studios = await window.db.getStudios({ limit: 5, featured: true 
             } catch (error) {
                 console.warn('Error loading studios from Supabase:', error);
                 // Fallback to sample data
@@ -145,7 +145,7 @@ class CalendarIntegration {
         this.availabilityCalendar.init(this.featuredStudioId, calendarEl);
         
         // Scroll to the calendar
-        container.scrollIntoView({ behavior: 'smooth' });
+        container.scrollIntoView({ behavior: 'smooth' 
     }
     
     /**
@@ -159,7 +159,7 @@ class CalendarIntegration {
             // Try to get booking data from Supabase
             let bookings = [];
             try {
-                bookings = await window.db.getBookings({ limit: 50 });
+                bookings = await window.db.getBookings({ limit: 50 
             } catch (error) {
                 console.warn('Error loading bookings from Supabase:', error);
             }
@@ -169,12 +169,12 @@ class CalendarIntegration {
             bookings.forEach(booking => {
                 const studioId = booking.studio_id;
                 studioBookingCounts[studioId] = (studioBookingCounts[studioId] || 0) + 1;
-            });
+            
             
             // Sort studios by booking count
             const sortedStudioIds = Object.keys(studioBookingCounts).sort((a, b) => {
                 return studioBookingCounts[b] - studioBookingCounts[a];
-            });
+            
             
             // Get top 3 studios
             let topStudios = [];
@@ -254,10 +254,10 @@ class CalendarIntegration {
             studioCard.querySelector('.book-studio-btn').addEventListener('click', () => {
                 // Redirect to studio detail page or show modal
                 window.location.href = `studio.html?id=${studio.id}`;
-            });
+            
             
             container.appendChild(studioCard);
-        });
+        
     }
     
     /**

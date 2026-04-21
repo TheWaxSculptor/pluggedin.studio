@@ -28,7 +28,7 @@ class ExternalCalendarIntegration {
         document.addEventListener('DOMContentLoaded', () => {
             // Add integration button to booking section if user is studio owner
             this.addIntegrationButton();
-        });
+        
     }
 
     /**
@@ -68,7 +68,7 @@ class ExternalCalendarIntegration {
         // Add click handler
         integrationBtn.addEventListener('click', () => {
             this.showIntegrationModal();
-        });
+        
     }
 
     /**
@@ -124,7 +124,7 @@ class ExternalCalendarIntegration {
         // Setup event handlers
         modal.querySelector('#closeIntegrationModal').addEventListener('click', () => {
             document.body.removeChild(modal);
-        });
+        
         
         // Setup provider buttons
         modal.querySelectorAll('.provider-btn').forEach(btn => {
@@ -132,15 +132,15 @@ class ExternalCalendarIntegration {
                 const providerId = btn.dataset.provider;
                 this.connectProvider(providerId);
                 document.body.removeChild(modal);
-            });
-        });
+            
+        
         
         // Close on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 document.body.removeChild(modal);
             }
-        });
+        
     }
     
     /**
@@ -204,7 +204,7 @@ class ExternalCalendarIntegration {
         // Setup event listeners
         confirmDialog.querySelector('#cancelAuth').addEventListener('click', () => {
             document.body.removeChild(confirmDialog);
-        });
+        
         
         confirmDialog.querySelector('#continueAuth').addEventListener('click', () => {
             document.body.removeChild(confirmDialog);
@@ -213,7 +213,7 @@ class ExternalCalendarIntegration {
             // with proper client_id, redirect_uri, and scope parameters
             // For demo purposes, we'll simulate a successful connection
             this.simulateSuccessfulConnection(providerId);
-        });
+        
     }
     
     /**
@@ -258,7 +258,7 @@ class ExternalCalendarIntegration {
         // Setup event listeners
         embedDialog.querySelector('#closeEmbedDialog').addEventListener('click', () => {
             document.body.removeChild(embedDialog);
-        });
+        
         
         embedDialog.querySelector('#saveEmbedCode').addEventListener('click', () => {
             const embedCode = embedDialog.querySelector('#embedCode').value.trim();
@@ -268,7 +268,7 @@ class ExternalCalendarIntegration {
                 document.body.removeChild(embedDialog);
                 this.simulateSuccessfulConnection(providerId);
             }
-        });
+        
     }
     
     /**
@@ -322,7 +322,7 @@ class ExternalCalendarIntegration {
         // Setup event listeners
         instructionsDialog.querySelector('#closeInstructionsDialog').addEventListener('click', () => {
             document.body.removeChild(instructionsDialog);
-        });
+        
         
         instructionsDialog.querySelector('#saveApiKey').addEventListener('click', () => {
             const apiKey = instructionsDialog.querySelector('#apiKey').value.trim();
@@ -332,7 +332,7 @@ class ExternalCalendarIntegration {
                 document.body.removeChild(instructionsDialog);
                 this.simulateSuccessfulConnection(providerId);
             }
-        });
+        
     }
     
     /**
@@ -375,7 +375,7 @@ class ExternalCalendarIntegration {
             
             // Update UI to show connection status
             this.updateConnectionStatus(providerId);
-        });
+        
     }
     
     /**

@@ -126,7 +126,7 @@ class CalendarIntegrationsManager {
                 if (e.target === modal) {
                     this.hideIntegrationModal();
                 }
-            });
+            
         }
     }
 
@@ -489,7 +489,7 @@ class CalendarIntegrationsManager {
                 await this.backendService.storeIntegrationCredentials(studioId, type, {
                     ...config,
                     auth_type: 'api_key'
-                });
+                
                 
                 // Test the connection
                 await this.backendService.testConnection(studioId, type);
@@ -672,4 +672,4 @@ class CalendarIntegrationsManager {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.calendarIntegrations = new CalendarIntegrationsManager();
-});
+

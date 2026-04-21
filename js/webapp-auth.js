@@ -1,3 +1,7 @@
+// Ensure robust access to global helpers
+const db = window.db;
+const utils = window.utils;
+
 // Authentication Module for PluggedIn Web App
 
 class AuthManager {
@@ -8,13 +12,23 @@ class AuthManager {
     }
 
     init() {
-        this.client = window.supabaseClient || window.supabase || (window.db && window.db.supabase);
-        this.setupEventListeners();
-        this.checkAuthState();
-        this.checkCookieConsent();
+        // We now retrieve the client dynamically to ensure it's available after DB_READY
+        const getClient = () => window.supabaseClient || (window.db && window.db.supabase) || window.supabase;
         
-        // Subscribe to auth changes
-        if (this.client) {
+        this.setupEventListeners();
+        
+                        this.checkAuthState();
+                    }
+                
+            }
+        }
+        
+        this.checkCookieConsent();
+        this.subscribeToAuth();
+    }
+
+    subscribeToAuth() {
+        if (this.client && this.client.auth && !this.isSubscribed) {
             this.client.auth.onAuthStateChange((event, session) => {
                 console.log('Auth state changed in AuthManager:', event);
                 this.currentUser = session ? session.user : null;
@@ -31,7 +45,8 @@ class AuthManager {
                     this.updateUIForUnauthenticatedUser();
                     this.hideVerificationBanner();
                 }
-            });
+            
+            this.isSubscribed = true;
         }
     }
 
@@ -50,23 +65,15 @@ class AuthManager {
                 this.isSignUpMode = false;
                 this.showAuthModal();
                 this.updateAuthForm();
-            });
+            
         }
 
         // Register button click (Header)
         const registerBtnHeader = document.getElementById('registerBtnHeader');
         if (registerBtnHeader) {
             registerBtnHeader.addEventListener('click', () => {
-                if (typeof window.showRegisterModal === 'function') {
-                    window.showRegisterModal();
-                } else {
-                    console.error('showRegisterModal function not found');
-                    // Fallback to sign up mode in auth modal
-                    this.isSignUpMode = true;
-                    this.showAuthModal();
-                    this.updateAuthForm();
-                }
-            });
+                this.showRegisterModal();
+            
         }
 
         // Auth modal close
@@ -75,7 +82,7 @@ class AuthManager {
             closeAuthModal.addEventListener('click', () => {
                 console.log('Close auth modal clicked');
                 this.hideAuthModal();
-            });
+            
         }
 
         // ESC key listener for modal
@@ -83,7 +90,7 @@ class AuthManager {
             if (e.key === 'Escape' && !document.getElementById('authModal').classList.contains('hidden')) {
                 this.hideAuthModal();
             }
-        });
+        
 
         // Auth form submit
         const authForm = document.getElementById('authForm');
@@ -101,12 +108,8 @@ class AuthManager {
         if (switchToSignUp) {
             switchToSignUp.addEventListener('click', () => {
                 this.hideAuthModal();
-                if (typeof window.showRegisterModal === 'function') {
-                    window.showRegisterModal();
-                } else {
-                    this.toggleAuthMode();
-                }
-            });
+                this.showRegisterModal();
+            
         }
 
         // Google Sign In
@@ -131,7 +134,7 @@ class AuthManager {
             forgotPasswordLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.showForgotView();
-            });
+            
         }
 
         const backToSignIn = document.getElementById('backToSignIn');
@@ -148,7 +151,7 @@ class AuthManager {
         const toggleBtns = document.querySelectorAll('.password-toggle');
         toggleBtns.forEach(btn => {
             btn.addEventListener('click', () => this.togglePasswordVisibility(btn));
-        });
+        
 
         // Sign out
         const signOutBtn = document.getElementById('signOutBtn');
@@ -156,7 +159,7 @@ class AuthManager {
             signOutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.signOut();
-            });
+            
         }
     }
 
@@ -178,8 +181,7 @@ class AuthManager {
         const modal = document.getElementById('authModal');
         if (modal) {
             modal.classList.remove('hidden');
-            this.resetAuthForm();
-            this.hideForgotView();
+            document.body.style.overflow = 'hidden';
         }
     }
 
@@ -187,9 +189,28 @@ class AuthManager {
         const modal = document.getElementById('authModal');
         if (modal) {
             modal.classList.add('hidden');
-            // Reset to Sign In mode for next time
-            this.isSignUpMode = false;
-            this.hideForgotView();
+            document.body.style.overflow = '';
+        }
+    }
+
+    showRegisterModal() {
+        const modal = document.getElementById('registerModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // If the register modal has its own step logic, reset it
+            if (typeof window.goToStep === 'function') {
+                window.goToStep(1);
+            }
+        }
+    }
+
+    hideRegisterModal() {
+        const modal = document.getElementById('registerModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
         }
     }
 
@@ -326,7 +347,7 @@ class AuthManager {
     }
 
     async signIn(email, password) {
-        const { data, error } = await this.getClient().auth.signInWithPassword({ email, password });
+        const { data, error } = await this.getClient().auth.signInWithPassword({ email, password 
         if (error) throw error;
         this.currentUser = data.user;
         this.updateUIForAuthenticatedUser();
@@ -363,7 +384,7 @@ class AuthManager {
                     referral_source: referral
                 }
             }
-        });
+        
 
         if (error) throw error;
         if (data.user) {
@@ -420,7 +441,7 @@ class AuthManager {
             const client = this.getClient();
             const { data, error } = await client.auth.updateUser({
                 data: { user_type: newType }
-            });
+            
 
             if (error) throw error;
 
@@ -518,7 +539,7 @@ class AuthManager {
         try {
             const { error } = await this.getClient().auth.resetPasswordForEmail(email, {
                 redirectTo: window.location.origin + '/app.html'
-            });
+            
             if (error) throw error;
             window.utils?.showNotification('Reset link sent! Check your email.', 'success');
             this.hideForgotView();
@@ -550,7 +571,7 @@ class AuthManager {
             const { error } = await this.getClient().auth.signInWithOAuth({
                 provider: 'google',
                 options: { redirectTo: window.location.origin + '/app.html' }
-            });
+            
             if (error) throw error;
         } catch (error) {
             window.utils?.showNotification(error.message, 'error');
@@ -627,7 +648,7 @@ class AuthManager {
             const { error } = await this.client.auth.resend({
                 type: 'signup',
                 email: this.currentUser.email
-            });
+            
             
             if (error) throw error;
             
@@ -683,7 +704,7 @@ class AuthManager {
                 banner.style.transform = 'translateY(120%)';
                 banner.style.opacity = '0';
                 setTimeout(() => banner.remove(), 500);
-            });
+            
         }
     }
 }
@@ -691,4 +712,9 @@ class AuthManager {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     window.authManager = new AuthManager();
-});
+    
+    // Globally expose modal control functions for legacy onclick handlers
+    window.showRegisterModal = () => window.authManager.showRegisterModal();
+    window.closeRegisterModal = () => window.authManager.hideRegisterModal();
+    window.showAuthModal = () => window.authManager.showAuthModal();
+

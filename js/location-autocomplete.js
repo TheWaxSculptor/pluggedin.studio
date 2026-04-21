@@ -24,7 +24,7 @@ class LocationAutocomplete {
                 if (typeof google !== 'undefined' && google.maps && google.maps.places) {
                     this.setupAutocomplete();
                 }
-            });
+            
         }
     }
     
@@ -52,7 +52,7 @@ class LocationAutocomplete {
             
             // Trigger search automatically on selection
             this.triggerSearch();
-        });
+        
 
         // Add visual indicator class
         this.inputElement.classList.add('google-autocomplete-active');
@@ -74,4 +74,4 @@ class LocationAutocomplete {
 document.addEventListener('DOMContentLoaded', () => {
     // Check if google maps script is already loading
     window.locationAutocomplete = new LocationAutocomplete();
-});
+

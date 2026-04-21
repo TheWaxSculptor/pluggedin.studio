@@ -2595,10 +2595,11 @@ body.dark-mode .comparison-table .legend {
 
 @media (max-width: 640px) {
     .cookie-banner {
-        bottom: 1rem;
+        bottom: 6.5rem; /* Raised to avoid blocking mobile-bottom-nav */
         left: 1rem;
         right: 1rem;
         max-width: none;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
     }
 }
 

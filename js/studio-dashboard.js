@@ -22,8 +22,8 @@ class StudioDashboard {
             button.addEventListener('click', (e) => {
                 const tabId = e.target.id.replace('Tab', '');
                 this.switchTab(tabId);
-            });
-        });
+            
+        
 
         // User menu functionality
         this.setupUserMenu();
@@ -39,14 +39,14 @@ class StudioDashboard {
         if (userMenuBtn && userDropdown) {
             userMenuBtn.addEventListener('click', () => {
                 userDropdown.classList.toggle('hidden');
-            });
+            
 
             // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
                 if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
                     userDropdown.classList.add('hidden');
                 }
-            });
+            
         }
 
         // Sign out functionality
@@ -55,7 +55,7 @@ class StudioDashboard {
             signOutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.signOut();
-            });
+            
         }
     }
 
@@ -66,8 +66,8 @@ class StudioDashboard {
             btn.addEventListener('click', (e) => {
                 const action = e.target.dataset.action;
                 this.handleQuickAction(action);
-            });
-        });
+            
+        
     }
 
     async checkAuthState() {
@@ -100,7 +100,7 @@ class StudioDashboard {
         document.querySelectorAll('.dashboard-tab').forEach(btn => {
             btn.classList.remove('active', 'bg-blue-100', 'text-blue-700', 'dark:bg-blue-900/30', 'dark:text-blue-300', 'font-bold');
             btn.classList.add('text-gray-700', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-800');
-        });
+        
 
         const activeTab = document.getElementById(`${tabId}Tab`);
         if (activeTab) {
@@ -111,7 +111,7 @@ class StudioDashboard {
         // Show/hide content
         document.querySelectorAll('.dashboard-content').forEach(content => {
             content.classList.add('hidden');
-        });
+        
 
         const activeContent = document.getElementById(`${tabId}Content`);
         if (activeContent) {
@@ -160,7 +160,7 @@ class StudioDashboard {
         const thisMonth = succeeded.filter(f => {
             const date = new Date(f.created_at);
             return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-        });
+        
         
         const monthlyGross = thisMonth.reduce((sum, f) => sum + (f.amount || 0), 0);
 
@@ -354,7 +354,7 @@ class StudioDashboard {
             const publicUrl = await db.uploadFile('studio-pictures', filePath, file);
             
             // Update the studio record in DB
-            await db.updateStudio(studioId, { image_url: publicUrl });
+            await db.updateStudio(studioId, { image_url: publicUrl 
             
             // Update local state and UI
             this.studioData.image_url = publicUrl;
@@ -383,7 +383,7 @@ class StudioDashboard {
                     el.classList.remove('border-b', 'border-blue-500/50');
                 }
             }
-        });
+        
 
         document.getElementById('saveActionArea').classList.toggle('hidden');
         document.getElementById('editStudioBtn').textContent = isEditing ? 'Cancel' : 'Edit Details';
@@ -735,4 +735,4 @@ class StudioDashboard {
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.studioDashboard = new StudioDashboard();
-});
+

@@ -29,7 +29,7 @@
     // 4. Utility methods
     window.utils = {
         formatDate(date) {
-            return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' 
         },
         formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
@@ -72,7 +72,7 @@
         }
         // ... (Other DB methods from webapp-supabase.js included here in the final bundle)
     };
-})();
+
 
 // 6. AuthManager Class
 class AuthManager {
@@ -89,7 +89,7 @@ class AuthManager {
                 this.currentUser = session ? session.user : null;
                 if (this.currentUser) this.updateUIForAuthenticatedUser();
                 else this.updateUIForUnauthenticatedUser();
-            });
+            
             this.checkAuthState();
         }
         this.setupEventListeners();
@@ -105,16 +105,16 @@ class AuthManager {
 
     setupEventListeners() {
         const authBtn = document.getElementById('authBtn');
-        if (authBtn) authBtn.addEventListener('click', () => { this.isSignUpMode = false; this.showAuthModal(); this.updateAuthForm(); });
+        if (authBtn) authBtn.addEventListener('click', () => { this.isSignUpMode = false; this.showAuthModal(); this.updateAuthForm(); 
 
         const registerBtnHeader = document.getElementById('registerBtnHeader');
         if (registerBtnHeader) registerBtnHeader.addEventListener('click', () => {
             if (typeof window.showRegisterModal === 'function') window.showRegisterModal();
             else { this.isSignUpMode = true; this.showAuthModal(); this.updateAuthForm(); }
-        });
+        
 
         const signOutBtn = document.getElementById('signOutBtn');
-        if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); this.signOut(); });
+        if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); this.signOut(); 
 
         document.getElementById('authForm')?.addEventListener('submit', (e) => this.handleAuthSubmit(e));
         document.getElementById('switchToSignUp')?.addEventListener('click', () => this.toggleAuthMode());
@@ -142,7 +142,7 @@ class AuthManager {
     }
 
     async signIn(email, password) {
-        const { data, error } = await this.client.auth.signInWithPassword({ email, password });
+        const { data, error } = await this.client.auth.signInWithPassword({ email, password 
         if (error) throw error;
         window.utils.showNotification('Welcome back!', 'success');
         this.hideAuthModal();
@@ -154,7 +154,7 @@ class AuthManager {
         const { data, error } = await this.client.auth.signUp({
             email, password,
             options: { data: { first_name: firstName, last_name: lastName, full_name: `${firstName} ${lastName}`.trim() } }
-        });
+        
         if (error) throw error;
         window.utils.showNotification('Account created! Please verify your email.', 'success');
         this.hideAuthModal();
@@ -198,4 +198,4 @@ class AuthManager {
 
 document.addEventListener('DOMContentLoaded', () => {
     window.authManager = new AuthManager();
-});
+

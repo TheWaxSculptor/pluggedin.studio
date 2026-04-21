@@ -34,7 +34,7 @@ class CalendarBackendService {
                 scope: config.scope,
                 state: state,
                 response_type: 'code'
-            });
+            
 
             const authUrl = `${config.authUrl}?${params.toString()}`;
             
@@ -63,7 +63,7 @@ class CalendarBackendService {
                     if (!popup.closed) popup.close();
                     reject(new Error('OAuth timeout'));
                 }, 300000);
-            });
+            
 
         } catch (error) {
             console.error('OAuth initiation error:', error);
@@ -91,7 +91,7 @@ class CalendarBackendService {
                     redirect_uri: `${this.baseUrl}/oauth-callback.html`,
                     grant_type: 'authorization_code'
                 })
-            });
+            
 
             const tokenData = await response.json();
             
@@ -132,7 +132,7 @@ class CalendarBackendService {
                     status: 'active',
                     connected_at: new Date().toISOString(),
                     last_sync: null
-                });
+                
 
             if (error) throw error;
 
@@ -401,7 +401,7 @@ class CalendarBackendService {
                     'Depth': '1',
                     'Content-Type': 'application/xml'
                 }
-            });
+            
             const text = await response.text();
             return { raw: text };
         }
@@ -496,7 +496,7 @@ class CalendarBackendService {
                         start: this.parseICalDate(match[1]),
                         end: this.parseICalDate(match[2]),
                         available: false
-                    });
+                    
                 }
                 return events;
             }

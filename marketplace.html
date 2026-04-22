@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Equipment Marketplace - PluggedIn Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gear Marketplace - PluggedIn</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/pluggedin.bundle.css">
@@ -12,19 +12,18 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .gear-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-        .category-chip {
-            transition: all 0.2s ease;
+            transform: translateY(-8px);
         }
         .category-chip.active {
-            background-color: black;
-            color: white;
+            background-color: #000;
+            color: #fff;
         }
-        .dark .category-chip.active {
-            background-color: white;
-            color: black;
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
@@ -32,22 +31,20 @@
     <!-- Navigation -->
     <nav class="bg-white/80 dark:bg-black/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex justify-between items-center h-16 sm:h-20">
                 <div class="flex items-center">
                     <a href="app.html" class="flex items-center">
-                        <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" width="180">
-                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" width="180">
+                        <img src="PluggedIn_Studio_Light.png" alt="PluggedIn" class="h-8 w-auto dark:hidden">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn" class="h-8 w-auto hidden dark:block">
                     </a>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <a href="app.html" class="text-sm font-medium hover:text-blue-600 transition-colors">Find Studios</a>
-                    <button id="themeToggle" class="p-2 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-500 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:block"></i>
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-all">
+                        <i class="fas fa-moon text-xl"></i>
                     </button>
-                    <div id="authButtons" class="flex items-center space-x-3">
-                        <!-- Populated by webapp-auth.js -->
-                    </div>
+                    <a href="profile.html" class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                        U
+                    </a>
                 </div>
             </div>
         </div>
@@ -61,15 +58,15 @@
             
             <!-- Marketplace Search (Piano Style) -->
             <div class="max-w-4xl mx-auto mb-12">
-                <div class="flex items-end bg-gray-100 dark:bg-white/5 rounded-2xl p-1.5 shadow-2xl border dark:border-white/10">
-                    <div class="flex-1 flex bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm">
+                <div class="flex flex-col md:flex-row items-stretch md:items-end bg-gray-100 dark:bg-white/5 rounded-2xl p-1.5 shadow-2xl border dark:border-white/10 gap-2 md:gap-0">
+                    <div class="flex-1 flex flex-col sm:flex-row bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm">
                         <!-- What Key -->
-                        <div class="flex-1 px-6 py-4 border-r dark:border-white/5">
+                        <div class="flex-1 px-6 py-4 border-b sm:border-b-0 sm:border-r dark:border-white/5 text-left">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">What gear?</label>
                             <input type="text" id="gearSearch" placeholder="U87, Les Paul, Moog..." class="w-full bg-transparent border-none focus:ring-0 text-sm font-bold placeholder:text-gray-300">
                         </div>
                         <!-- In Category Key -->
-                        <div class="flex-1 px-6 py-4">
+                        <div class="flex-1 px-6 py-4 text-left">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Category</label>
                             <select id="categorySelect" class="w-full bg-transparent border-none focus:ring-0 text-sm font-bold appearance-none cursor-pointer">
                                 <option value="all">All Categories</option>
@@ -81,18 +78,21 @@
                             </select>
                         </div>
                     </div>
-                    <button id="searchSubmit" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-600/20">
+                    <button id="searchSubmit" class="bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-600/20">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Quick Categories -->
-            <div class="flex flex-wrap justify-center gap-3" id="quickCategories">
-                <button class="category-chip active px-6 py-2.5 rounded-full text-xs font-bold border dark:border-white/10 uppercase tracking-widest" data-cat="all">All Gear</button>
-                <button class="category-chip px-6 py-2.5 rounded-full text-xs font-bold border dark:border-white/10 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors uppercase tracking-widest" data-cat="Microphone">Microphones</button>
-                <button class="category-chip px-6 py-2.5 rounded-full text-xs font-bold border dark:border-white/10 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors uppercase tracking-widest" data-cat="Instrument">Instruments</button>
-                <button class="category-chip px-6 py-2.5 rounded-full text-xs font-bold border dark:border-white/10 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors uppercase tracking-widest" data-cat="Outboard">Outboard</button>
+            <div class="flex items-center gap-3 mb-12 overflow-x-auto pb-4 scrollbar-hide">
+                <button class="category-chip active px-6 py-2 bg-black text-white rounded-full text-sm font-bold transition-all whitespace-nowrap" data-cat="all">All Items</button>
+                <button class="category-chip px-6 py-2 bg-white dark:bg-zinc-900 border dark:border-white/5 rounded-full text-sm font-bold transition-all whitespace-nowrap" data-cat="Microphones">Microphones</button>
+                <button class="category-chip px-6 py-2 bg-white dark:bg-zinc-900 border dark:border-white/5 rounded-full text-sm font-bold transition-all whitespace-nowrap" data-cat="Synthesizers">Synthesizers</button>
+                <button class="category-chip px-6 py-2 bg-white dark:bg-zinc-900 border dark:border-white/5 rounded-full text-sm font-bold transition-all whitespace-nowrap" data-cat="Instruments">Instruments</button>
+                <div class="hidden sm:block w-px h-8 bg-gray-200 dark:bg-white/10 mx-2 self-center"></div>
+                <button class="status-chip px-6 py-2 bg-white dark:bg-zinc-900 border dark:border-white/5 rounded-full text-sm font-bold transition-all whitespace-nowrap hover:border-green-500/50" data-status="for_sale">🛒 For Sale</button>
+                <button class="status-chip px-6 py-2 bg-white dark:bg-zinc-900 border dark:border-white/5 rounded-full text-sm font-bold transition-all whitespace-nowrap hover:border-blue-500/50" data-status="for_rent">📅 For Rent</button>
             </div>
         </div>
     </header>
@@ -105,33 +105,24 @@
         </div>
 
         <div id="gearGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 hidden">
-            <!-- Gear Cards Injected Here -->
-        </div>
-
-        <div id="emptyState" class="hidden text-center py-24">
-            <div class="w-20 h-20 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fas fa-guitar text-3xl text-gray-300"></i>
-            </div>
-            <h3 class="text-2xl font-bold mb-2">No gear found</h3>
-            <p class="text-gray-500">Try adjusting your filters or searching for something else.</p>
+            <!-- Gear cards will be loaded here -->
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-zinc-900 border-t dark:border-white/5 pt-16 pb-32">
+    <footer class="bg-white dark:bg-black border-t border-gray-200 dark:border-white/5 pt-16 pb-32">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <div class="col-span-2">
-                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn" class="logo-light mb-6" width="150">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn" class="logo-dark mb-6" width="150">
-                    <p class="text-gray-500 max-w-sm">The world's premium recording studio network. Find the gear you need, book the room you want.</p>
+                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn" class="h-8 w-auto mb-6 dark:hidden">
+                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn" class="h-8 w-auto mb-6 hidden dark:block">
+                    <p class="text-gray-500 max-w-sm">The world's largest marketplace for high-end recording studio equipment. Rent or buy gear from local studios.</p>
                 </div>
                 <div>
-                    <h4 class="font-bold mb-6">Explore</h4>
+                    <h4 class="font-bold mb-6">Marketplace</h4>
                     <ul class="space-y-4 text-sm text-gray-500">
-                        <li><a href="app.html" class="hover:text-blue-600">Studios</a></li>
-                        <li><a href="marketplace.html" class="text-blue-600">Marketplace</a></li>
-                        <li><a href="explore.html" class="hover:text-blue-600">Categories</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Browse Gear</a></li>
+                        <li><a href="#" class="hover:text-blue-600">How it Works</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Insurance</a></li>
                     </ul>
                 </div>
                 <div>
@@ -149,31 +140,34 @@
         </div>
     </footer>
 
-    <!-- Mobile Navigation Bar -->
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl px-6 py-4 flex items-center space-x-12 z-[1002]">
-        <a href="app.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
-            <i class="fas fa-search text-lg"></i>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Explore</span>
-        </a>
-        <a href="marketplace.html" class="flex flex-col items-center space-y-1 text-blue-600">
-            <i class="fas fa-guitar text-lg"></i>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Gear</span>
-        </a>
-        <a href="bookings.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
-            <i class="fas fa-calendar-alt text-lg"></i>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Bookings</span>
-        </a>
-        <a href="profile.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
-            <i class="fas fa-user-circle text-lg"></i>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
-        </a>
-    </nav>
-
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="js/webapp-supabase.js?v=fixed5?v=fixed5"></script>
+    <script src="js/webapp-supabase.js?v=fixed5"></script>
     <script src="js/webapp-auth.js"></script>
     <script src="js/webapp-marketplace.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="app.html" class="mobile-nav-item" aria-label="Explore Studios">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
+        </a>
+        <a href="marketplace.html" class="mobile-nav-item active" aria-label="Gear Marketplace">
+            <i class="fas fa-guitar"></i>
+            <span>Gear</span>
+        </a>
+        <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
+            <i class="fas fa-calendar-check"></i>
+            <span>Bookings</span>
+        </a>
+        <a href="studio-dashboard.html" class="mobile-nav-item" aria-label="Studio Owner Dashboard">
+            <i class="fas fa-music"></i>
+            <span>Studio</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" aria-label="User Profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
 </body>
 </html>

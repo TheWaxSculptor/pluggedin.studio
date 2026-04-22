@@ -191,6 +191,9 @@ Object.assign(window.db, {
             .from(tableName)
             .select('*');
         
+        // Filter out non-studio entries (like Gear Hub) from main grid
+        query = query.neq('name', 'PluggedIn Gear Hub');
+        
         if (filters.location) {
             query = query.ilike('location', `%${filters.location}%`);
         }
@@ -369,9 +372,10 @@ Object.assign(window.db, {
         }
 
         // Try to pre-fetch studios once for the cache
-        if (!_studioCache) {
+        if (!_studioCache || !_studioCache.length) {
             try {
-                const { data: studios } = await client.from(studioTable).select('id, name, slug, location');
+                // Fixed: Removing 'slug' which was causing 400 error
+                const { data: studios } = await client.from(studioTable).select('id, name, location');
                 _studioCache = studios || [];
             } catch (e) {
                 console.warn('Could not cache studios for equipment join:', e);
@@ -380,7 +384,8 @@ Object.assign(window.db, {
         }
 
         // Fetch equipment WITHOUT the failing studios(...) join
-        let query = client.from(tableName).select('*');
+        // Increased limit to handle full inventory including new marketplace items
+        let query = client.from(tableName).select('*').limit(3000);
         
         if (filters.category && filters.category !== 'all') {
             query = query.eq('category', filters.category);
@@ -421,6 +426,54 @@ Object.assign(window.db, {
         
         if (error) throw error;
         return data;
+    },
+
+    async updateEquipment(id, updates) {
+        const tableName = getTableName('equipment');
+        const { data, error } = await supabaseClient
+            .from(tableName)
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+        
+        if (error) throw error;
+        return data;
+    },
+
+    async deleteEquipment(id) {
+        const tableName = getTableName('equipment');
+        const { error } = await supabaseClient
+            .from(tableName)
+            .delete()
+            .eq('id', id);
+        
+        if (error) throw error;
+        return true;
+    },
+
+    async getEquipmentByStudio(studioId) {
+        const tableName = getTableName('equipment');
+        const { data, error } = await supabaseClient
+            .from(tableName)
+            .select('*')
+            .eq('studio_id', studioId)
+            .order('name');
+        
+        if (error) throw error;
+        return data || [];
+    },
+
+    async getEquipmentByUser(userId) {
+        const tableName = getTableName('equipment');
+        const { data, error } = await supabaseClient
+            .from(tableName)
+            .select('*')
+            .eq('studio_id', userId) // Using studio_id to store user_id for personal gear
+            .order('name');
+        
+        if (error) throw error;
+        return data || [];
     },
 
     async getPayments(userId, filters = {}) {

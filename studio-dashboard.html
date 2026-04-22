@@ -65,7 +65,7 @@
                             </div>
                         </button>
                         <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 border dark:border-slate-700 z-50">
-                            <a href="#" id="profileLink" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">Profile</a>
+                            <a href="profile.html" id="profileLink" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">Profile</a>
                             <a href="#" id="signOutBtn" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-t dark:border-slate-700">Sign Out</a>
                         </div>
                     </div>
@@ -83,12 +83,12 @@
         </div>
 
         <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Sidebar Navigation -->
             <div class="lg:col-span-1">
-                <nav class="bg-white dark:bg-black rounded-2xl shadow-sm p-6 border dark:border-slate-800">
-                    <ul class="space-y-2">
-                        <li>
+                <nav class="bg-white dark:bg-black rounded-2xl shadow-sm p-4 md:p-6 border dark:border-slate-800 overflow-x-auto">
+                    <ul class="flex lg:flex-col space-x-4 lg:space-x-0 lg:space-y-2 whitespace-nowrap lg:whitespace-normal scrollbar-hide">
+                        <li class="flex-shrink-0">
                             <button id="overviewTab" class="dashboard-tab active w-full text-left px-3 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-700">
                                 Overview
                             </button>
@@ -98,23 +98,30 @@
                                 Studio Details
                             </button>
                         </li>
-                        <li>
+                        <li class="flex-shrink-0">
                             <button id="bookingsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
                                 Bookings
                             </button>
                         </li>
-                        <li>
+                        <li class="flex-shrink-0">
+                            <button id="gearTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Gear Inventory
+                            </button>
+                        </li>
+                        <li class="flex-shrink-0">
                             <button id="integrationsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
                                 Calendar Integrations
                             </button>
                         </li>
-                        <li>
-                            <button id="analyticsTab" class="dashboard-tab w-full flex items-center px-4 py-3 rounded-xl mb-1 transition-all text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800">
-                            <span class="mr-3">📈</span> Analytics
-                        </button>
-                        <button id="financialsTab" class="dashboard-tab w-full flex items-center px-4 py-3 rounded-xl mb-1 transition-all text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800">
-                            <span class="mr-3">💰</span> Financials
-                        </button>
+                        <li class="flex-shrink-0">
+                            <button id="analyticsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Analytics
+                            </button>
+                        </li>
+                        <li class="flex-shrink-0">
+                            <button id="financialsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+                                Financials
+                            </button>
                         </li>
                     </ul>
                 </nav>
@@ -250,6 +257,41 @@
                     </div>
                 </div>
 
+                <!-- Gear Inventory Tab -->
+                <div id="gearContent" class="dashboard-content hidden">
+                    <div class="bg-white dark:bg-black rounded-2xl shadow-sm p-8 border dark:border-slate-800">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                            <div>
+                                <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Gear Inventory</h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your studio gear and marketplace listings</p>
+                            </div>
+                            <button id="addGearBtn" class="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg active:scale-95 flex items-center">
+                                <span class="mr-2">➕</span> Add Item
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b dark:border-slate-800">
+                                        <th class="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Item</th>
+                                        <th class="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Category</th>
+                                        <th class="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
+                                        <th class="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Marketplace</th>
+                                        <th class="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gearInventoryList">
+                                    <!-- Gear items will be loaded here -->
+                                    <tr>
+                                        <td colspan="5" class="py-20 text-center text-gray-500">Loading your gear...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="analyticsContent" class="dashboard-content hidden">
                     <div class="bg-white dark:bg-black rounded-2xl shadow-sm p-8 border dark:border-slate-800">
                         <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">Analytics</h2>
@@ -317,21 +359,25 @@
     <script src="js/stripe-connect.js"></script>
     <!-- Mobile Bottom Navigation -->
     <nav class="mobile-bottom-nav">
-        <a href="app.html" class="mobile-nav-item" aria-label="Home">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
+        <a href="app.html" class="mobile-nav-item" aria-label="Explore Studios">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
         </a>
-        <a href="#bookings" class="mobile-nav-item" onclick="window.dashboard.switchTab('bookings')" aria-label="My Bookings">
-            <i class="fas fa-calendar-alt"></i>
+        <a href="marketplace.html" class="mobile-nav-item" aria-label="Gear Marketplace">
+            <i class="fas fa-guitar"></i>
+            <span>Gear</span>
+        </a>
+        <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
+            <i class="fas fa-calendar-check"></i>
             <span>Bookings</span>
         </a>
-        <a href="messages.html" class="mobile-nav-item" aria-label="Messages">
-            <i class="fas fa-comment-dots"></i>
-            <span>Messages</span>
-        </a>
-        <a href="#studio" class="mobile-nav-item" onclick="window.dashboard.switchTab('studio')" aria-label="Studio Details">
+        <a href="studio-dashboard.html" class="mobile-nav-item active" aria-label="Studio Owner Dashboard">
             <i class="fas fa-music"></i>
             <span>Studio</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" aria-label="User Profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
         </a>
     </nav>
 </body>

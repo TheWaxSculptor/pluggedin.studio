@@ -138,7 +138,7 @@
                 </select>
             </div>
 
-            <div id="studiosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="grid" aria-labelledby="studios-grid-heading">
+            <div id="studioGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="grid" aria-labelledby="studios-grid-heading">
                 <!-- Studios will be loaded here -->
             </div>
         </section>
@@ -576,7 +576,8 @@
     <footer class="bg-black text-white pt-16 pb-8 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400 border-t border-gray-800 pt-8 mt-8">
-                <div class="flex space-x-6 mb-4 md:mb-0">
+                <div class="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 mb-4 md:mb-0">
+                    <a href="protection.html" class="hover:text-white transition-colors font-bold">Session Protection</a>
                     <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
                     <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
                     <a href="accessibility.html" class="hover:text-white transition-colors">Accessibility Statement</a>
@@ -589,20 +590,24 @@
     </footer>
     <!-- Mobile Bottom Navigation -->
     <nav class="mobile-bottom-nav">
-        <a href="app.html" class="mobile-nav-item" aria-label="Home">
+        <a href="app.html" class="mobile-nav-item active" aria-label="Explore Studios">
             <i class="fas fa-search"></i>
             <span>Explore</span>
         </a>
+        <a href="marketplace.html" class="mobile-nav-item" aria-label="Gear Marketplace">
+            <i class="fas fa-guitar"></i>
+            <span>Gear</span>
+        </a>
         <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
-            <i class="fas fa-calendar-alt"></i>
+            <i class="fas fa-calendar-check"></i>
             <span>Bookings</span>
         </a>
-        <a href="messages.html" class="mobile-nav-item" aria-label="Messages">
-            <i class="fas fa-comment-dots"></i>
-            <span>Messages</span>
+        <a href="studio-dashboard.html" class="mobile-nav-item" aria-label="Studio Owner Dashboard">
+            <i class="fas fa-music"></i>
+            <span>Studio</span>
         </a>
-        <a href="profile.html" class="mobile-nav-item" aria-label="Profile">
-            <i class="fas fa-user-circle"></i>
+        <a href="profile.html" class="mobile-nav-item" aria-label="User Profile">
+            <i class="fas fa-user"></i>
             <span>Profile</span>
         </a>
     </nav>

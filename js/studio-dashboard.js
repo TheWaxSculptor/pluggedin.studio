@@ -203,6 +203,9 @@ class StudioDashboard {
             case 'bookings':
                 this.loadBookingsDetails();
                 break;
+            case 'gear':
+                this.loadGearInventory();
+                break;
             case 'integrations':
                 // Calendar integrations are handled by the CalendarIntegrationsManager
                 break;
@@ -725,6 +728,127 @@ class StudioDashboard {
 
     getAnalyticsData() {
         return this.analyticsData;
+    }
+
+    async loadGearInventory() {
+        const container = document.getElementById('gearInventoryList');
+        if (!container) return;
+
+        const studioId = localStorage.getItem('currentStudioId') || '1';
+        
+        container.innerHTML = `
+            <tr>
+                <td colspan="5" class="py-20 text-center">
+                    <div class="animate-spin h-6 w-6 border-b-2 border-black dark:border-white mx-auto mb-4 rounded-full"></div>
+                    <p class="text-gray-500">Loading inventory...</p>
+                </td>
+            </tr>
+        `;
+
+        try {
+            const gear = await db.getEquipmentByStudio(studioId);
+            this.renderGearInventory(gear);
+        } catch (error) {
+            console.error('Error loading gear inventory:', error);
+            container.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-red-500 font-bold">Error loading inventory</td></tr>`;
+        }
+    }
+
+    renderGearInventory(gear) {
+        const container = document.getElementById('gearInventoryList');
+        if (!container) return;
+
+        if (!gear || gear.length === 0) {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="5" class="py-20 text-center text-gray-500">
+                        <div class="text-4xl mb-4">🎸</div>
+                        <p class="font-bold">No gear listed yet</p>
+                        <p class="text-xs mt-1">Start by adding your first item to the database.</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        container.innerHTML = gear.map(item => {
+            const desc = item.description || '';
+            const saleMatch = desc.match(/\[FOR SALE:?\s*\$([\d,]+)\]/i);
+            const rentMatch = desc.match(/\[FOR RENT:?\s*\$([\d,]+)(\/day)?\]/i);
+            
+            let marketplaceStatus = '<span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Internal Only</span>';
+            if (saleMatch) {
+                marketplaceStatus = `
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-green-600 font-black uppercase tracking-widest">For Sale</span>
+                        <span class="text-xs font-bold">$${saleMatch[1]}</span>
+                    </div>
+                `;
+            } else if (rentMatch) {
+                marketplaceStatus = `
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-blue-600 font-black uppercase tracking-widest">For Rent</span>
+                        <span class="text-xs font-bold">$${rentMatch[1]}/day</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <tr class="border-b dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td class="py-4 px-2">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-slate-800 overflow-hidden mr-3">
+                                <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">${item.brand} ${item.name}</p>
+                                <p class="text-[10px] text-gray-400">${item.model || ''}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-2">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">${item.category}</span>
+                    </td>
+                    <td class="py-4 px-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            Available
+                        </span>
+                    </td>
+                    <td class="py-4 px-2">
+                        ${marketplaceStatus}
+                    </td>
+                    <td class="py-4 px-2 text-right">
+                        <div class="flex items-center justify-end space-x-2">
+                            <button class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Edit Item">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="window.studioDashboard.deleteGear('${item.id}')" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Delete Item">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Bind Add Gear button
+        const addGearBtn = document.getElementById('addGearBtn');
+        if (addGearBtn) {
+            addGearBtn.onclick = () => utils.showNotification('Add Gear functionality coming in the next update!', 'info');
+        }
+    }
+
+    async deleteGear(id) {
+        if (!confirm('Are you sure you want to remove this item from your inventory?')) return;
+        
+        try {
+            await db.deleteEquipment(id);
+            utils.showNotification('Item removed from inventory', 'success');
+            this.loadGearInventory();
+        } catch (error) {
+            console.error('Delete gear error:', error);
+            utils.showNotification('Error deleting item', 'error');
+        }
     }
 
     refreshData() {

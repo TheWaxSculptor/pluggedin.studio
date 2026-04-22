@@ -427,56 +427,18 @@ class AvailabilityCalendar {
      * Handle time slot selection
      */
     onTimeSlotSelected(booking) {
-        // Emit custom event for booking selection
-                        <span class="font-medium">${booking.date.toLocaleDateString()}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Time:</span>
-                        <span class="font-medium">${booking.time}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Duration:</span>
-                        <span class="font-medium">${booking.duration} hours</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Rate:</span>
-                        <span class="font-medium">$${booking.price}/hour</span>
-                    </div>
-                    <div class="flex justify-between border-t pt-3">
-                        <span class="font-semibold">Total:</span>
-                        <span class="font-semibold text-purple-600">$${booking.price * booking.duration}</span>
-                    </div>
-                </div>
-                <div class="flex space-x-3">
-                    <button id="cancelBooking" class="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                        Cancel
-                    </button>
-                    <button id="confirmBooking" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-                        Book Now
-                    </button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        // Handle modal actions
-        modal.querySelector('#cancelBooking').addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
-
-        modal.querySelector('#confirmBooking').addEventListener('click', () => {
-            // Here you would integrate with your booking system
-            alert('Booking confirmed! You will be redirected to payment.');
-            document.body.removeChild(modal);
-        });
-
-        // Close on backdrop click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                document.body.removeChild(modal);
+        // Dispatch custom event for the integration layer to handle
+        const event = new CustomEvent('timeSlotSelected', {
+            detail: {
+                date: booking.date,
+                time: booking.time,
+                price: booking.price,
+                duration: booking.duration
             }
         });
+        document.dispatchEvent(event);
+        
+        console.log('Time slot selected event dispatched:', booking);
     }
 }
 

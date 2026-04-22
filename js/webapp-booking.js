@@ -150,6 +150,23 @@ class BookingManager {
                                 <label for="notes" class="premium-label italic">Special Requirements / Notes</label>
                             </div>
 
+                            <!-- "Protect this session" Upsell -->
+                            <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-6 border border-gray-200 dark:border-white/10 mb-4 group transition-all hover:bg-gray-100 dark:hover:bg-white/10">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" id="protectSession" class="w-5 h-5 text-black dark:text-white rounded-lg border-gray-300 focus:ring-black dark:focus:ring-white transition-all cursor-pointer">
+                                    </div>
+                                    <div class="ml-4">
+                                        <label for="protectSession" class="text-sm font-black uppercase tracking-tight flex items-center cursor-pointer">
+                                            Protect This Session
+                                            <span class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-[8px] rounded-full">Recommended</span>
+                                        </label>
+                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 leading-relaxed font-medium">Add Gear Guard Pro protection for just $10.00. Covers accidental damage to studio equipment and instruments.</p>
+                                        <a href="protection.html" target="_blank" class="text-[9px] text-blue-500 font-black underline mt-2 block uppercase tracking-widest">Learn more about coverage</a>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Summary Card -->
                             <div id="bookingSummary" class="hidden p-8 rounded-3xl booking-summary-card">
                                 <div id="summaryContent" class="space-y-2"></div>
@@ -201,6 +218,12 @@ class BookingManager {
         const durationSelect = document.getElementById('duration');
         if (durationSelect) {
             durationSelect.addEventListener('change', () => this.updateBookingSummary());
+        }
+
+        // Protection change
+        const protectCheckbox = document.getElementById('protectSession');
+        if (protectCheckbox) {
+            protectCheckbox.addEventListener('change', () => this.updateBookingSummary());
         }
 
         // Form submission
@@ -353,7 +376,14 @@ class BookingManager {
 
         const startTime = new Date(`${this.selectedDate}T${this.selectedTimeSlot}`);
         const endTime = new Date(startTime.getTime() + (parseInt(duration) * 60 * 60 * 1000));
-        const totalCost = (this.selectedStudio.price || 0) * parseInt(duration);
+        
+        const hourlyRate = this.selectedStudio.price || 0;
+        const sessionCost = hourlyRate * parseInt(duration);
+        
+        const protectCheckbox = document.getElementById('protectSession');
+        const isProtected = protectCheckbox && protectCheckbox.checked;
+        const insuranceFee = isProtected ? 10 : 0;
+        const totalCost = sessionCost + insuranceFee;
 
         if (summaryContainer && summaryContent) {
             summaryContainer.classList.remove('hidden');
@@ -362,18 +392,22 @@ class BookingManager {
                     <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Pricing Details</span>
                     <span class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-[10px] font-bold uppercase tracking-tighter">Est. Total</span>
                 </div>
-                <div class="grid grid-cols-2 gap-y-4">
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Time Frame</p>
-                        <p class="text-sm font-bold">${utils.formatTime(startTime)} - ${utils.formatTime(endTime)}</p>
+                <div class="grid grid-cols-2 gap-y-3">
+                    <div class="flex justify-between col-span-2 text-sm">
+                        <span class="text-gray-500">${duration}h @ ${utils.formatCurrency(hourlyRate)}/hr</span>
+                        <span class="font-bold">${utils.formatCurrency(sessionCost)}</span>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Session Date</p>
-                        <p class="text-sm font-bold">${utils.formatDate(startTime)}</p>
-                    </div>
+                    
+                    ${isProtected ? `
+                        <div class="flex justify-between col-span-2 text-sm text-blue-500 font-bold border-t border-blue-500/10 pt-2">
+                            <span>Gear Guard Pro Protection</span>
+                            <span>$10.00</span>
+                        </div>
+                    ` : ''}
+
                     <div class="col-span-2 pt-4 border-t border-black/5 dark:border-white/5 flex justify-between items-end">
                         <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                            ${duration} hour${duration > 1 ? 's' : ''} session
+                            Verified Session Total
                         </div>
                         <div class="text-3xl font-black">${utils.formatCurrency(totalCost)}</div>
                     </div>
@@ -407,7 +441,14 @@ class BookingManager {
         try {
             const startTime = new Date(`${this.selectedDate}T${this.selectedTimeSlot}`);
             const endTime = new Date(startTime.getTime() + (parseInt(duration) * 60 * 60 * 1000));
-            const totalCost = (this.selectedStudio.price || 0) * parseInt(duration);
+            
+            const hourlyRate = this.selectedStudio.price || 0;
+            const sessionCost = hourlyRate * parseInt(duration);
+            
+            const protectCheckbox = document.getElementById('protectSession');
+            const isProtected = protectCheckbox && protectCheckbox.checked;
+            const insuranceFee = isProtected ? 10 : 0;
+            const totalCost = sessionCost + insuranceFee;
 
             const bookingData = {
                 studio_id: this.selectedStudio.id,
@@ -416,6 +457,8 @@ class BookingManager {
                 end_time: endTime.toISOString(),
                 duration_hours: parseInt(duration),
                 total_cost: totalCost,
+                is_protected: isProtected,
+                insurance_fee: insuranceFee,
                 status: 'pending',
                 notes: notes || null,
                 created_at: new Date().toISOString()

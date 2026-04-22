@@ -6,6 +6,8 @@
     <title>Profile - PluggedIn</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .profile-section {
             transition: all 0.2s ease-in-out;
@@ -266,6 +268,29 @@
             </div>
         </div>
 
+        <!-- My Gear Section (For Audiophiles/Artists) -->
+        <div id="myGearSection" class="mt-8 bg-white dark:bg-black rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-white/5">
+            <div class="p-6 border-b border-gray-200 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50/50 dark:bg-white/5 gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">My Gear Collection</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Track your personal inventory and list items in the marketplace</p>
+                </div>
+                <button id="addPersonalGearBtn" class="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-all">
+                    + Add Item
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="personalGearList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Personal gear will be loaded here -->
+                    <div class="col-span-full py-12 text-center">
+                        <div class="text-4xl mb-4">🎻</div>
+                        <p class="text-gray-500 font-medium">Your gear collection is empty</p>
+                        <p class="text-xs text-gray-400 mt-1">Start tracking your instruments and audio gear today.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Become Studio Owner CTA (if not owner) -->
         <div id="becomeOwnerSection" class="hidden mt-8 bg-white rounded-lg shadow-sm p-8 text-center">
             <div class="max-w-md mx-auto">
@@ -316,16 +341,66 @@
                 await this.loadUserProfile();
                 this.loadFavoriteStudios();
                 this.loadRecentActivity();
+                this.loadPersonalGear(); // Load personal gear collection
                 this.setupEventListeners();
             }
 
             setupEventListeners() {
+                // Add Personal Gear
+                const addGearBtn = document.getElementById('addPersonalGearBtn');
+                if (addGearBtn) {
+                    addGearBtn.onclick = () => alert('Add Gear functionality coming soon for individual collectors!');
+                }
+
                 // Toggle switches
                 document.querySelectorAll('.toggle-switch input').forEach(toggle => {
                     toggle.addEventListener('change', (e) => {
                         this.updateNotificationSetting(e.target);
                     });
                 });
+            }
+
+            async loadPersonalGear() {
+                const container = document.getElementById('personalGearList');
+                if (!container || !this.user) return;
+
+                try {
+                    const gear = await db.getEquipmentByUser(this.user.id);
+                    this.renderPersonalGear(gear);
+                } catch (error) {
+                    console.error('Error loading personal gear:', error);
+                }
+            }
+
+            renderPersonalGear(gear) {
+                const container = document.getElementById('personalGearList');
+                if (!container) return;
+
+                if (!gear || gear.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full py-12 text-center">
+                            <div class="text-4xl mb-4">🎻</div>
+                            <p class="text-gray-500 font-medium">Your gear collection is empty</p>
+                            <p class="text-xs text-gray-400 mt-1">Start tracking your instruments and audio gear today.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = gear.map(item => `
+                    <div class="flex items-center p-4 border rounded-xl hover:shadow-md transition-shadow group">
+                        <div class="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden mr-4">
+                            <img src="${item.image_url || 'https://via.placeholder.com/64'}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">${item.brand} ${item.name}</h4>
+                            <p class="text-xs text-gray-500">${item.category}</p>
+                        </div>
+                        <button class="p-2 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
             }
 
             getInitials(name) {
@@ -728,5 +803,28 @@
             window.profileManager = new ProfileManager();
         });
     </script>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="app.html" class="mobile-nav-item" aria-label="Explore Studios">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
+        </a>
+        <a href="marketplace.html" class="mobile-nav-item" aria-label="Gear Marketplace">
+            <i class="fas fa-guitar"></i>
+            <span>Gear</span>
+        </a>
+        <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
+            <i class="fas fa-calendar-check"></i>
+            <span>Bookings</span>
+        </a>
+        <a href="studio-dashboard.html" class="mobile-nav-item" aria-label="Studio Owner Dashboard">
+            <i class="fas fa-music"></i>
+            <span>Studio</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item active" aria-label="User Profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
 </body>
 </html>

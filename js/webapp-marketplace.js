@@ -8,7 +8,8 @@ class MarketplaceManager {
         this.gear = [];
         this.filters = {
             search: '',
-            category: 'all'
+            category: 'all',
+            status: 'all' // Added for marketplace filtering
         };
         this.init();
     }
@@ -58,10 +59,28 @@ class MarketplaceManager {
                 const cat = chip.dataset.cat;
                 this.filters.category = cat;
                 
-                // Update dropdown if it exists
-                if (categorySelect) categorySelect.value = cat;
+                // Clear status filter when category is picked, or keep it? 
+                // Let's allow cross-filtering
                 
-                this.updateChipUI(cat);
+                this.updateChipUI();
+                this.loadGear();
+            });
+        });
+
+        // Status Chips (For Sale / For Rent)
+        const statusChips = document.querySelectorAll('.status-chip');
+        statusChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const status = chip.dataset.status;
+                
+                // Toggle logic
+                if (this.filters.status === status) {
+                    this.filters.status = 'all';
+                } else {
+                    this.filters.status = status;
+                }
+                
+                this.updateChipUI();
                 this.loadGear();
             });
         });
@@ -77,13 +96,26 @@ class MarketplaceManager {
         }
     }
 
-    updateChipUI(activeCat) {
+    updateChipUI() {
+        // Update Categories
         document.querySelectorAll('.category-chip').forEach(chip => {
-            if (chip.dataset.cat === activeCat) {
-                chip.classList.add('active');
+            if (chip.dataset.cat === this.filters.category) {
+                chip.classList.add('bg-black', 'text-white');
+                chip.classList.remove('bg-white', 'dark:bg-zinc-900', 'text-gray-900', 'dark:text-white');
+            } else {
+                chip.classList.remove('bg-black', 'text-white');
+                chip.classList.add('bg-white', 'dark:bg-zinc-900', 'text-gray-900', 'dark:text-white');
+            }
+        });
+
+        // Update Status
+        document.querySelectorAll('.status-chip').forEach(chip => {
+            if (chip.dataset.status === this.filters.status) {
+                const colorClass = this.filters.status === 'for_sale' ? 'bg-green-600' : 'bg-blue-600';
+                chip.classList.add(colorClass, 'text-white');
                 chip.classList.remove('bg-white', 'dark:bg-zinc-900');
             } else {
-                chip.classList.remove('active');
+                chip.classList.remove('bg-green-600', 'bg-blue-600', 'text-white');
                 chip.classList.add('bg-white', 'dark:bg-zinc-900');
             }
         });
@@ -111,6 +143,16 @@ class MarketplaceManager {
             
             this.gear = await window.db.getEquipment(this.filters);
             
+            // Client-side marketplace filtering since schema doesn't have status columns yet
+            if (this.filters.status !== 'all') {
+                this.gear = this.gear.filter(item => {
+                    const desc = item.description || '';
+                    if (this.filters.status === 'for_sale') return desc.match(/\[FOR SALE:?/i);
+                    if (this.filters.status === 'for_rent') return desc.match(/\[FOR RENT:?/i);
+                    return true;
+                });
+            }
+
             if (this.gear.length === 0) {
                 this.showState('empty');
             } else {
@@ -135,35 +177,54 @@ class MarketplaceManager {
         const fallbackImage = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
         const image = item.image || item.image_url || fallbackImage;
         
-        // Build the studio link - if we have a studio_slug we use that, otherwise id
+        // Parse metadata from description if present
+        let displayDesc = item.description || 'Professional grade equipment';
+        let marketplaceBadge = '';
+        let priceDisplay = '';
+
+        const saleMatch = displayDesc.match(/\[FOR SALE:?\s*\$([\d,]+)\]/i);
+        const rentMatch = displayDesc.match(/\[FOR RENT:?\s*\$([\d,]+)(\/day)?\]/i);
+
+        if (saleMatch) {
+            marketplaceBadge = '<span class="px-2 py-0.5 bg-green-500 text-white text-[10px] font-black uppercase rounded-full ml-2">For Sale</span>';
+            priceDisplay = `<p class="text-xl font-black text-green-600 dark:text-green-400 mt-2">$${saleMatch[1]}</p>`;
+            displayDesc = displayDesc.replace(saleMatch[0], '').trim();
+        } else if (rentMatch) {
+            marketplaceBadge = '<span class="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-black uppercase rounded-full ml-2">For Rent</span>';
+            priceDisplay = `<p class="text-xl font-black text-blue-600 dark:text-blue-400 mt-2">$${rentMatch[1]}<span class="text-xs font-medium text-gray-500">/day</span></p>`;
+            displayDesc = displayDesc.replace(rentMatch[0], '').trim();
+        }
+
         const studioLink = `app.html?studio=${item.studio_id}`;
         
         return `
-            <div class="gear-card bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 flex flex-col">
+            <div class="gear-card bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 flex flex-col group transition-all hover:shadow-2xl hover:-translate-y-1">
                 <div class="relative aspect-square overflow-hidden bg-gray-100 dark:bg-zinc-800">
-                    <img src="${image}" alt="${item.name}" class="w-full h-full object-cover" loading="lazy">
-                    <div class="absolute top-4 left-4">
+                    <img src="${image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy">
+                    <div class="absolute top-4 left-4 flex items-center">
                         <span class="px-3 py-1 bg-white/90 dark:bg-black/90 backdrop-blur-md text-[10px] font-black uppercase tracking-tighter rounded-full border border-gray-100 dark:border-white/10">
                             ${item.category || 'Gear'}
                         </span>
+                        ${marketplaceBadge}
                     </div>
                 </div>
                 <div class="p-6 sm:p-8 flex-1 flex flex-col">
                     <div class="mb-4">
                         <h3 class="text-xl font-black leading-tight mb-2 tracking-tight">${item.brand ? item.brand + ' ' : ''}${item.name || item.model}</h3>
-                        <p class="text-sm text-gray-400 font-medium leading-relaxed">${item.description || 'Professional grade equipment'}</p>
+                        <p class="text-sm text-gray-400 font-medium leading-relaxed line-clamp-2">${displayDesc}</p>
+                        ${priceDisplay}
                     </div>
                     
                     <div class="mt-auto pt-4 border-t dark:border-white/5">
-                        <a href="${studioLink}" class="group flex items-center justify-between">
+                        <a href="${studioLink}" class="group/studio flex items-center justify-between">
                             <div class="flex-1">
                                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Located at</p>
-                                <p class="text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors truncate">
+                                <p class="text-sm font-bold text-gray-900 dark:text-white group-hover/studio:text-blue-600 transition-colors truncate">
                                     ${item.studio_name}
                                 </p>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center group-hover:bg-blue-600 transition-all">
-                                <i class="fas fa-arrow-right text-xs text-gray-400 group-hover:text-white transition-colors"></i>
+                            <div class="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center group-hover/studio:bg-blue-600 transition-all">
+                                <i class="fas fa-arrow-right text-xs text-gray-400 group-hover/studio:text-white transition-colors"></i>
                             </div>
                         </a>
                     </div>

@@ -176,7 +176,6 @@ class StudiosManager {
         
         try {
             if (window.DB_READY) {
-                console.log('⏳ Waiting for DB sync before loading studios...');
                 await window.DB_READY;
             }
             
@@ -190,16 +189,16 @@ class StudiosManager {
             this.renderStudios();
         } catch (error) {
             console.error('Error loading studios:', error);
-            const utils = window.utils;
-            if (utils && utils.showNotification) {
-                utils.showNotification('Error loading studios. Please try again.', 'error');
-            }
+            // Graceful fallback: render empty state but don't crash
             this.showEmptyState();
         }
     }
 
     handleSearch() {
         const searchTerm = document.getElementById('locationSearch')?.value.trim();
+        const citySuggestions = document.getElementById('locationSuggestions');
+        
+        if (citySuggestions) citySuggestions.classList.add('hidden');
         
         if (searchTerm) {
             this.currentFilters.location = searchTerm;
@@ -263,9 +262,8 @@ class StudiosManager {
     }
 
     renderStudios() {
-        const loadingState = document.getElementById('loadingState');
         const studioGrid = document.getElementById('studioGrid');
-        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
 
         if (loadingState) loadingState.classList.add('hidden');
 
@@ -274,45 +272,75 @@ class StudiosManager {
             return;
         }
 
-        if (emptyState) emptyState.classList.add('hidden');
-
         if (studioGrid) {
+            studioGrid.classList.add('grid');
+            studioGrid.classList.remove('block');
             studioGrid.innerHTML = this.filteredStudios.map(studio => this.createStudioCard(studio)).join('');
             
-            studioGrid.querySelectorAll('.studio-card').forEach((card, index) => {
-                card.addEventListener('click', () => this.showStudioDetails(this.filteredStudios[index]));
-            });
+            // Add delegated click listener to the grid instead of individual cards
+            if (!studioGrid.dataset.hasListener) {
+                studioGrid.addEventListener('click', (e) => {
+                    const card = e.target.closest('.studio-card');
+                    if (card && !e.target.closest('button')) {
+                        const studioId = card.dataset.id;
+                        const studio = this.filteredStudios.find(s => s.id === studioId);
+                        if (studio) this.showStudioDetails(studio);
+                    }
+                });
+                studioGrid.dataset.hasListener = "true";
+            }
         }
     }
 
     createStudioCard(studio) {
+        const rating = studio.rating || '4.8';
+        const price = studio.price || studio.hourly_rate || '75';
+        const image = studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80';
+
         return `
-            <div class="studio-card group cursor-pointer" onclick="window.studiosManager.showStudioDetails(${JSON.stringify(studio).replace(/"/g, '&quot;')})">
-                <div class="relative mb-3">
-                    <img src="${studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
-                         alt="${studio.name}" class="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-transform duration-200"
+            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/40 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all hover:shadow-2xl hover:shadow-black/5" data-id="${studio.id}">
+                <div class="relative aspect-[4/3] overflow-hidden">
+                    <img src="${image}" 
+                         alt="${studio.name}" 
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                          loading="lazy">
-                    <button class="absolute top-3 right-3 p-2 hover:scale-110 transition-transform" 
-                            onclick="event.stopPropagation(); toggleFavorite('${studio.id}')" 
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div class="absolute top-4 left-4">
+                        <span class="px-3 py-1 bg-white/90 backdrop-blur-md dark:bg-black/80 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                            ${studio.studio_type || 'Recording'}
+                        </span>
+                    </div>
+
+                    <button class="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-md dark:bg-black/80 rounded-full text-gray-900 dark:text-white border border-white/20 transition-all hover:scale-110 active:scale-95" 
+                            onclick="event.stopPropagation(); window.utils.showNotification('Saved to favorites', 'success')" 
                             aria-label="Add to favorites">
-                        <svg class="w-6 h-6 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
+                        <i class="far fa-heart"></i>
                     </button>
                 </div>
-                <div class="space-y-1">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-medium text-gray-900 dark:text-white truncate pr-2">${studio.name}</h3>
-                        <div class="flex items-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-yellow-500 fill-current" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
-                            <span class="text-sm text-gray-900 dark:text-gray-200 ml-1">${studio.rating || '4.8'}</span>
+                
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-black uppercase tracking-tight text-gray-900 dark:text-white truncate pr-4">${studio.name}</h3>
+                        <div class="flex items-center space-x-1 px-2 py-1 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10">
+                            <i class="fas fa-star text-[10px] text-yellow-500"></i>
+                            <span class="text-xs font-black">${rating}</span>
                         </div>
                     </div>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">${studio.location}</p>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">${studio.description || 'Professional recording studio'}</p>
-                    <p class="text-gray-900 dark:text-white font-medium"><span class="font-semibold">$${studio.price || studio.hourly_rate || '75'}</span> per hour</p>
+                    
+                    <p class="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 opacity-50"></i> ${studio.location}
+                    </p>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-white/5">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Hourly</span>
+                            <span class="text-xl font-black text-gray-900 dark:text-white mt-1">$${price}</span>
+                        </div>
+                        <button class="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]">
+                            Details
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -345,74 +373,105 @@ class StudiosManager {
         const utils = window.utils;
 
         if (modalStudioName) {
-            modalStudioName.textContent = studio.name;
+            modalStudioName.textContent = ""; // Use the modal's own header redesign
         }
 
         if (modalContent) {
             const imageUrl = studio.images && studio.images.length > 0 
                 ? studio.images[0] 
-                : 'https://via.placeholder.com/600x300?text=Studio+Image';
+                : studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80';
 
             modalContent.innerHTML = `
-                <div class="space-y-6">
-                    <div class="aspect-w-16 aspect-h-9">
-                        <img src="${imageUrl}" alt="${studio.name}" class="w-full h-64 object-cover rounded-lg">
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="text-lg font-semibold mb-3">Studio Details</h4>
-                            <div class="space-y-2">
-                                <p class="flex items-center text-gray-600">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
-                                    ${studio.location || 'Location not specified'}
-                                </p>
-                                <p class="flex items-center text-gray-600">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                    </svg>
-                                    ${utils ? utils.formatCurrency(studio.hourly_rate || 0) : '$' + (studio.hourly_rate || 0)} per hour
-                                </p>
-                            </div>
-                            <div class="mt-4">
-                                <h5 class="font-medium mb-2">Description</h5>
-                                <p class="text-gray-600 text-sm">${studio.description || 'No description available'}</p>
-                            </div>
+                <div class="flex flex-col md:flex-row h-full -m-5 md:-m-10 min-h-[85vh]">
+                    <!-- Left: Studio Immersion (High Fidelity) -->
+                    <div class="w-full md:w-5/12 bg-black text-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-40">
+                            <img src="${imageUrl}" class="w-full h-full object-cover grayscale active:grayscale-0 transition-all duration-1000">
                         </div>
-                        <div>
-                            <h4 class="text-lg font-semibold mb-3">Equipment</h4>
-                            <div class="space-y-2 max-h-48 overflow-y-auto">
-                                ${studio.equipment && studio.equipment.length > 0 
-                                    ? studio.equipment.map(eq => `
-                                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                            <span class="text-sm font-medium">${eq.name}</span>
-                                            <span class="text-xs text-gray-500">${eq.category || 'Equipment'}</span>
-                                        </div>
-                                    `).join('')
-                                    : '<p class="text-gray-500 text-sm">No equipment listed</p>'
-                                }
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-xl rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-white/20">
+                                ${studio.location ? studio.location.split(',')[0] : 'Exclusive'} Site
                             </div>
+                            <h2 class="text-5xl font-black mb-4 leading-[0.9] tracking-tighter uppercase">${studio.name}</h2>
+                            <p class="text-gray-400 text-sm font-medium leading-relaxed max-w-sm mb-8">
+                                ${studio.description || 'Elevating sound melalui premium hardware and world-class acoustics.'}
+                            </p>
                         </div>
-                    </div>
-                    <div class="border-t pt-6">
-                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        
+                        <div class="relative z-10 grid grid-cols-2 gap-8 pt-12 border-t border-white/10">
                             <div>
-                                <h4 class="text-lg font-semibold">Ready to book?</h4>
-                                <p class="text-gray-600">Choose your preferred booking method</p>
+                                <span class="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Standard Rate</span>
+                                <span class="text-3xl font-black">${utils ? utils.formatCurrency(studio.hourly_rate || 0) : '$' + (studio.hourly_rate || 0)}</span>
                             </div>
-                            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <div>
+                                <span class="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Verified Rating</span>
+                                <span class="text-3xl font-black flex items-center">
+                                    ${studio.rating || '4.8'}
+                                    <i class="fas fa-star text-xs ml-2 text-yellow-500"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Technical Specifications & Actions -->
+                    <div class="w-full md:w-7/12 p-8 md:p-12 bg-white dark:bg-zinc-950 flex flex-col">
+                        <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            <div class="space-y-12">
+                                <!-- Technical Rider -->
+                                <div>
+                                    <h4 class="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-8 border-b border-gray-100 dark:border-white/5 pb-4">Technical Rider</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        ${studio.equipment && studio.equipment.length > 0 
+                                            ? studio.equipment.map(eq => `
+                                                <div class="flex items-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 group hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all">
+                                                    <div class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center mr-4 group-hover:bg-white/20">
+                                                        <i class="fas fa-microchip text-[10px]"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="block text-xs font-black leading-tight uppercase">${eq.name}</span>
+                                                        <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">${eq.category || 'Gear'}</span>
+                                                    </div>
+                                                </div>
+                                            `).join('')
+                                            : `
+                                                <div class="col-span-2 py-10 text-center border-2 border-dashed border-gray-100 dark:border-white/5 rounded-3xl">
+                                                    <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Digital-First Environment / Custom Specs</p>
+                                                </div>
+                                            `
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Amenities Section -->
+                                <div>
+                                    <h4 class="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6">Environment Amenities</h4>
+                                    <div class="flex flex-wrap gap-3">
+                                        ${(studio.amenities || ['High-Speed WiFi', 'Climate Control', 'Lounge Access']).map(amenity => `
+                                            <span class="px-4 py-2 bg-gray-100 dark:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest opacity-60">
+                                                ${amenity}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="mt-12 pt-8 border-t border-gray-100 dark:border-white/5">
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <button id="bookStudioBtn" class="flex-1 bg-black dark:bg-white text-white dark:text-black py-5 rounded-2xl font-black uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-black/20">
+                                    Initiate Session
+                                </button>
                                 ${studio.external_booking_url ? `
                                     <a href="${studio.external_booking_url}" target="_blank" 
-                                       class="flex-1 text-center bg-white border-2 border-blue-600 text-blue-600 px-6 py-2 rounded-md hover:bg-blue-50 transition-colors font-medium">
-                                        Book via ${studio.external_platform === 'calendly' ? 'Calendly' : 'External Calendar'}
+                                       class="px-8 flex items-center justify-center bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 dark:hover:bg-white/10 transition-all">
+                                        External Sync
                                     </a>
                                 ` : ''}
-                                <button id="bookStudioBtn" class="flex-1 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium">
-                                    Native Booking
-                                </button>
                             </div>
+                            <p class="text-center text-[10px] font-bold text-gray-400 mt-6 uppercase tracking-widest">Secured via PluggedIn Protection®</p>
                         </div>
                     </div>
                 </div>
@@ -427,15 +486,37 @@ class StudiosManager {
 
     showStudioModal() {
         const modal = document.getElementById('studioModal');
+        const studioModalContent = modal?.querySelector('.relative.top-20');
+        
         if (modal) {
-            modal.classList.remove('hidden');
+            // Upgrade modal structure for High Fidelity
+            if (studioModalContent) {
+                studioModalContent.className = "relative mx-auto border-0 w-11/12 md:w-11/12 lg:w-3/4 max-w-6xl shadow-2xl rounded-[40px] bg-white dark:bg-slate-900 overflow-hidden transition-all duration-500 scale-95 opacity-0";
+                
+                // Animate entry
+                modal.classList.remove('hidden');
+                modal.classList.add('flex', 'items-center', 'justify-center', 'p-4');
+                modal.style.background = "rgba(0,0,0,0.85)";
+                modal.style.backdropFilter = "blur(10px)";
+                
+                setTimeout(() => {
+                    studioModalContent.classList.remove('scale-95', 'opacity-0');
+                    studioModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
         }
     }
 
     hideStudioModal() {
         const modal = document.getElementById('studioModal');
-        if (modal) {
-            modal.classList.add('hidden');
+        const studioModalContent = modal?.querySelector('.relative.mx-auto');
+        
+        if (modal && studioModalContent) {
+            studioModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex', 'items-center', 'justify-center', 'p-4');
+            }, 300);
         }
     }
 

@@ -21,3 +21,19 @@ window.APP_CONFIG = {
 // Convenience legacy export
 window.HUB_STUDIO_ID = window.APP_CONFIG.hubStudioId;
 
+// Insurance & Partnership Configuration
+window.PARTNER_CONFIG = {
+    insurance: {
+        next: {
+            name: 'Next Insurance',
+            affiliateUrl: 'https://www.nextinsurance.com/', // Replace with your affiliate link
+            apiBase: 'https://api.nextinsurance.com/v1'
+        },
+        frontRow: {
+            name: 'Front Row Insurance',
+            affiliateUrl: 'https://www.frontrowinsurance.com/music-industry-insurance',
+            apiBase: null
+        }
+    }
+};
+

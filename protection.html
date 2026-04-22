@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PluggedIn Protection - Peace of Mind for Music Creators</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/pluggedin.bundle.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Navigation (Mirrored from app.html) -->
+    <nav style="background: white; border-bottom: 1px solid #e5e7eb; position: relative; z-index: 1001;" class="bg-white dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center">
+                    <a href="app.html">
+                        <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" width="200" height="64">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" width="200" height="64">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="app.html" class="text-sm font-bold hover:text-blue-600 transition-colors">Home</a>
+                    <a href="support.html" class="text-sm font-bold hover:text-blue-600 transition-colors">Support</a>
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:text-white transition-all border border-transparent dark:border-white/10">
+                        <i class="fas fa-moon text-xl dark:hidden"></i>
+                        <i class="fas fa-sun text-xl hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="max-w-7xl mx-auto px-4 py-24 text-center">
+            <div class="inline-block px-4 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-gray-200 dark:border-white/10">Trust & Safety</div>
+            <h1 class="text-6xl md:text-8xl font-black mb-8 tracking-tighter">Total Protection.</h1>
+            <p class="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-12 font-medium">Whether you're renting out a vintage console or booking a multi-platinum room, PluggedIn Protection has your back.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#coverage" class="px-10 py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10 uppercase tracking-widest">Explore Coverage</a>
+                <a href="#partners" class="px-10 py-5 bg-white dark:bg-black text-black dark:text-white border border-gray-200 dark:border-white/10 rounded-2xl font-black text-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-all uppercase tracking-widest">Our Partners</a>
+            </div>
+        </section>
+
+        <!-- Coverage Tiers -->
+        <section id="coverage" class="max-w-7xl mx-auto px-4 py-20">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                <!-- Included Protection -->
+                <div class="bg-white dark:bg-white/5 rounded-[2.5rem] p-12 border border-blue-500/10 hover:border-blue-500/30 transition-all group overflow-hidden relative">
+                    <div class="relative z-10">
+                        <div class="text-xs font-black uppercase tracking-widest text-blue-500 mb-6">Always Included</div>
+                        <h2 class="text-4xl font-black mb-6 tracking-tight">Liability Shield</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed font-medium">Every booking on PluggedIn is covered by our $1M Liability Shield. This protects both hosts and guests against third-party claims during a session.</p>
+                        <ul class="space-y-4 text-sm font-bold">
+                            <li class="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-check-circle text-blue-500"></i>
+                                <span>$1,000,000 Liability Coverage</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-check-circle text-blue-500"></i>
+                                <span>Available in 50+ Countries</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Premium Protection -->
+                <div class="bg-white dark:bg-white/5 rounded-[2.5rem] p-12 border border-gray-200 dark:border-white/10 hover:border-white/20 transition-all group overflow-hidden relative">
+                    <div class="relative z-10">
+                        <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 font-bold">Enhanced Security</div>
+                        <h2 class="text-4xl font-black mb-6 tracking-tight">Gear Guard Pro</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed font-medium">Protect your specialized equipment against accidental damage, theft, and breakage. Tailored specifically for professional engineers and home studios.</p>
+                        <ul class="space-y-4 text-sm font-bold mb-10">
+                            <li class="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-plus text-gray-400"></i>
+                                <span>Zero-Deductible Options</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-plus text-gray-400"></i>
+                                <span>Full Replacement Value</span>
+                            </li>
+                        </ul>
+                        <a href="#partners" class="inline-flex items-center px-8 py-4 bg-gray-100 dark:bg-white/10 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all">
+                            Get a Premium Quote
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Partners Section -->
+        <section id="partners" class="max-w-7xl mx-auto px-4 py-24 mb-20">
+            <h2 class="text-3xl font-black mb-16 text-center uppercase tracking-tighter">Trusted Insurance Partners</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Next Insurance -->
+                <div class="bg-gray-100/50 dark:bg-white/5 p-12 rounded-[2rem] border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all">
+                    <h3 class="text-2xl font-black mb-4">Next Insurance</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm font-medium">Instant quotes and embedded protection for small business owners and freelancers.</p>
+                    <a href="https://www.nextinsurance.com/" target="_blank" class="text-sm font-black uppercase tracking-[0.2em] text-blue-500 hover:translate-x-2 transition-transform inline-flex items-center">
+                        Visit Partner <i class="fas fa-arrow-right ml-2 text-[10px]"></i>
+                    </a>
+                </div>
+                <!-- Front Row -->
+                <div class="bg-gray-100/50 dark:bg-white/5 p-12 rounded-[2rem] border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all">
+                    <h3 class="text-2xl font-black mb-4">Front Row Insurance</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm font-medium">Specialized entertainment insurance for high-value gear and touring professionals.</p>
+                    <a href="https://www.frontrowinsurance.com/music-industry-insurance" target="_blank" class="text-sm font-black uppercase tracking-[0.2em] text-blue-500 hover:translate-x-2 transition-transform inline-flex items-center">
+                        Visit Partner <i class="fas fa-arrow-right ml-2 text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 border-t border-gray-200 dark:border-white/5 bg-white dark:bg-black">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <img src="PluggedIn_Studio_Light.png" alt="PluggedIn" class="logo-light opacity-30 mb-8 mx-auto" width="150" height="48">
+            <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn" class="logo-dark opacity-30 mb-8 mx-auto" width="150" height="48">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                PluggedIn Studio is not an insurance carrier. Coverage is provided by our licensed partners. <br>
+                All rights reserved &copy; 2026.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const updateTheme = (isDark) => {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        };
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const isDark = !document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                updateTheme(isDark);
+            });
+        }
+        
+        updateTheme(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    </script>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="app.html" class="mobile-nav-item" aria-label="Explore Studios">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
+        </a>
+        <a href="marketplace.html" class="mobile-nav-item" aria-label="Gear Marketplace">
+            <i class="fas fa-guitar"></i>
+            <span>Gear</span>
+        </a>
+        <a href="bookings.html" class="mobile-nav-item" aria-label="My Bookings">
+            <i class="fas fa-calendar-check"></i>
+            <span>Bookings</span>
+        </a>
+        <a href="studio-dashboard.html" class="mobile-nav-item" aria-label="Studio Owner Dashboard">
+            <i class="fas fa-music"></i>
+            <span>Studio</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item" aria-label="User Profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+</body>
+</html>

@@ -346,7 +346,7 @@ class StudiosManager {
                     <img src="${image}" 
                          alt="${studio.name}" 
                          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                         onerror="this.onerror=null; this.src='${fallbackImage}'; this.parentElement.classList.add('image-fallback');"
+                         onerror="this.onerror=null; this.src='${fallbackImage}'; this.style.color='transparent';"
                          loading="lazy">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
                     

@@ -816,23 +816,23 @@
                     
                     <div class="flex gap-4">
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerFirstName" class="premium-input" placeholder="First Name" required>
+                            <input type="text" id="registerFirstName" class="premium-input" placeholder=" " required>
                             <label for="registerFirstName" class="premium-label">First Name <span class="required-asterisk">*</span></label>
                         </div>
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerLastName" class="premium-input" placeholder="Last Name" required>
+                            <input type="text" id="registerLastName" class="premium-input" placeholder=" " required>
                             <label for="registerLastName" class="premium-label">Last Name <span class="required-asterisk">*</span></label>
                         </div>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="email" id="registerEmail" class="premium-input" placeholder="Email Address" required aria-describedby="emailHint">
+                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required aria-describedby="emailHint">
                         <label for="registerEmail" class="premium-label">Email <span class="required-asterisk">*</span></label>
                         <p id="emailHint" class="sr-only">Enter a valid email address to receive your confirmation link.</p>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="tel" id="registerPhone" class="premium-input" placeholder="(555) 000-0000">
+                        <input type="tel" id="registerPhone" class="premium-input" placeholder=" ">
                         <label for="registerPhone" class="premium-label">Phone Number (optional)</label>
                     </div>
                     
@@ -843,7 +843,7 @@
                 
                 <!-- Step 2: User Preferences -->
                 <div id="formStep2" class="form-step hidden">
-                    <h3 class="font-bold text-lg mb-4">Step 2: User Preferences</h3>
+                    <h3 class="font-black text-sm uppercase tracking-widest text-gray-400 mb-5">Step 2 — User Preferences</h3>
                     
                     <!-- All Users Fields -->
                     <div class="premium-field-group">
@@ -984,7 +984,7 @@
                 
                 <!-- Step 3: Account Security -->
                 <div id="formStep3" class="form-step hidden">
-                    <h3 class="font-bold text-lg mb-4">Step 3: Create Password</h3>
+                    <h3 class="font-black text-sm uppercase tracking-widest text-gray-400 mb-5">Step 3 — Account Security</h3>
                     
                     <div class="premium-field-group">
                         <div class="password-field-wrapper relative">
@@ -1227,10 +1227,14 @@
         }
         
         async function submitRegistration() {
+            // Clear previous notifications if any
+            const registerBtn = document.getElementById('registerBtn');
+            const originalBtnText = registerBtn.innerHTML;
+            
             // Validate the form
             const termsAccepted = document.getElementById('termsAccept').checked;
             if (!termsAccepted) {
-                showNotification('Please accept the Terms of Service and Privacy Policy', 'error');
+                showNotification('⚡ PROFESSIONAL STANDARDS: Please accept the Terms of Service to proceed.', 'error');
                 return;
             }
             
@@ -1239,68 +1243,56 @@
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
             const firstName = document.getElementById('registerFirstName').value;
             const lastName = document.getElementById('registerLastName').value;
-            const phone = document.getElementById('registerPhone').value;
-            const address = document.getElementById('registerAddress').value;
-            const address2 = document.getElementById('registerAddress2').value;
-            const city = document.getElementById('registerCity').value;
-            const state = document.getElementById('registerState').value;
-            const zip = document.getElementById('registerZip').value;
             const referral = document.getElementById('registerReferral').value;
-            const marketingConsent = document.getElementById('marketingConsent').checked;
-            
-            const fullName = `${firstName} ${lastName}`.trim();
-            const fullAddress = `${address}${address2 ? ', ' + address2 : ''}, ${city}, ${state} ${zip}`;
 
-            if (!email || !password || !firstName || !lastName) {
-                showNotification('Please fill in all required fields', 'error');
+            if (!email || !password || !firstName || !lastName || !referral) {
+                showNotification('⚠️ MISSING DATA: Please ensure all required fields (*) are complete.', 'error');
                 return;
             }
             
             if (password !== confirmPassword) {
-                showNotification('Passwords do not match', 'error');
+                showNotification('❌ SECURITY MISMATCH: Passwords do not match.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showNotification('⚠️ SECURITY POLICY: Password must be at least 6 characters.', 'warning');
                 return;
             }
             
             // Collect additional data based on user type
             let additionalData = {};
-            if (selectedUserType === 'studio') {
-                const studioName = document.getElementById('studioName').value;
-                const studioType = document.getElementById('studioType').value;
-                const amenities = [
-                    document.getElementById('amenityMixing').checked ? 'mixing' : null,
-                    document.getElementById('amenityMastering').checked ? 'mastering' : null,
-                    document.getElementById('amenityLiveRoom').checked ? 'live_room' : null,
-                    document.getElementById('amenityEngineer').checked ? 'engineer' : null,
-                ].filter(Boolean);
-                
-                additionalData = {
-                    studio_name: studioName,
-                    studio_type: studioType,
-                    amenities: amenities
-                };
-            } else if (selectedUserType === 'collector') {
-                const interest = document.getElementById('collectorInterest').value;
-                const bio = document.getElementById('collectorBio').value;
-                
-                additionalData = {
-                    collector_interest: interest,
-                    collector_bio: bio
-                };
-            } else {
-                const genreSelect = document.getElementById('artistGenres');
-                const genres = Array.from(genreSelect.selectedOptions).map(option => option.value);
-                const experience = document.getElementById('experienceLevel').value;
-                
-                additionalData = {
-                    genres: genres,
-                    experience_level: experience
-                };
+            try {
+                if (selectedUserType === 'studio') {
+                    const studioName = document.getElementById('studioName').value;
+                    const studioType = document.getElementById('studioType').value;
+                    const amenities = [
+                        document.getElementById('amenityMixing').checked ? 'mixing' : null,
+                        document.getElementById('amenityMastering').checked ? 'mastering' : null,
+                        document.getElementById('amenityLiveRoom').checked ? 'live_room' : null,
+                        document.getElementById('amenityEngineer').checked ? 'engineer' : null,
+                    ].filter(Boolean);
+                    
+                    additionalData = { studio_name: studioName, studio_type: studioType, amenities: amenities };
+                } else if (selectedUserType === 'collector') {
+                    additionalData = {
+                        collector_interest: document.getElementById('collectorInterest').value,
+                        collector_bio: document.getElementById('collectorBio').value
+                    };
+                } else {
+                    const genreSelect = document.getElementById('artistGenres');
+                    const genres = Array.from(genreSelect.selectedOptions).map(option => option.value);
+                    additionalData = {
+                        genres: genres,
+                        experience_level: document.getElementById('experienceLevel').value
+                    };
+                }
+            } catch (dataError) {
+                console.warn('Non-critical preference collection error:', dataError);
             }
             
             // Show loading state
-            const registerBtn = document.getElementById('registerBtn');
-            const originalBtnText = registerBtn.innerHTML;
-            registerBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Registering...';
+            registerBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> INITIATING SECURE SESSION...';
             registerBtn.disabled = true;
             
             try {
@@ -1308,7 +1300,7 @@
                 const supabase = window.db?.supabase || (window.authManager && window.authManager.getClient());
                 
                 if (!supabase) {
-                    throw new Error('Database connection not available');
+                    throw new Error('SYSTEM ERROR: Database connection offline. Please refresh.');
                 }
                 
                 // 1. Sign Up the user
@@ -1319,16 +1311,8 @@
                         data: {
                             first_name: firstName,
                             last_name: lastName,
-                            full_name: fullName,
+                            full_name: `${firstName} ${lastName}`.trim(),
                             user_type: selectedUserType,
-                            phone: phone || null,
-                            address: address || null,
-                            address_line_2: address2 || null,
-                            city: city || null,
-                            state: state || null,
-                            zip: zip || null,
-                            location: fullAddress || null,
-                            marketing_consent: marketingConsent,
                             referral: referral || 'direct',
                             ...additionalData
                         }
@@ -1340,35 +1324,28 @@
                 if (data && data.user) {
                     // Create core user profile in users table
                     if (window.authManager && typeof window.authManager.createUserProfile === 'function') {
-                        await window.authManager.createUserProfile(data.user, firstName, lastName, fullName, selectedUserType, referral);
+                        await window.authManager.createUserProfile(data.user, firstName, lastName, `${firstName} ${lastName}`.trim(), selectedUserType, referral);
                     }
                     
                     // Success handling
                     const needsVerification = !data.user.email_confirmed_at && !data.session;
                     if (needsVerification) {
-                        showNotification('Account created! Please check your email to verify your account before signing in.', 'success');
-                        closeRegisterModal();
+                        showNotification('✅ ACCOUNT CREATED: Check your inbox to verify your email.', 'success');
+                        setTimeout(closeRegisterModal, 2000);
                     } else {
-                        // User is already confirmed (e.g. email confirmation disabled in Supabase)
-                        showNotification('Welcome to PluggedIn! Your account is ready.', 'success');
-                        closeRegisterModal();
-                        if (window.authManager) {
-                            window.authManager.currentUser = data.user;
-                            window.authManager.updateUIForAuthenticatedUser();
-                        }
+                        showNotification('🔥 SESSION INITIATED: Welcome to PluggedIn!', 'success');
                         setTimeout(() => {
+                            closeRegisterModal();
                             window.location.href = 'profile.html';
                         }, 1500);
                     }
                 }
             } catch (error) {
-                console.error('Registration flow error:', error);
-                showNotification(error.message || 'An unexpected error occurred during registration', 'error');
+                console.error('Registration Critical Failure:', error);
+                showNotification(`❌ REGISTRATION FAILED: ${error.message}`, 'error');
             } finally {
-                if (registerBtn) {
-                    registerBtn.innerHTML = originalBtnText;
-                    registerBtn.disabled = false;
-                }
+                registerBtn.innerHTML = originalBtnText;
+                registerBtn.disabled = false;
             }
         }
         

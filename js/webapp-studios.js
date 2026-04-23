@@ -469,13 +469,8 @@ class StudiosManager {
     }
 
     renderStudioModal(studio) {
-        const modalStudioName = document.getElementById('modalStudioName');
         const modalContent = document.getElementById('modalContent');
         const utils = window.utils;
-
-        if (modalStudioName) {
-            modalStudioName.textContent = ""; // Use the modal's own header redesign
-        }
 
         if (modalContent) {
             const imageUrl = studio.images && studio.images.length > 0 
@@ -483,9 +478,9 @@ class StudiosManager {
                 : studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80';
 
             modalContent.innerHTML = `
-                <div class="flex flex-col md:flex-row h-full -m-5 md:-m-10 min-h-[85vh]">
-                    <!-- Left: Studio Immersion (High Fidelity) -->
-                    <div class="w-full md:w-5/12 bg-black text-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
+                <div class="flex flex-col md:flex-row min-h-full">
+                    <!-- Left: Studio Immersion -->
+                    <div class="w-full md:w-5/12 bg-black text-white p-6 md:p-12 flex flex-col justify-between relative overflow-hidden min-h-[400px] md:min-h-0">
                         <div class="absolute inset-0 opacity-40">
                             <img src="${imageUrl}" class="w-full h-full object-cover grayscale active:grayscale-0 transition-all duration-1000">
                         </div>
@@ -624,50 +619,43 @@ class StudiosManager {
                 history.pushState({ modalOpen: true, studioId: this.selectedStudio?.id }, '');
             }
 
-            // Upgrade modal structure for High Fidelity
-            if (studioModalContent) {
-                studioModalContent.className = "relative mx-auto border-0 w-11/12 md:w-11/12 lg:w-2/3 max-w-4xl max-h-[90vh] shadow-2xl rounded-[40px] bg-white dark:bg-slate-900 overflow-hidden transition-all duration-500 scale-95 opacity-0 flex flex-col";
-                
-                // Set fixed height for the content wrapper to enable internal scrolling
-                const modalWrapper = studioModalContent.querySelector('.flex-col.md\\:flex-row');
-                if (modalWrapper) {
-                    modalWrapper.classList.add('h-[90vh]', 'md:h-[80vh]', 'max-h-[800px]');
-                    modalWrapper.classList.remove('min-h-[85vh]', '-m-5', '-m-10');
-                }
-                
-                // Animate entry
-                modal.classList.remove('hidden');
-                modal.classList.add('flex', 'items-center', 'justify-center', 'p-4');
-                modal.style.background = "rgba(0,0,0,0.85)";
-                modal.style.backdropFilter = "blur(10px)";
-                document.body.classList.add('modal-open');
-                
-                setTimeout(() => {
-                    studioModalContent.classList.remove('scale-95', 'opacity-0');
-                    studioModalContent.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            }
+    showStudioModal() {
+        const modal = document.getElementById('studioModal');
+        const modalContent = document.getElementById('studioModalContent');
+        
+        if (modal && modalContent) {
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+            
+            // Trigger drawer animation
+            setTimeout(() => {
+                modalContent.classList.remove('translate-y-full');
+                modalContent.classList.add('translate-y-0');
+            }, 10);
+            
+            this.isModalOpen = true;
         }
     }
 
     hideStudioModal(pushState = true) {
         const modal = document.getElementById('studioModal');
-        const studioModalContent = modal?.querySelector('.relative.mx-auto') || modal?.querySelector('.relative.top-20');
+        const modalContent = document.getElementById('studioModalContent');
         
-        if (modal && studioModalContent) {
-            this.isModalOpen = false;
-            
+        if (modal && modalContent) {
             // If closed via UI (not back button), and we were tracking state, go back
             if (pushState && history.state?.modalOpen === true) {
                 history.back();
             }
 
-            studioModalContent.classList.add('scale-95', 'opacity-0');
-            document.body.classList.remove('modal-open');
+            // Animate out
+            modalContent.classList.remove('translate-y-0');
+            modalContent.classList.add('translate-y-full');
+            
             setTimeout(() => {
                 modal.classList.add('hidden');
-                modal.classList.remove('flex', 'items-center', 'justify-center', 'p-4');
-            }, 300);
+                document.body.classList.remove('modal-open');
+                this.isModalOpen = false;
+            }, 500);
         }
     }
 

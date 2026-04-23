@@ -274,16 +274,21 @@ class StudiosManager {
 
         if (studioGrid) {
             studioGrid.innerHTML = Array(6).fill(0).map(() => `
-                <div class="studio-card rounded-xl overflow-hidden border border-gray-100 dark:border-slate-800">
-                    <div class="skeleton skeleton-img w-full h-64"></div>
-                    <div class="p-4 space-y-3">
-                        <div class="flex justify-between">
-                            <div class="skeleton skeleton-title" style="width: 70%"></div>
-                            <div class="skeleton skeleton-text" style="width: 15%"></div>
+                <div class="studio-card group rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 bg-white dark:bg-zinc-900/40">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-zinc-800 animate-pulse"></div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div class="h-6 bg-gray-200 dark:bg-zinc-800 rounded-lg w-3/4 animate-pulse"></div>
+                            <div class="h-6 bg-gray-100 dark:bg-zinc-800 rounded-lg w-1/4 animate-pulse"></div>
                         </div>
-                        <div class="skeleton skeleton-text" style="width: 40%"></div>
-                        <div class="skeleton skeleton-text" style="width: 100%"></div>
-                        <div class="skeleton skeleton-text" style="width: 30%"></div>
+                        <div class="h-4 bg-gray-100 dark:bg-zinc-800 rounded-lg w-1/2 animate-pulse"></div>
+                        <div class="pt-4 border-t border-gray-50 dark:border-white/5 flex justify-between items-center">
+                            <div class="h-8 bg-gray-100 dark:bg-zinc-800 rounded-lg w-1/3 animate-pulse"></div>
+                            <div class="flex space-x-2 w-1/2">
+                                <div class="h-10 bg-gray-100 dark:bg-zinc-800 rounded-xl w-full animate-pulse"></div>
+                                <div class="h-10 bg-gray-200 dark:bg-zinc-800 rounded-xl w-full animate-pulse"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -335,13 +340,15 @@ class StudiosManager {
     }
 
     createStudioCard(studio) {
+        if (!studio || !studio.id) return '';
+        
         const rating = parseFloat(studio.rating || 4.8).toFixed(1);
         const price = studio.price || studio.hourly_rate || '75';
         const fallbackImage = 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80';
         const image = studio.image_url || studio.image || fallbackImage;
 
         return `
-            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/60 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all duration-300 hover:shadow-2xl hover:shadow-black/10" data-id="${studio.id}" onclick="if(!event.target.closest('button')) window.studiosManager.showStudioDetailsById('${studio.id}')">
+            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/60 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all duration-500 hover:shadow-2xl hover:shadow-black/10" data-id="${studio.id}" onclick="if(!event.target.closest('button')) window.studiosManager.showStudioDetailsById('${studio.id}')">
                 <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-zinc-800">
                     <img src="${image}" 
                          alt="${studio.name}" 

@@ -581,55 +581,65 @@ textarea:focus {
 
 .premium-input {
     width: 100%;
-    height: 56px;
+    height: 60px;
     padding: 24px 16px 8px 16px;
     font-size: 16px;
     background-color: var(--input-bg);
     border: 1.5px solid var(--input-border);
-    border-radius: 12px;
+    border-radius: 16px;
     color: var(--text-primary);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none !important;
 }
 
 .dark .premium-input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
     color: #ffffff !important;
 }
 
 .premium-input:focus {
-    border-color: var(--input-focus);
+    border-color: var(--accent);
     box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
-    transform: translateY(-1px);
+    background-color: #ffffff;
 }
 
 .dark .premium-input:focus {
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
 }
 
 .premium-label {
     position: absolute;
     left: 16px;
-    top: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--input-label);
+    top: 18px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #64748b;
     pointer-events: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: top left;
     display: flex;
     align-items: center;
     gap: 4px;
-    text-transform: uppercase;
+}
+
+.dark .premium-label {
+    color: #94a3b8;
 }
 
 .premium-input:focus ~ .premium-label,
 .premium-input:not(:placeholder-shown) ~ .premium-label {
     top: 8px;
-    font-size: 11px;
-    color: var(--input-focus);
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    transform: scale(0.75);
+    color: var(--accent);
+    font-weight: 800;
+}
+
+.dark .premium-input:focus ~ .premium-label,
+.dark .premium-input:not(:placeholder-shown) ~ .premium-label {
+    color: #ffffff;
 }
 
 /* Labels inside password-field-wrapper */

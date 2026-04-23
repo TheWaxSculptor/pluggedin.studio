@@ -932,7 +932,7 @@ const utilsMethods = {
     showNotification(message, type = 'info') {
         // Create a simple notification system
         const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
+        notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-[9999] ${
             type === 'success' ? 'bg-green-500 text-white' :
             type === 'error' ? 'bg-red-500 text-white' :
             'bg-blue-500 text-white'

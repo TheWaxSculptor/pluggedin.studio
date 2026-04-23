@@ -609,18 +609,6 @@ class StudiosManager {
 
     showStudioModal() {
         const modal = document.getElementById('studioModal');
-        const studioModalContent = modal?.querySelector('.relative.top-20') || modal?.querySelector('.relative.mx-auto');
-        
-        if (modal) {
-            this.isModalOpen = true;
-            
-            // Push state for browser back button support
-            if (history.state?.modalOpen !== true) {
-                history.pushState({ modalOpen: true, studioId: this.selectedStudio?.id }, '');
-            }
-
-    showStudioModal() {
-        const modal = document.getElementById('studioModal');
         const modalContent = document.getElementById('studioModalContent');
         
         if (modal && modalContent) {

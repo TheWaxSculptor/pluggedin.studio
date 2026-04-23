@@ -91,6 +91,20 @@ class MarketplaceManager {
         if (themeToggle) {
             themeToggle.addEventListener('click', () => {
                 const isDark = document.documentElement.classList.toggle('dark');
+                if (isDark) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+                
+                // Update icons
+                const moonIcon = document.getElementById('moonIcon');
+                const sunIcon = document.getElementById('sunIcon');
+                if (moonIcon && sunIcon) {
+                    moonIcon.classList.toggle('hidden', isDark);
+                    sunIcon.classList.toggle('hidden', !isDark);
+                }
+                
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
             });
         }

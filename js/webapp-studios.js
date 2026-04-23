@@ -394,8 +394,6 @@ class StudiosManager {
             </div>
         `;
     }
-        `;
-    }
 
     async showStudioDetails(studio) {
         if (this.isModalOpen) return;

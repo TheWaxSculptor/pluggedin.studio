@@ -201,6 +201,14 @@ Object.assign(window.db, {
         if (filters.name) {
             query = query.ilike('name', `%${filters.name}%`);
         }
+
+        if (filters.studio_type) {
+            query = query.eq('studio_type', filters.studio_type);
+        }
+        
+        if (filters.category && filters.category !== 'all') {
+            query = query.eq('category', filters.category);
+        }
         
         const { data, error } = await query;
         if (error) {

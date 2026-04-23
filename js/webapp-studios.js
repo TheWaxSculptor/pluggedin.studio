@@ -335,61 +335,65 @@ class StudiosManager {
     }
 
     createStudioCard(studio) {
-        const rating = studio.rating || '4.8';
+        const rating = parseFloat(studio.rating || 4.8).toFixed(1);
         const price = studio.price || studio.hourly_rate || '75';
-        const image = studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80';
+        const fallbackImage = 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80';
+        const image = studio.image_url || studio.image || fallbackImage;
 
         return `
-            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/40 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all hover:shadow-2xl hover:shadow-black/5" data-id="${studio.id}" onclick="if(!event.target.closest('button')) window.studiosManager.showStudioDetailsById('${studio.id}')">
-                <div class="relative aspect-[4/3] overflow-hidden">
+            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/60 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all duration-300 hover:shadow-2xl hover:shadow-black/10" data-id="${studio.id}" onclick="if(!event.target.closest('button')) window.studiosManager.showStudioDetailsById('${studio.id}')">
+                <div class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-zinc-800">
                     <img src="${image}" 
                          alt="${studio.name}" 
-                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                         onerror="this.onerror=null; this.src='${fallbackImage}'; this.parentElement.classList.add('image-fallback');"
                          loading="lazy">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
                     
-                    <div class="absolute top-4 left-4">
-                        <span class="px-3 py-1 bg-white/90 backdrop-blur-md dark:bg-black/80 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="px-3 py-1.5 bg-black/80 backdrop-blur-md text-white rounded-xl text-[9px] font-black uppercase tracking-[0.15em] border border-white/10 shadow-xl">
                             ${studio.studio_type || 'Recording'}
                         </span>
                     </div>
 
-                    <button class="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-md dark:bg-black/80 rounded-full text-gray-900 dark:text-white border border-white/20 transition-all hover:scale-110 active:scale-95" 
+                    <button class="absolute top-4 right-4 z-10 p-2.5 bg-white/95 backdrop-blur-md dark:bg-zinc-900/90 rounded-full text-gray-900 dark:text-white border border-white/20 transition-all hover:scale-110 active:scale-95 shadow-lg" 
                             onclick="event.stopPropagation(); window.utils.showNotification('Saved to favorites', 'success')" 
                             aria-label="Add to favorites">
                         <i class="far fa-heart"></i>
                     </button>
                 </div>
                 
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-lg font-black uppercase tracking-tight text-gray-900 dark:text-white truncate pr-4">${studio.name}</h3>
-                        <div class="flex items-center space-x-1 px-2 py-1 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10">
-                            <i class="fas fa-star text-[10px] text-yellow-500"></i>
-                            <span class="text-xs font-black">${rating}</span>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-1.5">
+                        <h3 class="text-base font-black uppercase tracking-tight text-gray-900 dark:text-white truncate pr-2">${studio.name}</h3>
+                        <div class="flex items-center space-x-1 px-2 py-0.5 bg-yellow-400/10 dark:bg-yellow-400/5 rounded-lg border border-yellow-400/20">
+                            <i class="fas fa-star text-[9px] text-yellow-500"></i>
+                            <span class="text-[11px] font-black text-yellow-600 dark:text-yellow-500">${rating}</span>
                         </div>
                     </div>
                     
                     <p class="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-4 flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2 opacity-50"></i> ${studio.location}
+                        <i class="fas fa-map-marker-alt mr-2 opacity-50 text-[8px]"></i> ${studio.location || 'Location Pending'}
                     </p>
                     
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-white/5">
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/5">
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Hourly</span>
-                            <span class="text-xl font-black text-gray-900 dark:text-white mt-1">$${price}</span>
+                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-[0.1em] leading-none">Hourly</span>
+                            <span class="text-lg font-black text-gray-900 dark:text-white mt-1">$${price}</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="event.stopPropagation(); window.studiosManager.showStudioDetailsById('${studio.id}')" class="px-4 py-2.5 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/10">
+                            <button onclick="event.stopPropagation(); window.studiosManager.showStudioDetailsById('${studio.id}')" class="px-4 py-2 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/10">
                                 Details
                             </button>
-                            <button onclick="event.stopPropagation(); window.studiosManager.initiateBookingById('${studio.id}')" class="px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]">
+                            <button onclick="event.stopPropagation(); window.studiosManager.initiateBookingById('${studio.id}')" class="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/5 dark:shadow-white/5">
                                 Book
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
+        `;
+    }
         `;
     }
 

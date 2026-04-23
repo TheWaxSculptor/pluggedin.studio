@@ -5,7 +5,7 @@
 
 PluggedIn is a comprehensive mobile and web platform designed to revolutionize how musicians, producers, and audio engineers discover, book, and manage recording studio spaces. By creating a marketplace that connects studio owners with artists seeking recording spaces, PluggedIn addresses the fragmentation in the music production industry and brings efficiency to studio discovery and booking.
 
-This whitepaper outlines the technical architecture, core features, and implementation details of the PluggedIn platform, which leverages modern app development practices, real-time database technology, and a user-centric design philosophy.
+This whitepaper outlines the technical architecture, core features, and implementation details of the PluggedIn platform. Built with a **monochromatic "Piano" design philosophy**, the platform leverages modern web technologies, real-time database synchronization, and a high-fidelity user interface to provide a professional environment for the music industry.
 
 ## Table of Contents
 
@@ -52,10 +52,10 @@ PluggedIn consists of three main components:
 3. **Studio Owner Dashboard**: Specialized tools for managing studio listings, equipment, availability, and bookings.
 
 The platform serves four primary user types:
-- **Recording Artists**: Musicians seeking studio space for recording projects.
-- **Producers/Engineers**: Audio professionals looking for technically appropriate spaces.
-- **Studio Owners**: Individuals or businesses offering recording spaces.
-- **Administrative Staff**: Platform managers ensuring quality and resolving disputes.
+- **Recording Artists**: Musicians seeking high-fidelity studio space and specialized equipment.
+- **Producers/Engineers**: Audio professionals looking for technically superior recording environments.
+- **Studio Owners**: Entrepreneurs offering professional, project, or home studio spaces.
+- **Administrative/Partners**: Insurance providers (Next/Front Row) and platform managers.
 
 ## Core Features
 
@@ -80,11 +80,15 @@ The platform serves four primary user types:
    - Booking confirmation and reminders
    - Modification and cancellation capabilities
 
-4. **Post-Session Tools**
-   - Session rating and review system
-   - File sharing for session outputs
-   - Re-booking simplified process
-   - Equipment favorites for future sessions
+4. **Integrated Insurance Protection**
+   - Direct integration with **Next** and **Front Row Insurance**.
+   - Automatic protection for session gear and liability.
+   - Streamlined claims process within the platform.
+
+5. **Gear Marketplace**
+   - Discovery of high-end outboard gear, microphones, and instruments.
+   - Rental and purchase options directly from local studios.
+   - Equipment verification and history tracking.
 
 ### For Studio Owners
 
@@ -108,11 +112,11 @@ The platform serves four primary user types:
    - Equipment usage statistics
    - Competitive positioning data
 
-4. **Promotion Tools**
-   - Featured listing opportunities
-   - Promotion creation and management
-   - Social media integration
-   - Client retention campaigns
+4. **Studio Console Dashboard**
+   - Professional, hardware-inspired management interface.
+   - Real-time monitoring of bookings and revenue.
+   - Direct integration with insurance and financial tools.
+   - Centralized communication hub for all sessions.
 
 ## Technical Architecture
 
@@ -120,29 +124,18 @@ PluggedIn employs a modern, scalable architecture built on the following compone
 
 ### Frontend
 
-- **Mobile**: SwiftUI (iOS) with native components
-- **Web**: React with responsive design principles
-- **Shared Logic**: Core business logic shared between platforms where possible
+- **Web Core**: HTML5, JavaScript (ES6+), and Vanilla CSS.
+- **Styling**: TailwindCSS with a custom "Piano" monochromatic theme system.
+- **Responsiveness**: Mobile-first architecture with PWA-style navigation and interactions.
+- **State Management**: Reactive data binding with Supabase Realtime JS Client.
 
 ### Backend
 
-- **Database**: Supabase (PostgreSQL) for relational data storage
-  - Real-time data sync using Supabase Realtime
-  - Row-level security (RLS) policies for access control
-  - Stored procedures for complex operations
-- **Authentication**: Supabase Auth with multi-factor authentication
-  - Email/password authentication
-  - OAuth integrations (Google, Apple, etc.)
-  - JWT-based session management
-- **Storage**: Supabase Storage for media assets (images, audio samples)
-  - Access control via bucket policies
-  - Image optimization pipeline
-- **API Layer**: RESTful and real-time API endpoints
-  - PostgREST for RESTful APIs
-  - Subscriptions for real-time updates
-- **Search**: Full-text search capabilities with PostgreSQL
-  - Indexed search across studio and equipment metadata
-  - Geospatial queries for location-based discovery
+- **Database**: Supabase (PostgreSQL) for relational and real-time data storage.
+- **Authentication**: Unified registration flow with multi-step validation and profile persistence.
+- **Storage**: Supabase Storage for high-fidelity media assets (Lossless studio imagery).
+- **Insurance API**: Integration with partner insurance APIs for real-time coverage.
+- **Search**: Advanced full-text and geospatial search across studio and inventory metadata.
 
 ### Infrastructure
 
@@ -277,10 +270,11 @@ PluggedIn prioritizes user experience through:
 
 ### Responsive Design
 
-- Adapts to different device sizes and orientations
-- Consistent experience across platforms
-- Accessibility features for all users
-- Dark/light mode support
+- Adapts to different device sizes and orientations.
+- **Piano Theme**: High-contrast monochromatic design system (Black/White/Zinc).
+- **Hardware Aesthetics**: UI elements inspired by professional recording hardware (knobs, faders, consoles).
+- **Safe Area Optimization**: PWA-style navigation with bottom-bar accessibility on mobile.
+- Dark/light mode support with persistent user preferences.
 
 ### Onboarding Flow
 

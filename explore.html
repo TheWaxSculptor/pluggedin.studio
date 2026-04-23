@@ -70,22 +70,19 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-black shadow-sm border-b border-gray-800 sticky top-0 z-40 min-h-[8rem]" aria-label="Main navigation">
+    <nav class="bg-white dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40 h-20 transition-all duration-300" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-32 min-h-[8rem]">
+            <div class="flex justify-between items-center h-20">
                 <div class="flex items-center">
                     <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
-                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-32 w-auto max-h-40 object-contain" width="300" height="128" loading="lazy">
+                        <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" style="height:48px;width:auto;display:inline-block;">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" style="height:48px;width:auto;display:none;">
                     </a>
                 </div>
-                <div class="flex items-center space-x-4" role="menubar">
-                    <a href="app.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Home</a>
-                    <a href="explore.html" class="text-white font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem" aria-current="page">Explore</a>
-                    <a href="search.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Search</a>
-                    <a href="bookings.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Bookings</a>
-                    <a href="messages.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Messages</a>
-                    <a href="equipment.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Equipment</a>
-                    <a href="profile.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Profile</a>
+                <div class="flex items-center space-x-4">
+                    <a href="app.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors font-medium">Home</a>
+                    <a href="explore.html" class="text-blue-600 font-bold">Explore</a>
+                    <a href="profile.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors font-medium">Profile</a>
                 </div>
             </div>
         </div>
@@ -130,7 +127,7 @@
                     All Studios <span id="studiosCount" class="text-gray-500 text-base font-normal" aria-live="polite">(0)</span>
                 </h2>
                 <label for="sortSelect" class="sr-only">Sort studios by</label>
-                <select id="sortSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" aria-label="Sort studios by">
+                <select id="sortSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black" aria-label="Sort studios by">
                     <option value="featured">Featured</option>
                     <option value="rating">Highest Rated</option>
                     <option value="price-low">Price: Low to High</option>
@@ -229,7 +226,7 @@
             renderCities() {
                 const container = document.getElementById('cityGrid');
                 container.innerHTML = this.cities.map(city => `
-                    <button class="city-btn p-4 text-center border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${city === this.selectedCity ? 'border-purple-600 bg-purple-50' : ''}" 
+                    <button class="city-btn p-4 text-center border-4 border-gray-100 dark:border-white/5 rounded-2xl hover:border-black dark:hover:border-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all focus:outline-none ${city === this.selectedCity ? 'border-black dark:border-white bg-black text-white dark:bg-white dark:text-black shadow-xl' : 'text-gray-500'}" 
                             data-city="${city}"
                             aria-pressed="${city === this.selectedCity ? 'true' : 'false'}"
                             aria-label="Filter studios by ${city}, ${this.getStudioCount(city)} studios available"
@@ -282,7 +279,7 @@
             renderTags() {
                 const container = document.getElementById('popularTags');
                 container.innerHTML = this.tags.map(tag => `
-                    <button class="tag-button px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-purple-300 ${this.selectedTags.has(tag) ? 'active' : 'text-gray-700 bg-white'}" 
+                    <button class="tag-button px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-black ${this.selectedTags.has(tag) ? 'active' : 'text-gray-700 bg-white'}" 
                             data-tag="${tag}">
                         ${tag}
                     </button>
@@ -356,29 +353,31 @@
 
             createStudioCard(studio) {
                 return `
-                    <div class="studio-card bg-white rounded-lg shadow-sm overflow-hidden">
-                        <img src="${studio.image}" alt="${studio.name}" class="w-full h-48 object-cover" width="400" height="300" loading="lazy">
-                        <div class="p-4">
-                            <div class="flex items-start justify-between mb-2">
-                                <h3 class="text-lg font-semibold text-gray-900 truncate">${studio.name}</h3>
+                    <div class="studio-card bg-white dark:bg-zinc-900 rounded-lg shadow-sm overflow-hidden group">
+                        <div class="relative overflow-hidden">
+                            <img src="${studio.image}" alt="${studio.name}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0" width="400" height="300" loading="lazy">
+                            <div class="absolute top-4 left-4">
+                                <span class="px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20">Exclusive Site</span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-1">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white truncate tracking-tight">${studio.name}</h3>
                                 <div class="flex items-center space-x-1 ml-2">
-                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <span class="text-sm text-gray-600">${studio.rating}</span>
-                                    <span class="text-sm text-gray-400">(${studio.reviewCount})</span>
+                                    <i class="fas fa-star text-[10px] text-yellow-400"></i>
+                                    <span class="text-xs font-black text-gray-900 dark:text-white">${studio.rating}</span>
                                 </div>
                             </div>
-                            <p class="text-gray-600 text-sm mb-3">${studio.location}</p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                ${studio.tags.slice(0, 3).map(tag => `
-                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">${tag}</span>
-                                `).join('')}
+                            <p class="text-gray-400 text-[10px] font-medium mb-4 uppercase tracking-widest">${studio.location.split(',')[0]}</p>
+                            
+                            <div class="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 border-t border-gray-100 dark:border-white/5 pt-4">
+                                96kHz • Analog Path • Treated
                             </div>
+
                             <div class="flex items-center justify-between">
-                                <div class="text-lg font-semibold text-gray-900">$${studio.price}/hr</div>
-                                <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm">
-                                    View Details
+                                <div class="text-xl font-black text-gray-900 dark:text-white tracking-tighter">$${studio.price}<span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">/hr</span></div>
+                                <button onclick="window.studios?.showStudioDetails('${studio.id}')" class="bg-black dark:bg-white text-white dark:text-black px-5 py-3 rounded-xl hover:opacity-90 active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest shadow-xl">
+                                    Details
                                 </button>
                             </div>
                         </div>
@@ -425,7 +424,7 @@
                         : studio.specialties || [];
                     tags.push(...specialties);
                 }
-                return tags.length > 0 ? tags : ['Studio'];
+                return tags.length > 0 ? tags : ['Music Production'];
             }
 
             extractAmenities(studio) {
@@ -479,8 +478,8 @@
                     if (studioIds.length >= 2) {
                         this.featuredSections.push({
                             id: (index + 1).toString(),
-                            title: `${tag} Studios`,
-                            description: `Studios specializing in ${tag.toLowerCase()}`,
+                            title: `${tag} Facilities`,
+                            description: `Premier spaces for ${tag.toLowerCase()} enthusiasts`,
                             icon: this.getTagIcon(tag),
                             backgroundColor: this.getTagBackground(index),
                             studioIds: studioIds.slice(0, 6) // Limit to 6 studios per section
@@ -505,12 +504,12 @@
 
             getTagBackground(index) {
                 const backgrounds = [
-                    'bg-gradient-to-r from-blue-500 to-purple-600',
-                    'bg-gradient-to-r from-purple-500 to-pink-600',
-                    'bg-gradient-to-r from-green-500 to-blue-600',
-                    'bg-gradient-to-r from-yellow-500 to-orange-600',
-                    'bg-gradient-to-r from-red-500 to-pink-600',
-                    'bg-gradient-to-r from-indigo-500 to-purple-600'
+                    'bg-gradient-to-r from-zinc-800 to-black',
+                    'bg-zinc-800',
+                    'bg-zinc-700',
+                    'bg-zinc-900',
+                    'bg-gray-800',
+                    'bg-gradient-to-r from-gray-700 to-gray-900'
                 ];
                 return backgrounds[index % backgrounds.length];
             }
@@ -555,7 +554,7 @@
                         title: 'Professional Studios',
                         description: 'High-end professional recording facilities',
                         icon: '🏢',
-                        backgroundColor: 'bg-gradient-to-r from-blue-500 to-purple-600',
+                        backgroundColor: 'bg-gradient-to-r from-zinc-800 to-black',
                         studioIds: ['1', '2']
                     }
                 ];

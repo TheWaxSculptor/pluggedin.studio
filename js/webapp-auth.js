@@ -3,7 +3,6 @@
 class AuthManager {
     constructor() {
         this.currentUser = null;
-        this.isSignUpMode = false;
         this.init();
     }
 
@@ -61,10 +60,6 @@ class AuthManager {
                     window.showRegisterModal();
                 } else {
                     console.error('showRegisterModal function not found');
-                    // Fallback to sign up mode in auth modal
-                    this.isSignUpMode = true;
-                    this.showAuthModal();
-                    this.updateAuthForm();
                 }
             });
         }
@@ -91,29 +86,24 @@ class AuthManager {
             authForm.addEventListener('submit', (e) => this.handleAuthSubmit(e));
         }
 
-        // Switch between sign in and sign up
-        const switchAuthBtn = document.getElementById('switchAuthBtn');
+        // Switch to sign up
         const switchToSignUp = document.getElementById('switchToSignUp');
-        
-        if (switchAuthBtn) {
-            switchAuthBtn.addEventListener('click', () => this.toggleAuthMode());
-        }
         if (switchToSignUp) {
             switchToSignUp.addEventListener('click', () => {
                 this.hideAuthModal();
                 if (typeof window.showRegisterModal === 'function') {
                     window.showRegisterModal();
-                } else {
-                    this.toggleAuthMode();
                 }
             });
         }
 
-        // Google Sign In
+        // Google Sign In - Temporarily disabled
+        /*
         const googleSignInBtn = document.getElementById('googleSignInBtn');
         if (googleSignInBtn) {
             googleSignInBtn.addEventListener('click', () => this.signInWithGoogle());
         }
+        */
 
         // Password validation
         const confirmPassword = document.getElementById('confirmPassword');
@@ -173,11 +163,11 @@ class AuthManager {
             console.error('Error checking auth state:', error);
         }
     }
-
     showAuthModal() {
         const modal = document.getElementById('authModal');
         if (modal) {
             modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
             this.resetAuthForm();
             this.hideForgotView();
         }
@@ -187,88 +177,29 @@ class AuthManager {
         const modal = document.getElementById('authModal');
         if (modal) {
             modal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
             // Reset to Sign In mode for next time
             this.isSignUpMode = false;
             this.hideForgotView();
         }
     }
 
-    toggleAuthMode() {
-        this.isSignUpMode = !this.isSignUpMode;
-        this.updateAuthForm();
-    }
-
     updateAuthForm() {
         const title = document.querySelector('#authModal h3');
         const submitBtnText = document.getElementById('submitBtnText');
-        const switchBtn = document.getElementById('switchToSignUp') || document.getElementById('switchAuthBtn');
-        const switchText = document.getElementById('switchText') || document.getElementById('switchViewText');
-        const signUpFields = document.getElementById('signUpFields');
-        const confirmPasswordField = document.getElementById('confirmPasswordField');
-        const userTypeField = document.getElementById('userTypeField');
-        const signInOptions = document.getElementById('signInOptions');
-        const signUpOptions = document.getElementById('signUpOptions');
+        const switchBtn = document.getElementById('switchToSignUp');
+        const switchText = document.getElementById('switchText');
         
-        // Inputs to toggle required status
-        const firstNameInput = document.getElementById('firstName');
-        const lastNameInput = document.getElementById('lastName');
-        const addressInput = document.getElementById('address');
-        const cityInput = document.getElementById('regCity');
-        const stateInput = document.getElementById('regState');
-        const zipInput = document.getElementById('regZip');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const agreeTermsInput = document.getElementById('agreeTerms');
-
-            if (this.isSignUpMode) {
-                if (title) title.textContent = 'Join PluggedIn.studio';
-                if (submitBtnText) submitBtnText.textContent = 'Create Account';
-                if (switchText) switchText.textContent = 'Already have an account? ';
-                if (switchBtn) switchBtn.textContent = 'Sign in';
-                if (passwordInput) passwordInput.setAttribute('autocomplete', 'new-password');
-                
-                signUpFields?.classList.remove('hidden');
-                confirmPasswordField?.classList.remove('hidden');
-                userTypeField?.classList.remove('hidden');
-                signUpOptions?.classList.remove('hidden');
-                signInOptions?.classList.add('hidden');
-                
-                if (firstNameInput) firstNameInput.required = true;
-                if (lastNameInput) lastNameInput.required = true;
-                if (addressInput) addressInput.required = true;
-                if (cityInput) cityInput.required = true;
-                if (stateInput) stateInput.required = true;
-            if (zipInput) zipInput.required = true;
-            if (confirmPasswordInput) confirmPasswordInput.required = true;
-            if (agreeTermsInput) agreeTermsInput.required = true;
-            } else {
-                if (title) title.textContent = 'Welcome Back';
-                if (submitBtnText) submitBtnText.textContent = 'Sign In';
-                if (switchText) switchText.textContent = "Don't have an account? ";
-                if (switchBtn) switchBtn.textContent = 'Sign up';
-                if (passwordInput) passwordInput.setAttribute('autocomplete', 'current-password');
-                
-                signUpFields?.classList.add('hidden');
-                confirmPasswordField?.classList.add('hidden');
-                userTypeField?.classList.add('hidden');
-                signUpOptions?.classList.add('hidden');
-                signInOptions?.classList.remove('hidden');
-                
-                if (firstNameInput) firstNameInput.required = false;
-                if (lastNameInput) lastNameInput.required = false;
-                if (addressInput) addressInput.required = false;
-                if (cityInput) cityInput.required = false;
-                if (stateInput) stateInput.required = false;
-            if (zipInput) zipInput.required = false;
-            if (confirmPasswordInput) confirmPasswordInput.required = false;
-            if (agreeTermsInput) agreeTermsInput.required = false;
-        }
+        if (title) title.textContent = 'Welcome Back';
+        if (submitBtnText) submitBtnText.textContent = 'Sign In';
+        if (switchText) switchText.textContent = "Don't have an account? ";
+        if (switchBtn) switchBtn.textContent = 'Sign up';
+        
     }
 
     resetAuthForm() {
         const form = document.getElementById('authForm');
         form?.reset();
-        this.isSignUpMode = false;
         this.updateAuthForm();
     }
 
@@ -284,7 +215,6 @@ class AuthManager {
         // Reset error state
         if (errorMsg) {
             errorMsg.classList.add('hidden');
-            errorMsg.textContent = '';
         }
 
         if (!email || !password) {
@@ -293,21 +223,15 @@ class AuthManager {
         }
 
         const originalText = submitBtnText.textContent;
-        if (submitBtnText) submitBtnText.textContent = 'Loading...';
+        if (submitBtnText) submitBtnText.textContent = 'Signing In...';
         if (submitBtnSpinner) submitBtnSpinner.classList.remove('hidden');
         submitBtn.disabled = true;
 
         try {
-            if (this.isSignUpMode) {
-                await this.signUp(email, password);
-            } else {
-                await this.signIn(email, password);
-            }
+            await this.signIn(email, password);
         } catch (error) {
             console.error('Auth error:', error);
-            // Show explicit error in modal
             this.showAuthError(error.message || 'Authentication failed. Please check your credentials.');
-            window.utils?.showNotification(error.message, 'error');
         } finally {
             if (submitBtnText) submitBtnText.textContent = originalText;
             if (submitBtnSpinner) submitBtnSpinner.classList.add('hidden');
@@ -317,8 +241,13 @@ class AuthManager {
 
     showAuthError(message) {
         const errorMsg = document.getElementById('authErrorMsg');
+        const errorText = document.getElementById('authErrorText');
         if (errorMsg) {
-            errorMsg.textContent = message;
+            if (errorText) {
+                errorText.textContent = message;
+            } else {
+                errorMsg.textContent = message;
+            }
             errorMsg.classList.remove('hidden');
         } else {
             window.utils?.showNotification(message, 'error');
@@ -334,52 +263,15 @@ class AuthManager {
         window.utils?.showNotification('Welcome back!', 'success');
     }
 
-    async signUp(email, password) {
-        const firstName = document.getElementById('firstName')?.value || '';
-        const lastName = document.getElementById('lastName')?.value || '';
-        const fullName = `${firstName} ${lastName}`.trim();
-        const address = document.getElementById('address')?.value || '';
-        const address2 = document.getElementById('address2')?.value || '';
-        const city = document.getElementById('regCity')?.value || '';
-        const state = document.getElementById('regState')?.value || '';
-        const zip = document.getElementById('regZip')?.value || '';
-        const userType = document.querySelector('input[name="userType"]:checked')?.value || 'client';
-        const referral = document.getElementById('registerReferral')?.value || '';
-
-        const { data, error } = await this.getClient().auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    first_name: firstName,
-                    last_name: lastName,
-                    full_name: fullName,
-                    address: address,
-                    address_line_2: address2,
-                    city: city,
-                    state: state,
-                    zip: zip,
-                    user_type: userType,
-                    referral_source: referral
-                }
-            }
-        });
-
-        if (error) throw error;
-        if (data.user) {
-            await this.createUserProfile(data.user, firstName, lastName, fullName, userType, referral);
-            window.utils?.showNotification('Account created! Please verify your email.', 'success');
-        }
-        this.hideAuthModal();
+    isAuthenticated() {
+        return !!this.currentUser;
     }
-
     async createUserProfile(user, firstName, lastName, fullName, userType, referral) {
         try {
             const client = this.getClient();
-            // Try to find correct users table (might be users or profiles)
             const tableName = (window.db && window.db.tableNames && window.db.tableNames.users) || 'users';
             
-            await client.from(tableName).insert([{
+            const { error } = await client.from(tableName).insert([{
                 id: user.id,
                 email: user.email,
                 first_name: firstName,
@@ -389,8 +281,13 @@ class AuthManager {
                 referral_source: referral,
                 created_at: new Date().toISOString()
             }]);
+
+            if (error) {
+                // Profile may already exist (e.g. trigger-created) — not fatal
+                console.warn('createUserProfile warning (may be non-fatal):', error.message);
+            }
         } catch (error) {
-            console.error('Profile creation error:', error);
+            console.warn('createUserProfile exception (non-fatal):', error.message);
         }
     }
 
@@ -414,7 +311,11 @@ class AuthManager {
         }
 
         const currentType = this.currentUser.user_metadata?.user_type || 'client';
-        const newType = currentType === 'client' ? 'studio' : 'client';
+        let newType = 'client';
+        
+        if (currentType === 'client') newType = 'collector';
+        else if (currentType === 'collector') newType = 'studio';
+        else newType = 'client';
         
         try {
             const client = this.getClient();
@@ -437,7 +338,8 @@ class AuthManager {
             }
 
             this.updateUIForAuthenticatedUser();
-            window.utils?.showNotification(`Switched to ${newType === 'studio' ? 'Studio' : 'Client'} Mode`, 'success');
+            const roleLabels = { 'client': 'Artist', 'collector': 'Audiophile', 'studio': 'Studio' };
+            window.utils?.showNotification(`Switched to ${roleLabels[newType] || 'Artist'} Mode`, 'success');
 
             // Dispatch event for other components
             window.dispatchEvent(new CustomEvent('userRoleChanged', { detail: { userType: newType } }));
@@ -453,9 +355,11 @@ class AuthManager {
         const userInitials = document.getElementById('userInitials');
         const modeToggle = document.getElementById('modeToggle');
         const modeLabel = document.getElementById('modeLabel');
+        const mobileNav = document.getElementById('mobileBottomNav');
 
         if (userMenu) userMenu.classList.remove('hidden');
         if (authButtons) authButtons.classList.add('hidden');
+        if (mobileNav) mobileNav.classList.remove('hidden');
 
         if (this.currentUser) {
             const userMetadata = this.currentUser.user_metadata || {};
@@ -473,10 +377,16 @@ class AuthManager {
                     modeToggle.parentElement.classList.add('toggle-active');
                     if (modeLabel) modeLabel.textContent = 'Studio Mode';
                     document.body.classList.add('studio-mode-active');
+                    document.body.classList.remove('collector-mode-active');
+                } else if (currentType === 'collector') {
+                    modeToggle.parentElement.classList.add('toggle-active');
+                    if (modeLabel) modeLabel.textContent = 'Audiophile Mode';
+                    document.body.classList.add('collector-mode-active');
+                    document.body.classList.remove('studio-mode-active');
                 } else {
                     modeToggle.parentElement.classList.remove('toggle-active');
-                    if (modeLabel) modeLabel.textContent = 'Client Mode';
-                    document.body.classList.remove('studio-mode-active');
+                    if (modeLabel) modeLabel.textContent = 'Artist Mode';
+                    document.body.classList.remove('studio-mode-active', 'collector-mode-active');
                 }
             }
         }
@@ -485,8 +395,10 @@ class AuthManager {
     updateUIForUnauthenticatedUser() {
         const userMenu = document.getElementById('userMenu');
         const authButtons = document.getElementById('authButtons');
+        const mobileNav = document.getElementById('mobileBottomNav');
         if (userMenu) userMenu.classList.add('hidden');
         if (authButtons) authButtons.classList.remove('hidden');
+        if (mobileNav) mobileNav.classList.add('hidden');
         document.body.classList.remove('studio-mode-active');
     }
 
@@ -545,17 +457,22 @@ class AuthManager {
     }
 
     // Google Sign In
+    /*
     async signInWithGoogle() {
         try {
             const { error } = await this.getClient().auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: window.location.origin + '/app.html' }
+                options: {
+                    redirectTo: window.location.origin + '/profile.html'
+                }
             });
             if (error) throw error;
         } catch (error) {
-            window.utils?.showNotification(error.message, 'error');
+            console.error('Google sign in error:', error);
+            this.showAuthError(error.message || 'Error signing in with Google');
         }
     }
+    */
 
     // Validation Helpers
     validatePasswordStrength() {
@@ -645,46 +562,7 @@ class AuthManager {
     }
 
     checkCookieConsent() {
-        const consent = localStorage.getItem('cookie_consent');
-        if (!consent) {
-            setTimeout(() => this.showCookieBanner(), 2000);
-        }
-    }
-
-    showCookieBanner() {
-        const banner = document.createElement('div');
-        banner.id = 'cookieBanner';
-        banner.className = 'cookie-banner';
-        banner.style.display = 'block';
-        banner.innerHTML = `
-            <div class="flex flex-col gap-4">
-                <div class="flex items-start gap-4">
-                    <div class="p-4 bg-blue-100 dark:bg-blue-900/40 rounded-2xl text-blue-600 dark:text-blue-400">
-                        <i class="fas fa-cookie-bite text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 dark:text-white">Cookie Preferences</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">We use cookies to enhance your experience and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.</p>
-                    </div>
-                </div>
-                <div class="flex gap-3 pt-2">
-                    <button id="acceptCookiesBtn" class="flex-1 bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity">Accept All</button>
-                    <a href="privacy.html" class="flex-1 text-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Privacy Policy</a>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(banner);
-        
-        const acceptBtn = document.getElementById('acceptCookiesBtn');
-        if (acceptBtn) {
-            acceptBtn.addEventListener('click', () => {
-                localStorage.setItem('cookie_consent', 'accepted');
-                banner.style.transform = 'translateY(120%)';
-                banner.style.opacity = '0';
-                setTimeout(() => banner.remove(), 500);
-            });
-        }
+        // Handled by inline script in app.html — no-op here to avoid race condition
     }
 }
 

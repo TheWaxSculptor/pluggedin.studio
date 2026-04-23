@@ -20,7 +20,8 @@ class StudioDashboard {
         const tabButtons = document.querySelectorAll('.dashboard-tab');
         tabButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const tabId = e.target.id.replace('Tab', '');
+                const btn = e.currentTarget;
+                const tabId = btn.id.replace('Tab', '');
                 this.switchTab(tabId);
             });
         });
@@ -96,16 +97,16 @@ class StudioDashboard {
     }
 
     switchTab(tabId) {
-        // Update active tab button
+        // Update active tab button (Piano Theme)
         document.querySelectorAll('.dashboard-tab').forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-100', 'text-blue-700', 'dark:bg-blue-900/30', 'dark:text-blue-300', 'font-bold');
-            btn.classList.add('text-gray-700', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-800');
+            btn.classList.remove('active', 'border-black', 'dark:border-white', 'shadow-xl');
+            btn.classList.add('border-transparent');
         });
 
         const activeTab = document.getElementById(`${tabId}Tab`);
         if (activeTab) {
-            activeTab.classList.add('active', 'bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-700', 'dark:text-blue-300', 'font-bold');
-            activeTab.classList.remove('text-gray-700', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-800');
+            activeTab.classList.add('active', 'border-black', 'dark:border-white', 'shadow-xl');
+            activeTab.classList.remove('border-transparent');
         }
 
         // Show/hide content
@@ -547,22 +548,39 @@ class StudioDashboard {
                         </div>
                     </div>
 
-                    <!-- Earnings Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-8 border border-gray-100 dark:border-slate-800">
-                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Gross Earnings</label>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">${utils.formatCurrency(this.analyticsData.totalGross)}</p>
-                            <p class="text-[10px] text-gray-400 mt-2 font-medium">Total revenue before fees</p>
+                    <!-- Earnings Grid (Piano Theme) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 rounded-[2rem] overflow-hidden border-4 border-black dark:border-white shadow-2xl">
+                        <!-- Gross Earnings (White Key) -->
+                        <div class="bg-white dark:bg-zinc-900 p-10 border-b md:border-b-0 md:border-r-4 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                            <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 group-hover:text-black dark:group-hover:text-white transition-colors">Gross Earnings</label>
+                            <p class="text-5xl font-black text-black dark:text-white tracking-tighter">${utils.formatCurrency(this.analyticsData.totalGross)}</p>
+                            <div class="mt-8 flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                                Total Revenue
+                            </div>
                         </div>
-                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-8 border border-gray-100 dark:border-slate-800">
-                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Platform Fees (10%)</label>
-                            <p class="text-3xl font-bold text-red-600 dark:text-red-400">-${utils.formatCurrency(this.analyticsData.totalGross * 0.10)}</p>
-                            <p class="text-[10px] text-gray-400 mt-2 font-medium">Auto-deducted upon booking</p>
+                        
+                        <!-- Platform Fees (White Key) -->
+                        <div class="bg-white dark:bg-zinc-900 p-10 border-b md:border-b-0 md:border-r-4 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                            <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 group-hover:text-black dark:group-hover:text-white transition-colors">Platform Fees (10%)</label>
+                            <p class="text-5xl font-black text-red-600 dark:text-red-500 tracking-tighter">-${utils.formatCurrency(this.analyticsData.totalGross * 0.10)}</p>
+                            <div class="mt-8 flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                                Auto-Deducted
+                            </div>
                         </div>
-                        <div class="bg-black dark:bg-white rounded-2xl p-8 shadow-2xl">
-                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest mb-1">Available for Payout</label>
-                            <p class="text-3xl font-bold text-white dark:text-black">${utils.formatCurrency(this.analyticsData.netEarnings)}</p>
-                            <p class="text-[10px] text-blue-200 dark:text-blue-700 mt-2 font-bold uppercase tracking-tighter">Ready to transfer</p>
+                        
+                        <!-- Available for Payout (Black Key) -->
+                        <div class="bg-black dark:bg-white p-10 transition-all hover:opacity-90 group relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10">
+                                <i class="fas fa-piano text-6xl text-white dark:text-black"></i>
+                            </div>
+                            <label class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-4 group-hover:text-white dark:group-hover:text-black transition-colors">Available Payout</label>
+                            <p class="text-5xl font-black text-white dark:text-black tracking-tighter">${utils.formatCurrency(this.analyticsData.netEarnings)}</p>
+                            <div class="mt-8 flex items-center text-[10px] font-black uppercase tracking-widest text-blue-400 dark:text-blue-600">
+                                <span class="w-2 h-2 rounded-full bg-blue-400 dark:bg-blue-600 mr-2 animate-pulse"></span>
+                                Ready to Transfer
+                            </div>
                         </div>
                     </div>
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Profile - PluggedIn</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -61,7 +61,7 @@
             border-radius: 50%;
         }
         input:checked + .toggle-slider {
-            background-color: #7c3aed;
+            background-color: #000;
         }
         input:checked + .toggle-slider:before {
             transform: translateX(24px);
@@ -70,22 +70,25 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-black shadow-sm border-b border-gray-800 sticky top-0 z-40 min-h-[8rem]" role="navigation" aria-label="Main navigation">
+    <nav class="bg-white dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-800 sticky top-0 z-[1001] h-20 transition-all duration-300" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-32 min-h-[8rem]">
+            <div class="flex justify-between items-center h-20">
                 <div class="flex items-center">
                     <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
-                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="h-32 w-auto max-h-40 object-contain">
+                        <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" style="height:48px;width:auto;display:inline-block;">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" style="height:48px;width:auto;display:none;">
                     </a>
                 </div>
-                <div class="flex items-center space-x-4" role="menubar">
-                    <a href="app.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Home</a>
-                    <a href="bookings.html" class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem">Bookings</a>
-                    <a href="profile.html" class="text-white font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-md px-2 py-1" role="menuitem" aria-current="page">Profile</a>
+                <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/10 text-zinc-400 hover:text-zinc-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon text-xl"></i>
+                        <i class="fas fa-sun text-xl"></i>
+                    </button>
+                    <a href="app.html" class="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white px-3 py-2 text-sm font-bold uppercase tracking-tighter">Home</a>
                     <div id="userMenu" class="relative">
-                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
-                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                                <span id="userInitials" class="text-white text-sm font-medium">U</span>
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white" title="User menu" aria-label="User menu">
+                            <div class="w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center border-2 border-zinc-200 dark:border-zinc-800 transition-transform active:scale-90">
+                                <span id="userInitials" class="text-white dark:text-black text-xs font-black">U</span>
                             </div>
                         </button>
                     </div>
@@ -99,16 +102,11 @@
         <!-- Profile Header -->
         <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
             <div class="flex items-center space-x-6">
-                <div class="relative">
-                    <div class="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold" id="profileInitials">U</span>
+                <div class="relative group">
+                    <div class="w-32 h-32 bg-black dark:bg-white rounded-[2.5rem] flex items-center justify-center text-white dark:text-black text-4xl font-black shadow-2xl border-4 border-white dark:border-zinc-900 transition-all group-hover:scale-105 group-hover:rotate-3 duration-500">
+                        <span id="profileInitials" class="drop-shadow-lg">U</span>
                     </div>
-                    <button class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-md border hover:bg-gray-50 transition-colors">
-                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </button>
+                    <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 border-4 border-white dark:border-zinc-900 rounded-full shadow-lg" title="Status: Online"></div>
                 </div>
                 <div class="flex-1">
                     <h1 class="text-2xl font-bold text-gray-900" id="profileName">John Doe</h1>
@@ -129,7 +127,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                <button class="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-xl font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl active:scale-95 text-xs">
                     Edit Profile
                 </button>
             </div>
@@ -227,7 +225,7 @@
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">Favorite Studios</h2>
-                        <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">View All</button>
+                        <button class="text-purple-600 hover:text-zinc-900 text-sm font-medium">View All</button>
                     </div>
                 </div>
                 <div class="p-6">
@@ -288,47 +286,124 @@
                         <p class="text-xs text-gray-400 mt-1">Start tracking your instruments and audio gear today.</p>
                     </div>
                 </div>
+                
+                <!-- Insurance Promo Container -->
+                <div id="gearInsurancePromo" class="mt-8"></div>
             </div>
         </div>
 
         <!-- Become Studio Owner CTA (if not owner) -->
         <div id="becomeOwnerSection" class="hidden mt-8 bg-white rounded-lg shadow-sm p-8 text-center">
             <div class="max-w-md mx-auto">
-                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m4 0v-5a1 1 0 011-1h4a1 1 0 011 1v5m-4-5V8a1 1 0 011-1h2a1 1 0 011 1v3"></path>
                     </svg>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Own a Recording Studio?</h3>
                 <p class="text-gray-600 mb-6">List your studio on PluggedIn and start accepting bookings from musicians worldwide.</p>
-                <button class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                <button class="bg-black text-white px-6 py-3 rounded-lg hover:opacity-90 transition-colors">
                     List Your Studio
                 </button>
             </div>
         </div>
 
         <!-- Danger Zone -->
-        <div class="mt-8 bg-white rounded-lg shadow-sm border border-red-200">
-            <div class="p-6 border-b border-red-200">
-                <h2 class="text-lg font-semibold text-red-600">Danger Zone</h2>
+        <div class="mt-12 bg-red-50/50 dark:bg-red-900/5 rounded-[2rem] border border-red-100 dark:border-red-900/20 overflow-hidden">
+            <div class="p-8 border-b border-red-100 dark:border-red-900/20">
+                <h2 class="text-xl font-black text-red-600 dark:text-red-500 tracking-tight uppercase tracking-widest text-xs">Danger Zone</h2>
             </div>
-            <div class="p-6">
-                <div class="flex items-center justify-between">
+            <div class="p-8 space-y-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                        <h3 class="font-medium text-gray-900">Delete Account</h3>
-                        <p class="text-sm text-gray-500">Permanently delete your account and all associated data</p>
+                        <h3 class="font-bold text-gray-900 dark:text-white mb-1">Delete Account</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Permanently remove your profile, gear listings, and booking history. This action cannot be undone.</p>
                     </div>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                    <button class="w-full sm:w-auto bg-white dark:bg-zinc-900 text-red-600 border border-red-200 dark:border-red-900/30 px-6 py-3 rounded-xl font-bold text-sm hover:bg-red-600 hover:text-white dark:hover:bg-red-600 transition-all shadow-sm">
                         Delete Account
                     </button>
                 </div>
             </div>
         </div>
     </main>
+    
+    <!-- Add Gear Modal -->
+    <div id="addGearModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+        <div class="relative bg-white dark:bg-zinc-900 w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden border dark:border-white/10">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black tracking-tight text-gray-900 dark:text-white">Add to Collection</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Register your gear in the PluggedIn database.</p>
+                    </div>
+                    <button id="closeAddGearModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="addGearForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Brand</label>
+                            <input type="text" name="brand" required placeholder="e.g. Neumann, Moog" 
+                                class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Model Name</label>
+                            <input type="text" name="name" required placeholder="e.g. U87, Matriarch" 
+                                class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Category</label>
+                        <select name="category" required class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none">
+                            <option value="">Select Category</option>
+                            <option value="Microphone">Microphone</option>
+                            <option value="Synth">Synthesizer</option>
+                            <option value="Guitar">Guitar/Bass</option>
+                            <option value="Outboard">Outboard Gear</option>
+                            <option value="Drums">Drums/Percussion</option>
+                            <option value="Software">Software/Plugin</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Description (Optional)</label>
+                        <textarea name="description" rows="3" placeholder="Tell us more about this specific unit..." 
+                            class="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"></textarea>
+                    </div>
+
+                    <div class="flex items-center space-x-4 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-900/30">
+                        <div class="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-bold text-blue-800 dark:text-blue-300">Listing Option</p>
+                            <p class="text-[10px] text-blue-600 dark:text-blue-400/80">List this item in the marketplace after adding.</p>
+                        </div>
+                        <input type="checkbox" name="listInMarketplace" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="button" id="cancelAddGear" class="flex-1 py-4 px-6 border border-gray-200 dark:border-white/10 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 py-4 px-6 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-black/10">
+                            Add to Gearbox
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
+    <script src="js/config.js"></script>
     <script src="js/webapp-supabase.js"></script>
     <script src="js/webapp-auth.js"></script>
+    <script src="js/webapp-insurance.js"></script>
     <script>
         // Profile management functionality
         class ProfileManager {
@@ -343,13 +418,30 @@
                 this.loadRecentActivity();
                 this.loadPersonalGear(); // Load personal gear collection
                 this.setupEventListeners();
+                
+                // Initialize insurance promos
+                if (window.insuranceManager) {
+                    window.insuranceManager.renderPromoCard('gearInsurancePromo', 'gear');
+                }
             }
 
             setupEventListeners() {
-                // Add Personal Gear
+                // Add Personal Gear Modal Controls
                 const addGearBtn = document.getElementById('addPersonalGearBtn');
+                const addGearModal = document.getElementById('addGearModal');
+                const closeGearModal = document.getElementById('closeAddGearModal');
+                const cancelGearBtn = document.getElementById('cancelAddGear');
+                const addGearForm = document.getElementById('addGearForm');
+
                 if (addGearBtn) {
-                    addGearBtn.onclick = () => alert('Add Gear functionality coming soon for individual collectors!');
+                    addGearBtn.onclick = () => this.openAddGearModal();
+                }
+
+                if (closeGearModal) closeGearModal.onclick = () => this.closeAddGearModal();
+                if (cancelGearBtn) cancelGearBtn.onclick = () => this.closeAddGearModal();
+
+                if (addGearForm) {
+                    addGearForm.onsubmit = (e) => this.handleAddGear(e);
                 }
 
                 // Toggle switches
@@ -358,6 +450,100 @@
                         this.updateNotificationSetting(e.target);
                     });
                 });
+            }
+
+            openAddGearModal() {
+                const modal = document.getElementById('addGearModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            closeAddGearModal() {
+                const modal = document.getElementById('addGearModal');
+                const form = document.getElementById('addGearForm');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    if (form) form.reset();
+                }
+            }
+
+            async handleAddGear(e) {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData(form);
+                const submitBtn = form.querySelector('button[type="submit"]');
+                
+                const gearData = {
+                    brand: formData.get('brand'),
+                    name: formData.get('name'),
+                    category: formData.get('category'),
+                    description: formData.get('description'),
+                    user_id: this.user.id,
+                    status: formData.get('listInMarketplace') === 'on' ? 'for_sale' : 'private',
+                    image_url: 'https://via.placeholder.com/300?text=' + formData.get('brand')
+                };
+
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Adding...';
+
+                    const { supabase } = window.db;
+                    const { data, error } = await supabase
+                        .from('equipment')
+                        .insert([gearData])
+                        .select();
+
+                    if (error) throw error;
+
+                    // Success!
+                    this.closeAddGearModal();
+                    await this.loadPersonalGear();
+                    
+                    // Show success notification
+                    const feedback = document.createElement('div');
+                    feedback.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] font-bold';
+                    feedback.textContent = `Successfully added ${gearData.brand} ${gearData.name}!`;
+                    document.body.appendChild(feedback);
+                    setTimeout(() => feedback.remove(), 3000);
+
+                } catch (error) {
+                    console.error('Error adding gear:', error);
+                    alert('Error adding gear: ' + error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add to Gearbox';
+                }
+            }
+
+            async deleteGear(id) {
+                if (!confirm('Are you sure you want to remove this item from your collection?')) return;
+
+                try {
+                    const { supabase } = window.db;
+                    const { error } = await supabase
+                        .from('equipment')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+
+                    // Success!
+                    await this.loadPersonalGear();
+                    
+                    // Show success notification
+                    const feedback = document.createElement('div');
+                    feedback.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] font-bold';
+                    feedback.textContent = `Item removed from collection.`;
+                    document.body.appendChild(feedback);
+                    setTimeout(() => feedback.remove(), 3000);
+
+                } catch (error) {
+                    console.error('Error deleting gear:', error);
+                    alert('Error removing gear: ' + error.message);
+                }
             }
 
             async loadPersonalGear() {
@@ -388,17 +574,25 @@
                 }
 
                 container.innerHTML = gear.map(item => `
-                    <div class="flex items-center p-4 border rounded-xl hover:shadow-md transition-shadow group">
-                        <div class="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden mr-4">
-                            <img src="${item.image_url || 'https://via.placeholder.com/64'}" class="w-full h-full object-cover">
+                    <div class="flex items-center p-5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[1.5rem] hover:shadow-xl hover:scale-[1.02] transition-all group relative">
+                        <div class="w-20 h-20 rounded-2xl bg-gray-50 dark:bg-black overflow-hidden mr-5 border dark:border-white/5">
+                            <img src="${item.image_url || 'https://via.placeholder.com/150?text=Gear'}" class="w-full h-full object-cover">
                         </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-900">${item.brand} ${item.name}</h4>
-                            <p class="text-xs text-gray-500">${item.category}</p>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <h4 class="font-black text-gray-900 dark:text-white truncate">${item.brand} ${item.name}</h4>
+                                ${item.status === 'for_sale' ? 
+                                    '<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest">Marketplace</span>' : 
+                                    '<span class="bg-gray-100 dark:bg-white/10 text-gray-400 text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest">Private</span>'}
+                            </div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">${item.category}</p>
+                            ${item.description ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-1">${item.description}</p>` : ''}
                         </div>
-                        <button class="p-2 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="flex space-x-2 ml-4">
+                            <button class="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100" onclick="window.profileManager.deleteGear('${item.id}')">
+                                <i class="fas fa-trash-alt text-sm"></i>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             }
@@ -558,7 +752,9 @@
                 
                 const profileTypeEl = document.createElement('div');
                 profileTypeEl.className = 'mt-1 px-2 py-1 bg-black text-white text-xs font-medium rounded inline-block user-type-badge';
-                profileTypeEl.textContent = this.user.userType === 'studio' ? 'Studio Owner' : 'Client (Artist)';
+                
+                const roleNames = { 'studio': 'Studio Owner', 'collector': 'Audiophile', 'client': 'Artist' };
+                profileTypeEl.textContent = roleNames[this.user.userType] || 'Artist';
                 
                 // Insert after email
                 const emailEl = document.getElementById('profileEmail');
@@ -568,7 +764,6 @@
                 
                 // Stats - Update based on user type
                 if (this.user.userType === 'studio') {
-                    // Update stats labels and values for studio owner
                     this.updateStatsSection([
                         { id: 'totalBookingsLabel', text: 'Bookings Received' },
                         { id: 'totalBookings', text: this.user.totalBookings || 0 },
@@ -577,8 +772,16 @@
                         { id: 'reviewsWrittenLabel', text: 'Reviews Received' },
                         { id: 'reviewsWritten', text: this.user.reviewsReceived || 0 }
                     ]);
+                } else if (this.user.userType === 'collector') {
+                    this.updateStatsSection([
+                        { id: 'totalBookingsLabel', text: 'Items Cataloged' },
+                        { id: 'totalBookings', text: this.user.itemsCataloged || 0 },
+                        { id: 'favoriteStudiosLabel', text: 'Collections' },
+                        { id: 'favoriteStudios', text: this.user.collectionsManaged || 0 },
+                        { id: 'reviewsWrittenLabel', text: 'Gear Reviews' },
+                        { id: 'reviewsWritten', text: this.user.gearReviews || 0 }
+                    ]);
                 } else {
-                    // Update stats for client
                     this.updateStatsSection([
                         { id: 'totalBookingsLabel', text: 'Total Bookings' },
                         { id: 'totalBookings', text: this.user.totalBookings || 0 },
@@ -589,9 +792,10 @@
                     ]);
                 }
                 
-                // Studio owner section visibility
+                // Studio/Collector section visibility
                 const studioOwnerSection = document.getElementById('studioOwnerSection');
                 const becomeOwnerSection = document.getElementById('becomeOwnerSection');
+                const collectorSection = document.getElementById('collectorSection'); // We might need to add this
                 
                 if (this.user.userType === 'studio') {
                     // Show studio owner dashboard section
@@ -686,7 +890,7 @@
                     const container = document.getElementById('recentActivityList');
                     container.innerHTML = activities.map(activity => `
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <div class="w-8 h-8 bg-zinc-100 rounded-full flex items-center justify-center">
                                 ${this.getActivityIcon(activity.icon)}
                             </div>
                             <div class="flex-1">
@@ -726,13 +930,16 @@
                 toggleSection.className = 'mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200';
                 toggleSection.innerHTML = `
                     <h3 class="font-medium text-gray-900 mb-2">Switch View</h3>
-                    <p class="text-sm text-gray-600 mb-3">Toggle between client and studio owner views</p>
+                    <p class="text-sm text-gray-600 mb-3">Toggle between Artist, Audiophile, and Studio views</p>
                     <div class="flex border rounded-lg overflow-hidden">
-                        <button type="button" id="profileClientToggle" class="userTypeToggle flex-1 py-2 px-4 text-center text-sm font-medium ${this.user.userType === 'client' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'}" onclick="window.profileManager.switchUserType('client')" aria-pressed="${this.user.userType === 'client'}">
-                            Client (Artist)
+                        <button type="button" class="userTypeToggle flex-1 py-2 px-2 text-center text-xs font-medium ${this.user.userType === 'client' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'}" onclick="window.profileManager.switchUserType('client')">
+                            Artist
                         </button>
-                        <button type="button" id="profileStudioToggle" class="userTypeToggle flex-1 py-2 px-4 text-center text-sm font-medium ${this.user.userType === 'studio' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'}" onclick="window.profileManager.switchUserType('studio')" aria-pressed="${this.user.userType === 'studio'}">
-                            Studio Owner
+                        <button type="button" class="userTypeToggle flex-1 py-2 px-2 text-center text-xs font-medium ${this.user.userType === 'collector' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'}" onclick="window.profileManager.switchUserType('collector')">
+                            Audiophile
+                        </button>
+                        <button type="button" class="userTypeToggle flex-1 py-2 px-2 text-center text-xs font-medium ${this.user.userType === 'studio' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'}" onclick="window.profileManager.switchUserType('studio')">
+                            Studio
                         </button>
                     </div>
                 `;

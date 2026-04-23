@@ -26,6 +26,88 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dashboard-tab {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid transparent !important;
+            color: inherit;
+        }
+        .dashboard-tab.active {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #000 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .dashboard-tab.active span {
+            color: #fff !important;
+        }
+        .dark .dashboard-tab.active {
+            background: #fff !important;
+            color: #000 !important;
+            border-color: #fff !important;
+        }
+        .dark .dashboard-tab.active span {
+            color: #000 !important;
+        }
+        .dashboard-tab:not(.active):hover {
+            border-color: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.02);
+        }
+        .dark .dashboard-tab:not(.active):hover {
+            border-color: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+        }
+        .control-card {
+            border: 4px solid #000;
+            border-radius: 2.5rem;
+            transition: all 0.5s ease;
+        }
+        .dark .control-card {
+            border-color: #fff;
+        }
+        .modular-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        /* Hardware Knob Effect */
+        .knob-ui {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #000;
+            border-radius: 50%;
+            position: relative;
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        }
+        .dark .knob-ui {
+            border-color: #fff;
+            background: linear-gradient(145deg, #1a1a1a, #000000);
+        }
+        .knob-ui::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: #000;
+            border-radius: 2px;
+        }
+        .dark .knob-ui::after {
+            background: #fff;
+        }
+        .console-nav-container {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .console-nav-container::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
     <script>
         // Theme and UI Configuration (Immediate Execution to prevent flash)
         (function() {
@@ -43,136 +125,111 @@
 </head>
     <body class="bg-gray-50 dark:bg-black min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <!-- Navigation -->
-        <nav class="bg-white dark:bg-black shadow-lg sticky top-0 z-[1001] border-b dark:border-slate-800">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-800 sticky top-0 z-[1001] h-20 transition-all duration-300" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+            <div class="flex justify-between items-center h-20">
                 <div class="flex items-center">
-                    <img src="PluggedIn_Studio_Light.png" alt="PluggedIn.studio" class="logo-light h-8 w-auto">
-                    <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn.studio" class="logo-dark h-8 w-auto">
-                    <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">PluggedIn Studio</span>
-                    <span class="ml-4 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full border dark:border-blue-800">Studio Owner</span>
+                    <a href="app.html" class="flex items-center" aria-label="PluggedIn home">
+                        <img src="PluggedIn_Studio_Light.png" alt="PluggedIn Studio" class="logo-light" style="height:48px;width:auto;display:inline-block;">
+                        <img src="PluggedIn_Studio_Dark.png" alt="PluggedIn Studio" class="logo-dark" style="height:48px;width:auto;display:none;">
+                    </a>
+                    <span class="ml-4 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-black uppercase tracking-widest rounded-full border border-zinc-200 dark:border-zinc-700 hidden sm:inline-block">Studio Owner</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-50 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme" aria-label="Toggle dark mode">
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/10 text-zinc-400 hover:text-zinc-600 dark:hover:text-white transition-all cursor-pointer border border-transparent dark:border-white/10" title="Toggle theme" aria-label="Toggle dark mode">
                         <i class="fas fa-moon text-xl"></i>
                         <i class="fas fa-sun text-xl"></i>
                     </button>
-                    <a href="app.html" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium">Back to App</a>
+                    <a href="app.html" class="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white px-3 py-2 text-sm font-bold uppercase tracking-tighter">Home</a>
                     <div id="userMenu" class="relative">
-                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" title="User menu" aria-label="User menu">
-                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border border-white dark:border-slate-800">
-                                <span id="userInitials" class="text-white text-sm font-medium">SO</span>
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white" title="User menu" aria-label="User menu">
+                            <div class="w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center border-2 border-zinc-200 dark:border-zinc-800 transition-transform active:scale-90">
+                                <span id="userInitials" class="text-white dark:text-black text-xs font-black">SO</span>
                             </div>
                         </button>
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 border dark:border-slate-700 z-50">
-                            <a href="profile.html" id="profileLink" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">Profile</a>
-                            <a href="#" id="signOutBtn" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-t dark:border-slate-700">Sign Out</a>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Studio Owner Dashboard</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Manage your studio, bookings, and calendar integrations</p>
-        </div>
-
-        <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Sidebar Navigation -->
-            <div class="lg:col-span-1">
-                <nav class="bg-white dark:bg-black rounded-2xl shadow-sm p-4 md:p-6 border dark:border-slate-800 overflow-x-auto">
-                    <ul class="flex lg:flex-col space-x-4 lg:space-x-0 lg:space-y-2 whitespace-nowrap lg:whitespace-normal scrollbar-hide">
-                        <li class="flex-shrink-0">
-                            <button id="overviewTab" class="dashboard-tab active w-full text-left px-3 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-700">
-                                Overview
-                            </button>
-                        </li>
-                        <li>
-                            <button id="studioTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
-                                Studio Details
-                            </button>
-                        </li>
-                        <li class="flex-shrink-0">
-                            <button id="bookingsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
-                                Bookings
-                            </button>
-                        </li>
-                        <li class="flex-shrink-0">
-                            <button id="gearTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
-                                Gear Inventory
-                            </button>
-                        </li>
-                        <li class="flex-shrink-0">
-                            <button id="integrationsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
-                                Calendar Integrations
-                            </button>
-                        </li>
-                        <li class="flex-shrink-0">
-                            <button id="analyticsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
-                                Analytics
-                            </button>
-                        </li>
-                        <li class="flex-shrink-0">
-                            <button id="financialsTab" class="dashboard-tab w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
-                                Financials
-                            </button>
-                        </li>
-                    </ul>
+    <!-- Main Content (Modular Layout) -->
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-12">
+        <!-- Control Panel Header -->
+        <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-16">
+            <div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Live Control Center</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-none">
+                    Studio<br><span class="text-black dark:text-white">Console</span>
+                </h1>
+            </div>
+            
+            <!-- Console Navigation -->
+            <div class="console-nav-container overflow-x-auto pb-4 -mx-4 px-4 xl:mx-0 xl:px-0">
+                <nav class="flex flex-nowrap xl:flex-wrap gap-3 min-w-max xl:min-w-0">
+                    <button id="overviewTab" class="dashboard-tab active px-8 py-5 rounded-[1.5rem] bg-white dark:bg-zinc-900 transition-all shadow-lg">
+                        <span class="text-xs font-black uppercase tracking-widest pointer-events-none">Overview</span>
+                    </button>
+                    <button id="studioTab" class="dashboard-tab px-8 py-5 rounded-[1.5rem] bg-white dark:bg-zinc-900 transition-all">
+                        <span class="text-xs font-black uppercase tracking-widest pointer-events-none">Studio Info</span>
+                    </button>
+                    <button id="bookingsTab" class="dashboard-tab px-8 py-5 rounded-[1.5rem] bg-white dark:bg-zinc-900 transition-all">
+                        <span class="text-xs font-black uppercase tracking-widest pointer-events-none">Bookings</span>
+                    </button>
+                    <button id="gearTab" class="dashboard-tab px-8 py-5 rounded-[1.5rem] bg-white dark:bg-zinc-900 transition-all">
+                        <span class="text-xs font-black uppercase tracking-widest pointer-events-none">Inventory</span>
+                    </button>
+                    <button id="analyticsTab" class="dashboard-tab px-8 py-5 rounded-[1.5rem] bg-white dark:bg-zinc-900 transition-all">
+                        <span class="text-xs font-black uppercase tracking-widest pointer-events-none">Analytics</span>
+                    </button>
+                    <button id="financialsTab" class="dashboard-tab px-8 py-5 rounded-[1.5rem] bg-white dark:bg-zinc-900 transition-all">
+                        <span class="text-xs font-black uppercase tracking-widest pointer-events-none">Financials</span>
+                    </button>
                 </nav>
             </div>
+        </div>
 
-            <!-- Main Content Area -->
-            <div class="lg:col-span-2">
+        <!-- Main Workspace Area -->
+        <div class="w-full">
                 <div id="overviewContent" class="dashboard-content">
                     <div class="bg-white dark:bg-black rounded-2xl shadow-sm p-8 border dark:border-slate-800">
                         <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">Studio Overview</h2>
                         
-                        <!-- Stats Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div class="bg-blue-50 dark:bg-blue-900/10 p-5 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-                                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">This Month</p>
-                                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="monthlyBookings">12</p>
+                        <!-- Stats Grid (Piano Theme) -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 mb-12 rounded-[2rem] overflow-hidden border-4 border-black dark:border-white">
+                            <!-- This Month (White Key) -->
+                            <div class="bg-white dark:bg-zinc-900 p-8 border-b md:border-b-0 md:border-r-4 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                                <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4">This Month</label>
+                                <div class="flex items-end justify-between">
+                                    <p class="text-4xl font-black text-black dark:text-white tracking-tighter" id="monthlyBookings">12</p>
+                                    <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                        <i class="fas fa-calendar-alt text-blue-600"></i>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="bg-green-50 dark:bg-green-900/10 p-5 rounded-xl border border-green-100 dark:border-green-900/30">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
-                                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Revenue</p>
-                                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="monthlyRevenue">$2,400</p>
+                            <!-- Revenue (White Key) -->
+                            <div class="bg-white dark:bg-zinc-900 p-8 border-b md:border-b-0 md:border-r-4 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                                <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4">Revenue</label>
+                                <div class="flex items-end justify-between">
+                                    <p class="text-4xl font-black text-black dark:text-white tracking-tighter" id="monthlyRevenue">$2,400</p>
+                                    <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                        <i class="fas fa-dollar-sign text-green-600"></i>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="bg-purple-50 dark:bg-purple-900/10 p-5 rounded-xl border border-purple-100 dark:border-purple-900/30">
-                                <div class="flex items-center">
-                                    <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-                                        <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Integrations</p>
-                                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="activeIntegrations">2</p>
+                            <!-- Integrations (Black Key) -->
+                            <div class="bg-black dark:bg-white p-8 transition-all hover:opacity-90 group">
+                                <label class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-4">Integrations</label>
+                                <div class="flex items-end justify-between">
+                                    <p class="text-4xl font-black text-white dark:text-black tracking-tighter" id="activeIntegrations">2</p>
+                                    <div class="p-2 bg-white/10 dark:bg-black/10 rounded-lg">
+                                        <i class="fas fa-bolt text-blue-400 dark:text-blue-600"></i>
                                     </div>
                                 </div>
                             </div>

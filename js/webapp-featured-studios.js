@@ -210,11 +210,6 @@ class FeaturedStudiosManager {
         }
         
         container.innerHTML = this.filteredStudios.map(studio => this.createStudioCard(studio)).join('');
-        
-        // Add click listeners to studio cards
-        container.querySelectorAll('.studio-card').forEach((card, index) => {
-            card.addEventListener('click', () => this.showStudioDetails(this.filteredStudios[index]));
-        });
 
         // Reset scroll position and update buttons
         container.scrollLeft = 0;
@@ -228,7 +223,7 @@ class FeaturedStudiosManager {
         const price = studio.hourlyRate ? utils.formatCurrency(studio.hourlyRate) : 'Contact for pricing';
         
         return `
-            <div class="studio-card flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-slate-800 cursor-pointer border border-transparent dark:border-slate-700">
+            <div class="studio-card flex-shrink-0 w-full sm:w-80 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-slate-800 cursor-pointer border border-transparent dark:border-slate-700" onclick="if(window.studiosManager) window.studiosManager.showStudioDetailsById('${studio.id}')">
                 <div class="relative h-48 overflow-hidden">
                     <img 
                         src="${studio.image_url || studio.coverImage || studio.cover_image || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 

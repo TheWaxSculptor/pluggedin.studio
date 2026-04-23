@@ -122,12 +122,50 @@ window.initializeCityPicker = function() {
     });
 };
 
+window.initializeCategoryFiltering = function() {
+    const categoryBtns = document.querySelectorAll('.category-filter');
+    if (!categoryBtns.length) return;
+
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // UI feedback
+            categoryBtns.forEach(b => {
+                b.classList.remove('active');
+                const icon = b.querySelector('div');
+                if (icon) {
+                    icon.classList.remove('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
+                    icon.classList.add('bg-gray-100');
+                }
+            });
+            
+            btn.classList.add('active');
+            const activeIcon = btn.querySelector('div');
+            if (activeIcon) {
+                activeIcon.classList.remove('bg-gray-100');
+                activeIcon.classList.add('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
+            }
+
+            // Filtering logic
+            const category = btn.dataset.category;
+            if (window.studiosManager) {
+                if (category === 'all') {
+                    delete window.studiosManager.currentFilters.studio_type;
+                } else {
+                    window.studiosManager.currentFilters.studio_type = category.charAt(0).toUpperCase() + category.slice(1);
+                }
+                window.studiosManager.loadStudios();
+            }
+        });
+    });
+};
+
 class StudiosManager {
     constructor() {
         this.studios = [];
         this.filteredStudios = [];
         this.currentFilters = {};
         this.selectedStudio = null;
+        this.isModalOpen = false;
         this.init();
     }
 
@@ -138,6 +176,14 @@ class StudiosManager {
         // Initialize global components
         window.initializeTagFiltering();
         window.initializeCityPicker();
+        window.initializeCategoryFiltering();
+
+        // Handle browser back button for modals
+        window.addEventListener('popstate', (e) => {
+            if (this.isModalOpen) {
+                this.hideStudioModal(false); // don't push state again
+            }
+        });
     }
 
     setupEventListeners() {
@@ -209,6 +255,15 @@ class StudiosManager {
         this.loadStudios();
     }
 
+    applyQuickFilter(key, value) {
+        // Simple filtering for now
+        this.currentFilters = { ...this.currentFilters, [key]: value };
+        this.loadStudios();
+        
+        // Visual feedback
+        window.utils?.showNotification(`Filtering by ${value}`, 'info');
+    }
+
     showLoadingState() {
         const loadingState = document.getElementById('loadingState');
         const studioGrid = document.getElementById('studioGrid');
@@ -276,19 +331,6 @@ class StudiosManager {
             studioGrid.classList.add('grid');
             studioGrid.classList.remove('block');
             studioGrid.innerHTML = this.filteredStudios.map(studio => this.createStudioCard(studio)).join('');
-            
-            // Add delegated click listener to the grid instead of individual cards
-            if (!studioGrid.dataset.hasListener) {
-                studioGrid.addEventListener('click', (e) => {
-                    const card = e.target.closest('.studio-card');
-                    if (card && !e.target.closest('button')) {
-                        const studioId = card.dataset.id;
-                        const studio = this.filteredStudios.find(s => s.id === studioId);
-                        if (studio) this.showStudioDetails(studio);
-                    }
-                });
-                studioGrid.dataset.hasListener = "true";
-            }
         }
     }
 
@@ -298,7 +340,7 @@ class StudiosManager {
         const image = studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80';
 
         return `
-            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/40 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all hover:shadow-2xl hover:shadow-black/5" data-id="${studio.id}">
+            <div class="studio-card group cursor-pointer bg-white dark:bg-zinc-900/40 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 transition-all hover:shadow-2xl hover:shadow-black/5" data-id="${studio.id}" onclick="if(!event.target.closest('button')) window.studiosManager.showStudioDetailsById('${studio.id}')">
                 <div class="relative aspect-[4/3] overflow-hidden">
                     <img src="${image}" 
                          alt="${studio.name}" 
@@ -337,9 +379,14 @@ class StudiosManager {
                             <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Hourly</span>
                             <span class="text-xl font-black text-gray-900 dark:text-white mt-1">$${price}</span>
                         </div>
-                        <button class="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]">
-                            Details
-                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="event.stopPropagation(); window.studiosManager.showStudioDetailsById('${studio.id}')" class="px-4 py-2.5 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/10">
+                                Details
+                            </button>
+                            <button onclick="event.stopPropagation(); window.studiosManager.initiateBookingById('${studio.id}')" class="px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                Book
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -347,24 +394,69 @@ class StudiosManager {
     }
 
     async showStudioDetails(studio) {
+        if (this.isModalOpen) return;
         this.selectedStudio = studio;
         
-        const studioCard = document.querySelector(`[onclick*="${studio.id}"]`);
+        // Use data-id for more reliable card targeting
+        const studioCard = document.querySelector(`.studio-card[data-id="${studio.id}"]`);
         if (studioCard) studioCard.style.opacity = '0.7';
         
         try {
             const db = window.db;
-            const fullStudio = await db.getStudio(studio.id);
+            let studioToRender = studio; // Default to partial data
+            
+            try {
+                // Try to fetch full details, but don't block modal if it fails
+                if (db && typeof db.getStudio === 'function') {
+                    const fullDetails = await db.getStudio(studio.id);
+                    if (fullDetails) studioToRender = fullDetails;
+                }
+            } catch (fetchError) {
+                console.warn('Could not fetch full details, rendering partial:', fetchError);
+            }
             
             if (studioCard) studioCard.style.opacity = '1';
-            this.renderStudioModal(fullStudio);
+            this.renderStudioModal(studioToRender);
             this.showStudioModal();
         } catch (error) {
+            console.error('Critical modal error:', error);
             if (studioCard) studioCard.style.opacity = '1';
-            console.error('Error loading studio details:', error);
-            const utils = window.utils;
-            if (utils) utils.showNotification('Error loading studio details. Please check your connection.', 'error');
+            window.utils?.showNotification('Unable to open studio details.', 'error');
         }
+    }
+
+    renderFeaturedStudios(studios) {
+        const featuredContainer = document.getElementById('featuredStudiosCarousel');
+        if (!featuredContainer) return;
+
+        if (!studios || studios.length === 0) {
+            featuredContainer.innerHTML = '<div class="w-full text-center py-12 text-gray-400 font-bold uppercase tracking-widest text-[10px]">No exclusive sites featured this week</div>';
+            return;
+        }
+
+        featuredContainer.innerHTML = studios.map(studio => this.createFeaturedStudioCard(studio)).join('');
+    }
+
+    createFeaturedStudioCard(studio) {
+        const price = studio.hourly_rate || 0;
+        const rating = studio.rating || '4.8';
+        const imageUrl = (studio.images && studio.images.length > 0) ? studio.images[0] : (studio.image_url || studio.image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80');
+
+        return `
+            <div class="flex-none w-[300px] group cursor-pointer" onclick="window.studiosManager.showStudioDetailsById('${studio.id}')">
+                <div class="relative h-[200px] rounded-2xl overflow-hidden mb-3">
+                    <img src="${imageUrl}" alt="${studio.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="absolute bottom-3 left-3">
+                        <span class="px-2 py-1 bg-white/90 dark:bg-black/80 backdrop-blur-md rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-900 dark:text-white">
+                            $${price}/hr
+                        </span>
+                    </div>
+                </div>
+                <h4 class="text-sm font-black uppercase tracking-tight text-gray-900 dark:text-white truncate">${studio.name}</h4>
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">${studio.location ? studio.location.split(',')[0] : 'Exclusive Site'}</p>
+            </div>
+        `;
     }
 
     renderStudioModal(studio) {
@@ -431,7 +523,7 @@ class StudiosManager {
                                                     </div>
                                                     <div>
                                                         <span class="block text-xs font-black leading-tight uppercase">${eq.name}</span>
-                                                        <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">${eq.category || 'Gear'}</span>
+                                                        <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">${eq.category === 'Marketplace Gear' ? 'STUDIO EQUIPMENT' : (eq.category || 'Gear')}</span>
                                                     </div>
                                                 </div>
                                             `).join('')
@@ -444,15 +536,42 @@ class StudiosManager {
                                     </div>
                                 </div>
 
-                                <!-- Amenities Section -->
+                                <!-- Audiophile Notes -->
                                 <div>
+                                    <h4 class="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6 border-b border-gray-100 dark:border-white/5 pb-4">Audiophile Notes</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                                        <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Room Treatment</span>
+                                            <p class="text-xs font-bold leading-relaxed">${studio.room_treatment || 'Optimized acoustics with custom diffusers and bass traps.'}</p>
+                                        </div>
+                                        <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Digital Chain</span>
+                                            <p class="text-xs font-bold leading-relaxed">${studio.digital_chain || 'Professional signal path with discrete analog summing.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Environment Amenities -->
+                                <div class="pb-10">
                                     <h4 class="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6">Environment Amenities</h4>
                                     <div class="flex flex-wrap gap-3">
-                                        ${(studio.amenities || ['High-Speed WiFi', 'Climate Control', 'Lounge Access']).map(amenity => `
-                                            <span class="px-4 py-2 bg-gray-100 dark:bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest opacity-60">
-                                                ${amenity}
-                                            </span>
-                                        `).join('')}
+                                        ${(() => {
+                                            let items = studio.amenities;
+                                            // Robust data conversion
+                                            if (typeof items === 'string' && items.trim() !== '') {
+                                                items = items.split(',').map(s => s.trim()).filter(s => s !== '');
+                                            }
+                                            // Handle empty or invalid data
+                                            if (!Array.isArray(items) || items.length === 0) {
+                                                items = ['High-Speed WiFi', 'Climate Control', 'Lounge Access', 'Secure Access'];
+                                            }
+                                            
+                                            return items.map(amenity => `
+                                                <span class="px-4 py-2.5 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-white/5 transition-all hover:bg-gray-100 dark:hover:bg-zinc-700">
+                                                    ${amenity}
+                                                </span>
+                                            `).join('');
+                                        })()}
                                     </div>
                                 </div>
                             </div>
@@ -486,18 +605,33 @@ class StudiosManager {
 
     showStudioModal() {
         const modal = document.getElementById('studioModal');
-        const studioModalContent = modal?.querySelector('.relative.top-20');
+        const studioModalContent = modal?.querySelector('.relative.top-20') || modal?.querySelector('.relative.mx-auto');
         
         if (modal) {
+            this.isModalOpen = true;
+            
+            // Push state for browser back button support
+            if (history.state?.modalOpen !== true) {
+                history.pushState({ modalOpen: true, studioId: this.selectedStudio?.id }, '');
+            }
+
             // Upgrade modal structure for High Fidelity
             if (studioModalContent) {
-                studioModalContent.className = "relative mx-auto border-0 w-11/12 md:w-11/12 lg:w-3/4 max-w-6xl shadow-2xl rounded-[40px] bg-white dark:bg-slate-900 overflow-hidden transition-all duration-500 scale-95 opacity-0";
+                studioModalContent.className = "relative mx-auto border-0 w-11/12 md:w-11/12 lg:w-2/3 max-w-4xl max-h-[90vh] shadow-2xl rounded-[40px] bg-white dark:bg-slate-900 overflow-hidden transition-all duration-500 scale-95 opacity-0 flex flex-col";
+                
+                // Set fixed height for the content wrapper to enable internal scrolling
+                const modalWrapper = studioModalContent.querySelector('.flex-col.md\\:flex-row');
+                if (modalWrapper) {
+                    modalWrapper.classList.add('h-[90vh]', 'md:h-[80vh]', 'max-h-[800px]');
+                    modalWrapper.classList.remove('min-h-[85vh]', '-m-5', '-m-10');
+                }
                 
                 // Animate entry
                 modal.classList.remove('hidden');
                 modal.classList.add('flex', 'items-center', 'justify-center', 'p-4');
                 modal.style.background = "rgba(0,0,0,0.85)";
                 modal.style.backdropFilter = "blur(10px)";
+                document.body.classList.add('modal-open');
                 
                 setTimeout(() => {
                     studioModalContent.classList.remove('scale-95', 'opacity-0');
@@ -507,16 +641,42 @@ class StudiosManager {
         }
     }
 
-    hideStudioModal() {
+    hideStudioModal(pushState = true) {
         const modal = document.getElementById('studioModal');
-        const studioModalContent = modal?.querySelector('.relative.mx-auto');
+        const studioModalContent = modal?.querySelector('.relative.mx-auto') || modal?.querySelector('.relative.top-20');
         
         if (modal && studioModalContent) {
+            this.isModalOpen = false;
+            
+            // If closed via UI (not back button), and we were tracking state, go back
+            if (pushState && history.state?.modalOpen === true) {
+                history.back();
+            }
+
             studioModalContent.classList.add('scale-95', 'opacity-0');
+            document.body.classList.remove('modal-open');
             setTimeout(() => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex', 'items-center', 'justify-center', 'p-4');
             }, 300);
+        }
+    }
+
+    showStudioDetailsById(id) {
+        const studio = this.filteredStudios.find(s => s.id === id) || this.studios.find(s => s.id === id);
+        if (studio) {
+            this.showStudioDetails(studio);
+        } else {
+            window.utils?.showNotification('Studio not found', 'error');
+        }
+    }
+
+    initiateBookingById(id) {
+        const studio = this.filteredStudios.find(s => s.id === id) || this.studios.find(s => s.id === id);
+        if (studio) {
+            this.initiateBooking(studio);
+        } else {
+            window.utils?.showNotification('Studio not found', 'error');
         }
     }
 

@@ -88,11 +88,11 @@
                         <span class="sr-only">Search</span>
                     </button>
                     <!-- Sign In/Register Group -->
-                    <div id="authButtons" class="flex items-center space-x-2">
-                        <button id="authBtn" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors">
+                    <div id="authButtons" class="flex items-center space-x-2 whitespace-nowrap">
+                        <button id="authBtn" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap">
                             Sign In
                         </button>
-                        <button id="registerBtnHeader" class="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-black hover:opacity-90 transition-all active:scale-95 shadow-sm border border-transparent dark:border-white/10">
+                        <button id="registerBtnHeader" class="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-black hover:opacity-90 transition-all active:scale-95 shadow-sm border border-transparent dark:border-white/10 whitespace-nowrap">
                             Register
                         </button>
                     </div>
@@ -216,7 +216,7 @@
                             </div>
                             
                             <!-- Black Piano Key (Search Button) - Narrower like a real piano key -->
-                            <div class="absolute right-2 top-1 bottom-1/3">
+                            <div class="black-key-container absolute right-2 top-1 bottom-1/3">
                                 <button id="searchSubmit" class="piano-key black-key bg-black dark:bg-white text-white dark:text-gray-900 transition-all duration-200 rounded-b-lg shadow-lg h-full flex items-center justify-center w-16" aria-label="Search for studios">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -229,11 +229,11 @@
                 
                 <!-- Quick Filters -->
                 <div class="flex flex-wrap justify-center gap-3 mt-8">
-                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Professional Studios</button>
-                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Home Studios</button>
-                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">24/7 Access</button>
-                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Parking Available</button>
-                    <button class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Live Room</button>
+                    <button onclick="window.studiosManager.applyQuickFilter('studio_type', 'Professional')" class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Professional Studios</button>
+                    <button onclick="window.studiosManager.applyQuickFilter('studio_type', 'Home')" class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Home Studios</button>
+                    <button onclick="window.studiosManager.applyQuickFilter('amenity', '24/7 Access')" class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">24/7 Access</button>
+                    <button onclick="window.studiosManager.applyQuickFilter('amenity', 'Parking Available')" class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Parking Available</button>
+                    <button onclick="window.studiosManager.applyQuickFilter('amenity', 'Live Room')" class="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Live Room</button>
                 </div>
             </div>
         </div>
@@ -280,6 +280,7 @@
                 <!-- Category Pills - Airbnb style filter tabs -->
                 <div class="mb-8 overflow-x-auto hide-scrollbar">
                     <div class="flex space-x-4 pb-2" id="categoryFilters">
+                        <button class="category-filter active flex flex-col items-center focus:outline-none" data-category="all">
                             <div class="w-12 h-12 mb-1 rounded-full flex items-center justify-center bg-black dark:bg-white text-white dark:text-black">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
@@ -507,7 +508,7 @@
     </main>
 
     <!-- Studio Detail Modal -->
-    <div id="studioModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div id="studioModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[4000]">
         <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-2xl bg-white dark:bg-slate-900">
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-4">
@@ -526,7 +527,7 @@
     </div>
 
     <!-- Auth Modal -->
-    <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+    <div id="authModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-[4000] flex items-center justify-center p-4">
         <div class="relative mx-auto p-8 border-0 w-full max-w-md shadow-2xl rounded-3xl bg-white dark:bg-slate-900 transition-all duration-300 transform">
             <div class="relative mb-6 text-center">
                 <h3 class="text-2xl font-bold text-gray-900 dark:text-white pr-8" id="authTitle" style="text-align: left;">Sign In</h3>
@@ -546,72 +547,8 @@
                     <span id="authErrorText"></span>
                 </div>
 
-                <!-- Google Sign In - Temporarily disabled pending OAuth configuration -->
-                <!-- To re-enable: remove the 'hidden' class from the div below -->
-                <div class="hidden">
-                    <div class="mb-8">
-                        <button type="button" id="googleSignInBtn" 
-                                class="w-full flex items-center justify-center py-4 px-4 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-200 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black dark:focus:ring-white transition-all transform active:scale-95">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Continue with Google
-                        </button>
-                        
-                        <div class="relative mt-8 mb-6">
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
-                            </div>
-                            <div class="relative flex justify-center text-sm">
-                                <span class="px-3 bg-white dark:bg-slate-900 text-gray-500 font-medium">Or email address</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Email/Password Form -->
                 <form id="authForm" class="auth-view">
-                    <!-- Extended Registration Fields (only shown for sign up) -->
-                    <div id="signUpFields" class="hidden flex-col gap-0 mb-0">
-                        <div class="flex gap-4">
-                            <div class="premium-field-group flex-1">
-                                <input type="text" id="firstName" class="premium-input" placeholder=" ">
-                                <label for="firstName" class="premium-label">First Name</label>
-                            </div>
-                            <div class="premium-field-group flex-1">
-                                <input type="text" id="lastName" class="premium-input" placeholder=" ">
-                                <label for="lastName" class="premium-label">Last Name</label>
-                            </div>
-                        </div>
-
-                        <div class="premium-field-group">
-                            <input type="text" id="address" class="premium-input" placeholder=" ">
-                            <label for="address" class="premium-label">Street Address</label>
-                        </div>
-
-                        <div class="premium-field-group">
-                            <input type="text" id="address2" class="premium-input" placeholder=" ">
-                            <label for="address2" class="premium-label">Apt, Suite, etc. (optional)</label>
-                        </div>
-
-                        <div class="flex gap-4">
-                            <div class="premium-field-group flex-[2]">
-                                <input type="text" id="regCity" class="premium-input" placeholder=" ">
-                                <label for="regCity" class="premium-label">City</label>
-                            </div>
-                            <div class="premium-field-group flex-1">
-                                <input type="text" id="regState" class="premium-input" placeholder=" ">
-                                <label for="regState" class="premium-label">State</label>
-                            </div>
-                            <div class="premium-field-group flex-1">
-                                <input type="text" id="regZip" class="premium-input" placeholder=" ">
-                                <label for="regZip" class="premium-label">Zip</label>
-                            </div>
-                        </div>
-                    </div>
 
                     
                     <div class="premium-field-group">
@@ -623,7 +560,7 @@
                         <div class="password-field-wrapper relative">
                             <input type="password" id="password" name="password" required class="premium-input pr-12" placeholder=" " autocomplete="current-password">
                             <label for="password" class="premium-label">Password</label>
-                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('password', this)" title="Toggle password visibility">
+                            <button type="button" class="password-toggle absolute right-4 bottom-3 p-1 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('password', this)" title="Toggle password visibility">
                                 <i class="fas fa-eye text-sm eye-icon"></i>
                                 <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
                             </button>
@@ -631,32 +568,7 @@
                         <p id="passwordHelp" class="mt-2 text-xs text-gray-500 hidden font-medium"></p>
                     </div>
                     
-                    <!-- Confirm Password field (only shown for sign up) -->
-                    <div id="confirmPasswordField" class="hidden premium-field-group mt-6">
-                        <div class="password-field-wrapper relative">
-                            <input type="password" id="confirmPassword" name="confirm-password" class="premium-input pr-12" placeholder=" " autocomplete="new-password">
-                            <label for="confirmPassword" class="premium-label">Confirm Password</label>
-                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('confirmPassword', this)" title="Toggle password visibility">
-                                <i class="fas fa-eye text-sm eye-icon"></i>
-                                <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
-                            </button>
-                        </div>
-                    </div>
                     
-                    <!-- User Type Selection (only shown for sign up) -->
-                    <div id="userTypeField" class="hidden mb-6">
-                        <label class="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3 ml-1">Account Type</label>
-                        <div class="grid grid-cols-1 gap-2">
-                            <label class="flex items-center p-3 border border-gray-100 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                                <input type="radio" name="userType" value="artist" class="h-4 w-4 text-black focus:ring-black border-gray-300" checked>
-                                <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 font-medium">Artist looking for studios</span>
-                            </label>
-                            <label class="flex items-center p-3 border border-gray-100 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                                <input type="radio" name="userType" value="studio_owner" class="h-4 w-4 text-black focus:ring-black border-gray-300">
-                                <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 font-medium">Studio owner listing a space</span>
-                            </label>
-                        </div>
-                    </div>
                     
                     <!-- Remember Me / Terms -->
                     <div id="signInOptions" class="flex items-center justify-between mb-6 px-1">
@@ -669,14 +581,6 @@
                         </div>
                     </div>
                     
-                    <div id="signUpOptions" class="hidden mb-6 px-1">
-                        <div class="flex items-start">
-                            <input id="agreeTerms" type="checkbox" class="mt-0.5 h-4 w-4 text-black focus:ring-black border-gray-300 rounded-md" required>
-                            <label for="agreeTerms" class="ml-3 block text-sm text-gray-600 dark:text-gray-400">
-                                I agree to the <a href="terms.html" class="text-black dark:text-white font-bold underline">Terms</a> and <a href="privacy.html" class="text-black dark:text-white font-bold underline">Privacy Policy</a>
-                            </label>
-                        </div>
-                    </div>
 
                     <button type="submit" id="signInSubmit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg text-base font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all transform active:scale-[0.98]">
                         <span id="submitBtnText">Sign In</span>
@@ -873,90 +777,69 @@
     <script src="js/features.bundle.js?v=fixed5"></script>
 
     <!-- Register Modal -->
-    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[2000] hidden overflow-y-auto pt-20 pb-10">
-        <div class="bg-white dark:bg-black rounded-3xl p-6 sm:p-10 max-w-lg w-[95%] shadow-2xl relative">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <h2 class="text-2xl font-bold">Register Studio</h2>
-                    <p class="text-xs text-gray-500">Already have an account? <button onclick="closeRegisterModal(); window.authManager.showAuthModal();" class="text-black font-bold underline">Sign In</button></p>
-                </div>
-                <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close register modal">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-start sm:items-center justify-center z-[4000] hidden overflow-y-auto pt-10 sm:pt-0 pb-10">
+        <div class="bg-white dark:bg-zinc-950 rounded-3xl p-6 sm:p-10 max-w-lg w-[95%] shadow-2xl relative">
+            <!-- Close button — absolutely positioned so it never shifts -->
+            <button onclick="closeRegisterModal()" class="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all" aria-label="Close">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <div class="mb-4 pr-10">
+                <h2 class="text-2xl font-black uppercase tracking-tight">Create Account</h2>
+                <p class="text-xs text-gray-500 mt-1">Already have an account? <button onclick="closeRegisterModal(); window.authManager.showAuthModal();" class="text-black dark:text-white font-bold underline">Sign In</button></p>
             </div>
             
             <!-- Progress Indicator -->
             <div class="mb-6">
-                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div id="formProgressBar" class="bg-blue-600 dark:bg-white h-2.5 rounded-full"></div>
+                <div class="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-2.5">
+                    <div id="formProgressBar" class="bg-black dark:bg-white h-2.5 rounded-full transition-all duration-500"></div>
                 </div>
-                <p class="text-xs text-gray-500 mt-1 text-right"><span id="currentStep">1</span> of 3</p>
+                <p class="text-xs text-gray-500 mt-1 text-right">Step <span id="currentStep">1</span> of 3</p>
             </div>
             
             <!-- User Type Toggle -->
             <div class="mb-6">
-                <div class="flex border rounded-lg overflow-hidden">
-                    <button type="button" id="clientToggle" class="userTypeToggle flex-1 py-3 px-4 text-center font-medium bg-black dark:bg-white text-white dark:text-black" onclick="toggleUserType('client')" aria-pressed="true">Client (Artist)</button>
-                    <button type="button" id="studioToggle" class="userTypeToggle flex-1 py-3 px-4 text-center font-medium bg-gray-100 text-gray-700" onclick="toggleUserType('studio')" aria-pressed="false">Studio Owner</button>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">I am a...</p>
+                <div class="flex border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden">
+                    <button type="button" id="clientToggle" class="userTypeToggle flex-1 py-3 px-2 text-center text-[10px] font-black uppercase tracking-widest bg-black dark:bg-white text-white dark:text-black transition-all" onclick="toggleUserType('client')" aria-pressed="true">Artist</button>
+                    <button type="button" id="collectorToggle" class="userTypeToggle flex-1 py-3 px-2 text-center text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-400 border-l border-gray-200 dark:border-white/10 transition-all" onclick="toggleUserType('collector')" aria-pressed="false">Audiophile</button>
+                    <button type="button" id="studioToggle" class="userTypeToggle flex-1 py-3 px-2 text-center text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-400 border-l border-gray-200 dark:border-white/10 transition-all" onclick="toggleUserType('studio')" aria-pressed="false">Studio</button>
                 </div>
-                <p class="text-sm text-gray-600 mt-2">Select whether you're registering as a client looking for studios or as a studio owner listing your space.</p>
+                <p class="text-[10px] text-gray-500 mt-2 uppercase tracking-widest font-bold">Registering as: <span id="selectedRoleText" class="text-black dark:text-white">Artist</span></p>
             </div>
             
             <!-- Multi-step Form -->
             <form id="registrationForm">
                 <!-- Step 1: Basic Info -->
                 <div id="formStep1" class="form-step active-step">
-                    <h3 class="font-bold text-lg mb-4 text-gray-900 dark:text-white">Step 1: Basic Info</h3>
-
-                    <!-- Google Sign In for Register -->
-                    <div class="mb-6">
-                        <button type="button" onclick="window.authManager.signInWithGoogle()" 
-                                class="w-full flex items-center justify-center py-3 px-4 border border-gray-200 dark:border-white/10 rounded-xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-200 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-white/5 transition-all transform active:scale-[0.98]">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Continue with Google
-                        </button>
-                        
-                        <div class="relative mt-6 mb-6">
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-100 dark:border-white/5"></div>
-                            </div>
-                            <div class="relative flex justify-center text-xs">
-                                <span class="px-3 bg-white dark:bg-black text-gray-400 font-medium">Or use email</span>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="font-black text-sm uppercase tracking-widest text-gray-400 mb-5">Step 1 — Basic Info</h3>
                     
                     <div class="flex gap-4">
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerFirstName" class="premium-input" placeholder=" " required>
+                            <input type="text" id="registerFirstName" class="premium-input" placeholder="First Name" required>
                             <label for="registerFirstName" class="premium-label">First Name <span class="required-asterisk">*</span></label>
                         </div>
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerLastName" class="premium-input" placeholder=" " required>
+                            <input type="text" id="registerLastName" class="premium-input" placeholder="Last Name" required>
                             <label for="registerLastName" class="premium-label">Last Name <span class="required-asterisk">*</span></label>
                         </div>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required aria-describedby="emailHint">
+                        <input type="email" id="registerEmail" class="premium-input" placeholder="Email Address" required aria-describedby="emailHint">
                         <label for="registerEmail" class="premium-label">Email <span class="required-asterisk">*</span></label>
                         <p id="emailHint" class="sr-only">Enter a valid email address to receive your confirmation link.</p>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="tel" id="registerPhone" class="premium-input" placeholder=" ">
+                        <input type="tel" id="registerPhone" class="premium-input" placeholder="(555) 000-0000">
                         <label for="registerPhone" class="premium-label">Phone Number (optional)</label>
                     </div>
                     
-                    <div class="flex justify-end mt-6">
-                        <button type="button" onclick="goToStep(2)" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Next</button>
+                    <div class="flex justify-end mt-8">
+                        <button type="button" onclick="goToStep(2)" class="bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 px-10 rounded-2xl hover:opacity-90 transition-all active:scale-95 shadow-xl text-sm">Next →</button>
                     </div>
                 </div>
                 
@@ -1073,9 +956,31 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-between mt-8">
-                        <button type="button" onclick="goToStep(1)" class="border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-2 px-6 rounded-xl transition-colors">Back</button>
-                        <button type="button" onclick="goToStep(3)" class="bg-black text-white hover:bg-gray-800 font-bold py-2 px-6 rounded-xl transition-colors">Next</button>
+                    <!-- Audiophile Fields -->
+                    <div id="collectorFields" class="conditional-fields hidden">
+                        <h3 class="font-bold text-lg mb-4 text-black dark:text-white">Audiophile Preferences</h3>
+                        <div class="premium-field-group">
+                            <select id="collectorInterest" class="premium-input premium-select">
+                                <option value="" disabled selected hidden></option>
+                                <option value="vintage-mics">Vintage Microphones</option>
+                                <option value="analog-consoles">Analog Consoles</option>
+                                <option value="modular-synths">Modular Synthesizers</option>
+                                <option value="outboard-gear">Outboard Gear</option>
+                                <option value="tape-machines">Tape Machines</option>
+                                <option value="other">General Audio Heritage</option>
+                            </select>
+                            <label for="collectorInterest" class="premium-label">Primary Audiophile Focus</label>
+                        </div>
+                        
+                        <div class="premium-field-group mt-6">
+                            <textarea id="collectorBio" class="premium-input min-h-[100px] py-4" placeholder=" "></textarea>
+                            <label for="collectorBio" class="premium-label">Share your audio journey/setup</label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-10 gap-4">
+                        <button type="button" onclick="goToStep(1)" class="flex-1 border-2 border-black dark:border-white text-black dark:text-white font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all active:scale-95 text-sm">Back</button>
+                        <button type="button" onclick="goToStep(3)" class="flex-[2] bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded-2xl hover:opacity-90 transition-all active:scale-95 shadow-xl text-sm">Next</button>
                     </div>
                 </div>
                 
@@ -1087,7 +992,7 @@
                         <div class="password-field-wrapper relative">
                             <input type="password" id="registerPassword" name="password" autocomplete="new-password" class="premium-input pr-12" placeholder=" " required aria-describedby="passwordStrength" onkeyup="checkPasswordStrength(this.value)">
                             <label for="registerPassword" class="premium-label">Password <span class="required-asterisk">*</span></label>
-                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerPassword', this)" title="Toggle password visibility">
+                            <button type="button" class="password-toggle absolute right-4 bottom-3 p-1 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerPassword', this)" title="Toggle password visibility">
                                 <i class="fas fa-eye text-sm eye-icon"></i>
                                 <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
                             </button>
@@ -1099,7 +1004,7 @@
                         <div class="password-field-wrapper relative">
                             <input type="password" id="registerConfirmPassword" name="confirm-password" autocomplete="new-password" class="premium-input pr-12" placeholder=" " required>
                             <label for="registerConfirmPassword" class="premium-label">Confirm Password <span class="required-asterisk">*</span></label>
-                            <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerConfirmPassword', this)" title="Toggle password visibility">
+                            <button type="button" class="password-toggle absolute right-4 bottom-3 p-1 text-gray-400 hover:text-black dark:hover:text-white transition-colors" onclick="togglePasswordVisibility('registerConfirmPassword', this)" title="Toggle password visibility">
                                 <i class="fas fa-eye text-sm eye-icon"></i>
                                 <i class="fas fa-eye-slash text-sm eye-off-icon hidden"></i>
                             </button>
@@ -1126,9 +1031,9 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-between mt-8">
-                        <button type="button" onclick="goToStep(2)" class="border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-2 px-6 rounded-xl transition-colors">Back</button>
-                        <button type="button" onclick="submitRegistration()" class="bg-black text-white hover:bg-gray-800 font-bold py-2 px-8 rounded-xl transition-transform active:scale-95 shadow-lg" title="Create account" id="registerBtn">Register</button>
+                    <div class="flex justify-between mt-10 gap-4">
+                        <button type="button" onclick="goToStep(2)" class="flex-1 border-2 border-black dark:border-white text-black dark:text-white font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all active:scale-95 text-sm">Back</button>
+                        <button type="button" onclick="submitRegistration()" class="flex-[2] bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded-2xl hover:opacity-90 transition-all active:scale-95 shadow-[0_15px_30px_rgba(0,0,0,0.2)] text-sm" id="registerBtn">Complete Registration</button>
                     </div>
                 </div>
             </form>
@@ -1143,12 +1048,14 @@
         
         function showRegisterModal() {
             document.getElementById('registerModal').classList.remove('hidden');
+            document.body.classList.add('modal-open');
             // Reset form to step 1
             goToStep(1, true);
         }
         
         function closeRegisterModal() {
             document.getElementById('registerModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
             // Reset form values
             document.getElementById('registrationForm').reset();
         }
@@ -1209,70 +1116,51 @@
             updateConditionalFields();
         }
 
+        // Bridge function for notifications
+        function showNotification(message, type = 'info') {
+            if (window.utils && typeof window.utils.showNotification === 'function') {
+                window.utils.showNotification(message, type);
+            } else {
+                console.log(`Notification (${type}): ${message}`);
+                // Fallback to alert if utils not loaded yet
+                if (type === 'error') alert(message);
+            }
+        }
+
         // --- AUTHENTICATION HANDLERS ---
 
-        async function signInWithGoogle() {
-            console.log('Initiating Google Sign-In...');
-            const supabase = window.db?.supabase || window.supabaseClient;
-            if (!supabase) {
-                console.error('Supabase client not initialized');
-                showNotification('Connection error. Please refresh the page and try again.', 'error');
-                return;
-            }
 
-            try {
-                const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: { redirectTo: window.location.origin + '/app.html' }
-                });
-                if (error) throw error;
-            } catch (error) {
-                console.error('Google Sign-In Error:', error);
-                if (error.message.includes('provider is not enabled')) {
-                    alert('Google Sign-In is not yet enabled in your Supabase project. Please enable it in your Supabase Dashboard (Authentication -> Providers -> Google) using your Client ID and Secret.');
-                } else {
-                    alert('Sign-In failed: ' + error.message);
-                }
-            }
-        }
-
-        function showAuthModal() {
-            console.log('Showing Auth Modal');
-            const modal = document.getElementById('authModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeAuthModal() {
-            const modal = document.getElementById('authModal');
-            if (modal) modal.classList.add('hidden');
-        }
         
         function toggleUserType(type) {
             selectedUserType = type;
             
-            // Update UI to show the active selection
-            const clientToggle = document.getElementById('clientToggle');
-            const studioToggle = document.getElementById('studioToggle');
+            const toggles = {
+                client: document.getElementById('clientToggle'),
+                collector: document.getElementById('collectorToggle'),
+                studio: document.getElementById('studioToggle')
+            };
             
-            if (type === 'client') {
-                clientToggle.classList.add('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
-                clientToggle.classList.remove('bg-gray-100', 'text-gray-700');
-                clientToggle.setAttribute('aria-pressed', 'true');
-                
-                studioToggle.classList.add('bg-gray-100', 'text-gray-700');
-                studioToggle.classList.remove('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
-                studioToggle.setAttribute('aria-pressed', 'false');
-            } else {
-                studioToggle.classList.add('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
-                studioToggle.classList.remove('bg-gray-100', 'text-gray-700');
-                studioToggle.setAttribute('aria-pressed', 'true');
-                
-                clientToggle.classList.add('bg-gray-100', 'text-gray-700');
-                clientToggle.classList.remove('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
-                clientToggle.setAttribute('aria-pressed', 'false');
-            }
+            const roleText = {
+                client: 'Artist',
+                collector: 'Audiophile',
+                studio: 'Studio Owner'
+            };
+
+            document.getElementById('selectedRoleText').textContent = roleText[type];
+
+            Object.keys(toggles).forEach(key => {
+                const btn = toggles[key];
+                if (key === type) {
+                    btn.classList.add('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
+                    btn.classList.remove('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-400');
+                    btn.setAttribute('aria-pressed', 'true');
+                } else {
+                    btn.classList.add('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-400');
+                    btn.classList.remove('bg-black', 'dark:bg-white', 'text-white', 'dark:text-black');
+                    btn.setAttribute('aria-pressed', 'false');
+                }
+            });
             
-            // Update conditional fields if on step 2
             if (currentStep === 2) {
                 updateConditionalFields();
             }
@@ -1281,13 +1169,18 @@
         function updateConditionalFields() {
             const clientFields = document.getElementById('clientFields');
             const studioFields = document.getElementById('studioFields');
+            const collectorFields = document.getElementById('collectorFields');
             
+            clientFields.classList.add('hidden');
+            studioFields.classList.add('hidden');
+            collectorFields.classList.add('hidden');
+
             if (selectedUserType === 'client') {
                 clientFields.classList.remove('hidden');
-                studioFields.classList.add('hidden');
-            } else {
-                clientFields.classList.add('hidden');
+            } else if (selectedUserType === 'studio') {
                 studioFields.classList.remove('hidden');
+            } else if (selectedUserType === 'collector') {
+                collectorFields.classList.remove('hidden');
             }
         }
         
@@ -1334,45 +1227,44 @@
             }
         }
         
-        function submitRegistration() {
+        async function submitRegistration() {
             // Validate the form
             const termsAccepted = document.getElementById('termsAccept').checked;
             if (!termsAccepted) {
-                showNotification('You must accept the Terms of Service and Privacy Policy', 'warning');
+                showNotification('Please accept the Terms of Service and Privacy Policy', 'error');
                 return;
             }
             
-            // Get form values
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
             const firstName = document.getElementById('registerFirstName').value;
             const lastName = document.getElementById('registerLastName').value;
-            const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const address = document.getElementById('registerAddress').value;
             const address2 = document.getElementById('registerAddress2').value;
             const city = document.getElementById('registerCity').value;
             const state = document.getElementById('registerState').value;
             const zip = document.getElementById('registerZip').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
             const referral = document.getElementById('registerReferral').value;
             const marketingConsent = document.getElementById('marketingConsent').checked;
-
+            
             const fullName = `${firstName} ${lastName}`.trim();
-            const fullAddress = `${address}${address2 ? ', ' + address2 : ''}, ${city}, ${state} ${zip}`.trim();
+            const fullAddress = `${address}${address2 ? ', ' + address2 : ''}, ${city}, ${state} ${zip}`;
+
+            if (!email || !password || !firstName || !lastName) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
             
-            // Get user type specific fields
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+            
+            // Collect additional data based on user type
             let additionalData = {};
-            
-            if (selectedUserType === 'client') {
-                const artistGenresSelect = document.getElementById('artistGenres');
-                const selectedGenres = Array.from(artistGenresSelect.selectedOptions).map(option => option.value);
-                const experienceLevel = document.getElementById('experienceLevel').value;
-                
-                additionalData = {
-                    genres: selectedGenres,
-                    experience_level: experienceLevel
-                };
-            } else {
+            if (selectedUserType === 'studio') {
                 const studioName = document.getElementById('studioName').value;
                 const studioType = document.getElementById('studioType').value;
                 const amenities = [
@@ -1387,119 +1279,98 @@
                     studio_type: studioType,
                     amenities: amenities
                 };
-            }
-            
-            // Validate required fields
-            if (!firstName || !lastName || !email || !password || !confirmPassword) {
-                showNotification('Please fill out all required fields', 'warning');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showNotification('Passwords do not match', 'error');
-                return;
+            } else if (selectedUserType === 'collector') {
+                const interest = document.getElementById('collectorInterest').value;
+                const bio = document.getElementById('collectorBio').value;
+                
+                additionalData = {
+                    collector_interest: interest,
+                    collector_bio: bio
+                };
+            } else {
+                const genreSelect = document.getElementById('artistGenres');
+                const genres = Array.from(genreSelect.selectedOptions).map(option => option.value);
+                const experience = document.getElementById('experienceLevel').value;
+                
+                additionalData = {
+                    genres: genres,
+                    experience_level: experience
+                };
             }
             
             // Show loading state
-            const registerBtn = document.querySelector('button[onclick="submitRegistration()"]');
+            const registerBtn = document.getElementById('registerBtn');
             const originalBtnText = registerBtn.innerHTML;
-            registerBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Registering...';
+            registerBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Registering...';
             registerBtn.disabled = true;
             
-            // Connect to Supabase and register user
-            const supabase = window.db?.supabase || window.supabaseClient;
-            
-            if (!supabase) {
-                console.error('Supabase client not initialized');
-                alert('Connection error. Please refresh the page and try again.');
-                registerBtn.innerHTML = originalBtnText;
-                registerBtn.disabled = false;
-                return;
-            }
-            
-            // First register the auth user with expanded metadata
-            supabase.auth.signUp({ 
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        first_name: firstName,
-                        last_name: lastName,
-                        full_name: fullName,
-                        user_type: selectedUserType,
-                        phone: phone || null,
-                        address: address || null,
-                        address_line_2: address2 || null,
-                        city: city || null,
-                        state: state || null,
-                        zip: zip || null,
-                        location: fullAddress || null,
-                        marketing_consent: marketingConsent,
-                        referral: referral || 'direct',
-                        ...additionalData
-                    }
-                }
-            })
-            .then(({ data, error }) => {
-                if (error) {
-                    console.error('Registration error:', error);
-                    showNotification('Registration failed: ' + error.message, 'error');
-                    registerBtn.innerHTML = originalBtnText;
-                    registerBtn.disabled = false;
-                    return;
-                }
-                // Create core user profile in users table
-                if (window.authManager && typeof window.authManager.createUserProfile === 'function') {
-                    window.authManager.createUserProfile(data.user, firstName, lastName, fullName, selectedUserType, referral);
+            try {
+                // Connect to Supabase
+                const supabase = window.db?.supabase || (window.authManager && window.authManager.getClient());
+                
+                if (!supabase) {
+                    throw new Error('Database connection not available');
                 }
                 
-                // Also store in studio_registrations table with additional info
-                if (window.db && window.db.supabase) {
-                    window.db.supabase
-                        .from('studio_registrations')
-                    .insert([
-
-                        { 
+                // 1. Sign Up the user
+                const { data, error: signUpError } = await supabase.auth.signUp({ 
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
                             first_name: firstName,
                             last_name: lastName,
-                            name: fullName,
-                            email: email,
+                            full_name: fullName,
+                            user_type: selectedUserType,
                             phone: phone || null,
                             address: address || null,
+                            address_line_2: address2 || null,
                             city: city || null,
                             state: state || null,
                             zip: zip || null,
                             location: fullAddress || null,
-                            user_type: selectedUserType,
                             marketing_consent: marketingConsent,
                             referral: referral || 'direct',
-                            additional_data: additionalData,
-                            registration_date: new Date().toISOString()
+                            ...additionalData
                         }
-                    ])
-
-                    .then(({ error: insertError }) => {
-                        if (insertError) {
-                            console.warn('Additional registration data error:', insertError);
-                            // Continue anyway since auth user was created
-                        }
-                        
-                        // Success message and close modal
-                        showNotification('Registration successful! Check your email to confirm your account.', 'success');
+                    }
+                });
+                
+                if (signUpError) throw signUpError;
+                
+                if (data && data.user) {
+                    // Create core user profile in users table
+                    if (window.authManager && typeof window.authManager.createUserProfile === 'function') {
+                        await window.authManager.createUserProfile(data.user, firstName, lastName, fullName, selectedUserType, referral);
+                    }
+                    
+                    // Success handling
+                    const needsVerification = !data.user.email_confirmed_at && !data.session;
+                    if (needsVerification) {
+                        showNotification('Account created! Please check your email to verify your account before signing in.', 'success');
                         closeRegisterModal();
-                        
-                        // Restore button
-                        registerBtn.innerHTML = originalBtnText;
-                        registerBtn.disabled = false;
-                    });
-                } else {
-                    // No extra DB write needed, just show success
-                    showNotification('Registration successful! Check your email to confirm your account.', 'success');
-                    closeRegisterModal();
+                    } else {
+                        // User is already confirmed (e.g. email confirmation disabled in Supabase)
+                        showNotification('Welcome to PluggedIn! Your account is ready.', 'success');
+                        closeRegisterModal();
+                        if (window.authManager) {
+                            window.authManager.currentUser = data.user;
+                            window.authManager.updateUIForAuthenticatedUser();
+                        }
+                        setTimeout(() => {
+                            window.location.href = 'profile.html';
+                        }, 1500);
+                    }
+                }
+            } catch (error) {
+                console.error('Registration flow error:', error);
+                showNotification(error.message || 'An unexpected error occurred during registration', 'error');
+            } finally {
+                if (registerBtn) {
                     registerBtn.innerHTML = originalBtnText;
                     registerBtn.disabled = false;
                 }
-            });
+            }
         }
         
         // Password strength listener for registration form
@@ -1512,10 +1383,9 @@
             }
         });
     </script>
-    <script src="js/webapp-auth.js?v=fixed5"></script>
     <script src="js/script.js?v=fixed5"></script>
-    <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-bottom-nav">
+    <!-- Mobile Bottom Navigation (hidden until signed in) -->
+    <nav class="mobile-bottom-nav hidden" id="mobileBottomNav">
         <a href="app.html" class="mobile-nav-item active" aria-label="Explore Studios">
             <i class="fas fa-search"></i>
             <span>Explore</span>
@@ -1537,5 +1407,54 @@
             <span>Profile</span>
         </a>
     </nav>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookieBanner" class="cookie-banner">
+        <div class="flex flex-col gap-6">
+            <div class="flex items-start gap-5">
+                <div class="p-4 bg-black text-white rounded-none">
+                    <i class="fas fa-fingerprint text-2xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-xl uppercase tracking-widest text-black dark:text-white">Privacy & Data</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed font-medium">We use technical cookies to optimize your high-fidelity experience. By continuing, you agree to our professional data standards.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 pt-2">
+                <button id="acceptCookiesBtn" class="flex-1 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded-none hover:opacity-90 transition-all active:scale-95 text-xs">Accept All</button>
+                <a href="privacy.html" class="flex-1 text-center border-2 border-black dark:border-white text-black dark:text-white font-black uppercase tracking-widest py-4 rounded-none hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all text-xs">Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Consent Init (runs immediately after the element is in the DOM) -->
+    <script>
+        (function() {
+            function initCookieBanner() {
+                var consent = localStorage.getItem('cookie_consent');
+                var banner = document.getElementById('cookieBanner');
+                if (!consent && banner) {
+                    setTimeout(function() {
+                        banner.style.display = 'block';
+                    }, 1500);
+                }
+                var btn = document.getElementById('acceptCookiesBtn');
+                if (btn && banner) {
+                    btn.addEventListener('click', function() {
+                        localStorage.setItem('cookie_consent', 'accepted');
+                        banner.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+                        banner.style.transform = 'translateY(120%)';
+                        banner.style.opacity = '0';
+                        setTimeout(function() { banner.style.display = 'none'; }, 450);
+                    });
+                }
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCookieBanner);
+            } else {
+                initCookieBanner();
+            }
+        })();
+    </script>
 </body>
 </html>

@@ -7,7 +7,8 @@
     --piano-white: #ffffff;
     --piano-black: #000000;
     --border-color: #e5e7eb;
-    --accent: #2563eb;
+    --accent: #000000;
+    --accent-color: #000000;
     --glass-bg: rgba(255, 255, 255, 0.8);
     --glass-border: rgba(0, 0, 0, 0.1);
 }
@@ -21,7 +22,7 @@ html.dark {
     --border-color: #27272a;
     --piano-white: #fdfdfd;
     --piano-black: #000000;
-    --accent: #3b82f6;
+    --accent: #ffffff;
     --glass-bg: rgba(0, 0, 0, 0.8);
     --glass-border: rgba(255, 255, 255, 0.1);
 }
@@ -31,6 +32,8 @@ body {
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
     -webkit-font-smoothing: antialiased;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* --- Accessibility Focus Rings --- */
@@ -124,13 +127,19 @@ nav button#registerBtnHeader:not(.dark *) {
 /* Piano Brand Assets - Professional Sync */
 .logo-light {
     display: inline-block !important;
-    height: 4rem !important;   /* h-16 = 64px */
+    height: 3.5rem !important;   /* Adjusted for better mobile fit */
     width: auto !important;
 }
 .logo-dark {
     display: none !important;
-    height: 4rem !important;
+    height: 3.5rem !important;
     width: auto !important;
+}
+
+@media (max-width: 640px) {
+    .logo-light, .logo-dark {
+        height: 2.5rem !important;
+    }
 }
 
 html.dark .logo-light {
@@ -163,10 +172,10 @@ img, svg, picture, video {
     left: 0;
     right: 0;
     height: calc(4.5rem + env(safe-area-inset-bottom));
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-top: 1px solid var(--glass-border);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     z-index: 2000;
     padding-bottom: env(safe-area-inset-bottom);
     display: none; /* Controlled by media query */
@@ -174,14 +183,51 @@ img, svg, picture, video {
     justify-content: space-around;
 }
 
+html.dark .mobile-bottom-nav {
+    background: rgba(0, 0, 0, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 @media (max-width: 768px) {
-    .mobile-bottom-nav {
-        display: flex;
-    }
-    
     /* Adjust page content to prevent overlap */
     body {
         padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
+    
+    /* Hide bottom nav when modals are open */
+    body.modal-open .mobile-bottom-nav {
+        display: none !important;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .mobile-bottom-nav {
+        height: 3.5rem !important;
+    }
+    body {
+        padding-bottom: 4rem !important;
+    }
+    .mobile-nav-item i {
+        font-size: 1.1rem !important;
+    }
+    .mobile-nav-item span {
+        font-size: 0.6rem !important;
+    }
+    /* Reduce hero and search bar padding in landscape */
+    .py-16 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    .piano-key > div {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+    h1.text-5xl {
+        font-size: 2.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    p.text-xl {
+        font-size: 1rem !important;
     }
 }
 
@@ -191,7 +237,7 @@ img, svg, picture, video {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
+    color: #4b5563; /* Light mode text-secondary */
     font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -200,13 +246,22 @@ img, svg, picture, video {
     opacity: 0.6;
 }
 
+html.dark .mobile-nav-item {
+    color: #a1a1aa; /* Dark mode text-secondary */
+}
+
 .mobile-nav-item i {
     font-size: 1.4rem;
     margin-bottom: 0.25rem;
 }
 
 .mobile-nav-item.active {
-    color: var(--accent);
+    color: #000000;
+    opacity: 1;
+}
+
+html.dark .mobile-nav-item.active {
+    color: #ffffff;
 }
 
 .mobile-nav-item.active i {
@@ -532,9 +587,13 @@ textarea:focus {
     background-color: var(--input-bg);
     border: 1.5px solid var(--input-border);
     border-radius: 12px;
-    color: inherit;
+    color: var(--text-primary);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none !important;
+}
+
+.dark .premium-input {
+    color: #ffffff !important;
 }
 
 .premium-input:focus {
@@ -550,8 +609,10 @@ textarea:focus {
 .premium-label {
     position: absolute;
     left: 16px;
-    top: 18px;
-    font-size: 16px;
+    top: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     color: var(--input-label);
     pointer-events: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -559,23 +620,26 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 4px;
+    text-transform: uppercase;
 }
 
 .premium-input:focus ~ .premium-label,
 .premium-input:not(:placeholder-shown) ~ .premium-label {
-    transform: translateY(-14px) scale(0.75);
+    top: 8px;
+    font-size: 11px;
     color: var(--input-focus);
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
 }
 
 /* Labels inside password-field-wrapper */
 .password-field-wrapper .premium-input:focus ~ .premium-label,
 .password-field-wrapper .premium-input:not(:placeholder-shown) ~ .premium-label {
-    transform: translateY(-14px) scale(0.75);
+    top: 8px;
+    font-size: 11px;
     color: var(--input-focus);
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
 }
 
 /* Fix for required asterisk */
@@ -1806,7 +1870,21 @@ body.dark-mode .form-message.error {
   
   /* Ensure black piano keys display properly */
   .black-key-container {
-    display: none; /* Hide on mobile as they cause obstruction */
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 60px !important;
+    margin-top: 0.5rem;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+  }
+  
+  .piano-key.black-key {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
   }
   
   /* Improve button clickability */
@@ -2577,35 +2655,59 @@ body.dark-mode .comparison-table .legend {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 1.5rem;
-    padding: 1.25rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    z-index: 1000;
+    max-width: 420px;
+    background: #fff;
+    backdrop-filter: blur(20px);
+    border: 2px solid #000;
+    border-radius: 0;
+    padding: 2rem;
+    box-shadow: 20px 20px 0px #000;
+    z-index: 9999;
     display: none;
-    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUpPremium 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .dark .cookie-banner {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #000;
+    border: 2px solid #fff;
+    box-shadow: 20px 20px 0px rgba(255,255,255,0.1);
 }
 
-@keyframes slideUp {
-    from { transform: translateY(100%) scale(0.9); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
+@keyframes slideUpPremium {
+    from { transform: translateY(120%) scale(0.8) rotate(2deg); opacity: 0; }
+    to { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
 }
 
 @media (max-width: 640px) {
     .cookie-banner {
-        bottom: 6.5rem; /* Raised to avoid blocking mobile-bottom-nav */
+        bottom: calc(5.5rem + env(safe-area-inset-bottom));
         left: 1rem;
         right: 1rem;
         max-width: none;
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+        padding: 1.5rem;
+        box-shadow: 10px 10px 0px rgba(0, 0, 0, 1);
+        border: 2px solid #000;
+    }
+}
+
+/* Landscape Cookie Banner Optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+    .cookie-banner {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        left: auto !important;
+        max-width: 340px !important;
+        padding: 1rem !important;
+        box-shadow: 5px 5px 0px rgba(0, 0, 0, 1) !important;
+        transform: scale(0.9);
+        transform-origin: bottom right;
+    }
+    .cookie-banner h4 {
+        font-size: 1rem !important;
+    }
+    .cookie-banner p {
+        font-size: 0.75rem !important;
+        margin-top: 0.5rem !important;
     }
 }
 
@@ -2813,6 +2915,14 @@ html.dark .password-toggle:hover {
     --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* --- Apple & Android Safe Area (Notch/Home Indicator) Support --- */
+:root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+}
+
 /* Navigation Notch Support */
 nav.sticky, nav.fixed {
     padding-top: var(--safe-top) !important;
@@ -2820,18 +2930,35 @@ nav.sticky, nav.fixed {
 
 /* Mobile Bottom Nav Notch Support - Consolidated */
 .mobile-bottom-nav {
-    padding-bottom: env(safe-area-inset-bottom) !important;
-    height: calc(4.5rem + env(safe-area-inset-bottom)) !important;
+    padding-bottom: var(--safe-bottom) !important;
+    height: calc(4.5rem + var(--safe-bottom)) !important;
 }
 
-/* Optimize Mobile Tap Targets */
+/* Optimize Mobile Tap Targets & Clickability */
 @media (max-width: 768px) {
-    .tag-btn, .active-tag, button, a.btn, nav a {
-        min-height: 44px;
+    .tag-btn, .active-tag, button, a.btn, nav a, .mobile-nav-item, select, input[type="checkbox"], input[type="radio"] {
+        min-height: 44px !important;
         display: inline-flex;
         align-items: center;
         justify-content: center;
     }
+    
+    /* Ensure inputs have enough tap area */
+    .premium-input {
+        min-height: 56px;
+    }
+    
+    /* Avoid text selection on buttons for better feel */
+    button, .userTypeToggle {
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* Ensure no invisible overlays block clicks */
+.hidden, [hidden], .modal-hidden {
+    pointer-events: none !important;
+    display: none !important;
 }
 
 /* Immersive background for notch devices */

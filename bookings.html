@@ -97,22 +97,33 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-20">
-            <div class="bg-gray-50 dark:bg-zinc-900/50 p-8 rounded-3xl border border-gray-100 dark:border-white/5">
-                <p class="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Confirmed</p>
-                <p class="text-4xl font-black" id="confirmedCount">0</p>
+        <!-- Stats Grid (Piano Theme) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-0 mb-20 rounded-[2.5rem] overflow-hidden border-4 border-black dark:border-white shadow-2xl">
+            <!-- Confirmed (White Key) -->
+            <div class="bg-white dark:bg-zinc-900 p-10 border-r-4 border-b-4 md:border-b-0 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 group-hover:text-black dark:group-hover:text-white transition-colors">Confirmed</label>
+                <p class="text-5xl font-black text-black dark:text-white tracking-tighter" id="confirmedCount">0</p>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-900/50 p-8 rounded-3xl border border-gray-100 dark:border-white/5">
-                <p class="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Pending</p>
-                <p class="text-4xl font-black" id="pendingCount">0</p>
+            
+            <!-- Pending (White Key) -->
+            <div class="bg-white dark:bg-zinc-900 p-10 border-r-4 md:border-r-4 border-b-4 md:border-b-0 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 group-hover:text-black dark:group-hover:text-white transition-colors">Pending</label>
+                <p class="text-5xl font-black text-black dark:text-white tracking-tighter" id="pendingCount">0</p>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-900/50 p-8 rounded-3xl border border-gray-100 dark:border-white/5">
-                <p class="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Completed</p>
-                <p class="text-4xl font-black" id="completedCount">0</p>
+
+            <!-- Completed (White Key) -->
+            <div class="bg-white dark:bg-zinc-900 p-10 border-r-4 md:border-r-4 border-black dark:border-white transition-all hover:bg-gray-50 dark:hover:bg-zinc-800 group">
+                <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 group-hover:text-black dark:group-hover:text-white transition-colors">Completed</label>
+                <p class="text-5xl font-black text-black dark:text-white tracking-tighter" id="completedCount">0</p>
             </div>
-            <div class="bg-black dark:bg-white p-8 rounded-3xl text-white dark:text-black">
-                <p class="text-xs font-black uppercase tracking-widest opacity-60 mb-2">Investment</p>
-                <p class="text-4xl font-black" id="totalSpent">$0</p>
+            
+            <!-- Investment (Black Key) -->
+            <div class="bg-black dark:bg-white p-10 transition-all hover:opacity-90 group relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fas fa-piano text-6xl text-white dark:text-black"></i>
+                </div>
+                <label class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-4 group-hover:text-white dark:group-hover:text-black transition-colors">Investment</label>
+                <p class="text-5xl font-black text-white dark:text-black tracking-tighter" id="totalSpent">$0</p>
             </div>
         </div>
 

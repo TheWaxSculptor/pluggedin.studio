@@ -488,40 +488,61 @@ Object.assign(window.db, {
         const tableName = getTableName('payments');
         const bookingsTable = getTableName('bookings');
         const studiosTable = getTableName('studios');
+        const client = window.supabaseClient || supabaseClient;
         
-        let query = supabaseClient
-            .from(tableName)
-            .select(`
-                *,
-                ${bookingsTable}(id, studio_id, ${studiosTable}(name))
-            `)
-            .eq('user_id', userId);
+        if (!client) return [];
         
-        if (filters.status) {
-            query = query.eq('status', filters.status);
+        try {
+            let query = client
+                .from(tableName)
+                .select(`
+                    *,
+                    ${bookingsTable}(id, studio_id, ${studiosTable}(name))
+                `)
+                .eq('user_id', userId);
+            
+            if (filters.status) {
+                query = query.eq('status', filters.status);
+            }
+            
+            const { data, error } = await query.order('created_at', { ascending: false });
+            if (error) {
+                if (error.code === 'PGRST116') return []; // Table missing
+                throw error;
+            }
+            return data || [];
+        } catch (err) {
+            console.warn('Payments table not available or error:', err.message);
+            return [];
         }
-        
-        const { data, error } = await query.order('created_at', { ascending: false });
-        if (error) throw error;
-        return data;
     },
 
     // Studio Analytics & Financials
     async getStudioFinancials(studioId) {
         const paymentsTable = getTableName('payments');
         const bookingsTable = getTableName('bookings');
-        
-        // Fetch all successful payments for bookings belonging to this studio
-        const { data, error } = await supabaseClient
-            .from(paymentsTable)
-            .select(`
-                *,
-                ${bookingsTable}!inner(id, studio_id)
-            `)
-            .eq(`${bookingsTable}.studio_id`, studioId);
+        const client = window.supabaseClient || supabaseClient;
+        if (!client) return [];
 
-        if (error) throw error;
-        return data || [];
+        try {
+            // Fetch all successful payments for bookings belonging to this studio
+            const { data, error } = await client
+                .from(paymentsTable)
+                .select(`
+                    *,
+                    ${bookingsTable}!inner(id, studio_id)
+                `)
+                .eq(`${bookingsTable}.studio_id`, studioId);
+
+            if (error) {
+                if (error.code === 'PGRST116') return [];
+                throw error;
+            }
+            return data || [];
+        } catch (err) {
+            console.warn('Financials error:', err.message);
+            return [];
+        }
     },
 
     async getStudioPayouts(studioId) {
@@ -569,18 +590,28 @@ Object.assign(window.db, {
         const reviewsTable = getTableName('reviews');
         const usersTable = getTableName('users');
         const bookingsTable = getTableName('bookings');
+        const client = window.supabaseClient || supabaseClient;
+        if (!client) return [];
         
-        const { data, error } = await supabaseClient
-            .from(reviewsTable)
-            .select(`
-                *,
-                ${usersTable}(name, avatar_url),
-                ${bookingsTable}(id, verified)
-            `)
-            .eq('studio_id', studioId)
-            .order('created_at', { ascending: false });
-        if (error) throw error;
-        return data;
+        try {
+            const { data, error } = await client
+                .from(reviewsTable)
+                .select(`
+                    *,
+                    ${usersTable}(name, avatar_url),
+                    ${bookingsTable}(id, verified)
+                `)
+                .eq('studio_id', studioId)
+                .order('created_at', { ascending: false });
+            if (error) {
+                if (error.code === 'PGRST116') return [];
+                throw error;
+            }
+            return data || [];
+        } catch (err) {
+            console.warn('Reviews table not available:', err.message);
+            return [];
+        }
     },
 
     async createReview(reviewData) {

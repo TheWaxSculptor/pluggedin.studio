@@ -108,6 +108,32 @@ class MarketplaceManager {
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
             });
         }
+
+        // Reset Filters Link/Button (Standardized)
+        const resetBtn = document.getElementById('resetMarketplaceFilters');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.resetFilters();
+            });
+        }
+    }
+
+    resetFilters() {
+        this.filters = {
+            search: '',
+            category: 'all',
+            status: 'all'
+        };
+        
+        const searchInput = document.getElementById('gearSearch');
+        const categorySelect = document.getElementById('categorySelect');
+        
+        if (searchInput) searchInput.value = '';
+        if (categorySelect) categorySelect.value = 'all';
+        
+        this.updateChipUI();
+        this.loadGear();
     }
 
     updateChipUI() {

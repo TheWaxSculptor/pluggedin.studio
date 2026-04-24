@@ -814,25 +814,25 @@
                 <div id="formStep1" class="form-step active-step">
                     <h3 class="font-black text-sm uppercase tracking-widest text-gray-400 mb-5">Step 1 — Basic Info</h3>
                     
-                    <div class="flex gap-4">
+                    <div class="flex flex-col sm:flex-row gap-4">
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerFirstName" class="premium-input" placeholder=" " required>
+                            <input type="text" id="registerFirstName" class="premium-input" placeholder="" required>
                             <label for="registerFirstName" class="premium-label">First Name <span class="required-asterisk">*</span></label>
                         </div>
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerLastName" class="premium-input" placeholder=" " required>
+                            <input type="text" id="registerLastName" class="premium-input" placeholder="" required>
                             <label for="registerLastName" class="premium-label">Last Name <span class="required-asterisk">*</span></label>
                         </div>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required aria-describedby="emailHint">
+                        <input type="email" id="registerEmail" class="premium-input" placeholder="" required aria-describedby="emailHint">
                         <label for="registerEmail" class="premium-label">Email <span class="required-asterisk">*</span></label>
                         <p id="emailHint" class="sr-only">Enter a valid email address to receive your confirmation link.</p>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="tel" id="registerPhone" class="premium-input" placeholder=" ">
+                        <input type="tel" id="registerPhone" class="premium-input" placeholder="">
                         <label for="registerPhone" class="premium-label">Phone Number (optional)</label>
                     </div>
                     
@@ -1238,11 +1238,11 @@
                 return;
             }
             
-            const email = document.getElementById('registerEmail').value;
+            const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            const firstName = document.getElementById('registerFirstName').value;
-            const lastName = document.getElementById('registerLastName').value;
+            const firstName = document.getElementById('registerFirstName').value.trim();
+            const lastName = document.getElementById('registerLastName').value.trim();
             const referral = document.getElementById('registerReferral').value;
 
             if (!email || !password || !firstName || !lastName || !referral) {

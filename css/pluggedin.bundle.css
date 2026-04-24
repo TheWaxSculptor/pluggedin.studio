@@ -587,7 +587,7 @@ textarea:focus {
     background-color: var(--input-bg);
     border: 1.5px solid var(--input-border);
     border-radius: 16px;
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none !important;
 }

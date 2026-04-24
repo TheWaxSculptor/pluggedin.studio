@@ -816,23 +816,23 @@
                     
                     <div class="flex flex-col sm:flex-row gap-4">
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerFirstName" class="premium-input" placeholder="" required>
+                            <input type="text" id="registerFirstName" class="premium-input" placeholder=" " required>
                             <label for="registerFirstName" class="premium-label">First Name <span class="required-asterisk">*</span></label>
                         </div>
                         <div class="premium-field-group flex-1">
-                            <input type="text" id="registerLastName" class="premium-input" placeholder="" required>
+                            <input type="text" id="registerLastName" class="premium-input" placeholder=" " required>
                             <label for="registerLastName" class="premium-label">Last Name <span class="required-asterisk">*</span></label>
                         </div>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="email" id="registerEmail" class="premium-input" placeholder="" required aria-describedby="emailHint">
+                        <input type="email" id="registerEmail" class="premium-input" placeholder=" " required aria-describedby="emailHint">
                         <label for="registerEmail" class="premium-label">Email <span class="required-asterisk">*</span></label>
                         <p id="emailHint" class="sr-only">Enter a valid email address to receive your confirmation link.</p>
                     </div>
                     
                     <div class="premium-field-group">
-                        <input type="tel" id="registerPhone" class="premium-input" placeholder="">
+                        <input type="tel" id="registerPhone" class="premium-input" placeholder=" ">
                         <label for="registerPhone" class="premium-label">Phone Number (optional)</label>
                     </div>
                     
@@ -1244,6 +1244,14 @@
             const firstName = document.getElementById('registerFirstName').value.trim();
             const lastName = document.getElementById('registerLastName').value.trim();
             const referral = document.getElementById('registerReferral').value;
+            
+            // Step 1 & 2 Additional Data
+            const phone = document.getElementById('registerPhone').value.trim();
+            const address = document.getElementById('registerAddress').value.trim();
+            const address2 = document.getElementById('registerAddress2').value.trim();
+            const city = document.getElementById('registerCity').value.trim();
+            const state = document.getElementById('registerState').value.trim();
+            const zip = document.getElementById('registerZip').value.trim();
 
             if (!email || !password || !firstName || !lastName || !referral) {
                 showNotification('⚠️ MISSING DATA: Please ensure all required fields (*) are complete.', 'error');
@@ -1313,6 +1321,12 @@
                             last_name: lastName,
                             full_name: `${firstName} ${lastName}`.trim(),
                             user_type: selectedUserType,
+                            phone: phone || null,
+                            address: address || null,
+                            address_line_2: address2 || null,
+                            city: city || null,
+                            state: state || null,
+                            zip: zip || null,
                             referral: referral || 'direct',
                             ...additionalData
                         }

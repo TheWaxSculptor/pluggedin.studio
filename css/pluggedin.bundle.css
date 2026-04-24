@@ -615,14 +615,15 @@ textarea:focus {
     left: 16px;
     top: 18px;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     color: #64748b;
     pointer-events: none;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: top left;
     display: flex;
     align-items: center;
     gap: 4px;
+    z-index: 10;
 }
 
 .dark .premium-label {
@@ -631,15 +632,15 @@ textarea:focus {
 
 .premium-input:focus ~ .premium-label,
 .premium-input:not(:placeholder-shown) ~ .premium-label {
-    top: 8px;
-    transform: scale(0.75);
-    color: var(--accent);
+    top: 10px;
+    transform: scale(0.8);
+    color: var(--accent) !important;
     font-weight: 800;
 }
 
 .dark .premium-input:focus ~ .premium-label,
 .dark .premium-input:not(:placeholder-shown) ~ .premium-label {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 /* Labels inside password-field-wrapper */

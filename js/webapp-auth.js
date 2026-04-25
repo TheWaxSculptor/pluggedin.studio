@@ -543,7 +543,10 @@ class AuthManager {
         try {
             const { error } = await this.client.auth.resend({
                 type: 'signup',
-                email: this.currentUser.email
+                email: this.currentUser.email,
+                options: {
+                    emailRedirectTo: window.location.origin + window.location.pathname
+                }
             });
             
             if (error) throw error;

@@ -1357,7 +1357,13 @@
                 }
             } catch (error) {
                 console.error('Registration Critical Failure:', error);
-                showNotification(`❌ REGISTRATION FAILED: ${error.message}`, 'error');
+                
+                // User-friendly rate limit handling
+                if (error.message && error.message.includes('rate limit')) {
+                    showNotification('⏳ TOO MANY REQUESTS: Please wait a few minutes before trying again.', 'warning');
+                } else {
+                    showNotification(`❌ REGISTRATION FAILED: ${error.message}`, 'error');
+                }
             } finally {
                 registerBtn.innerHTML = originalBtnText;
                 registerBtn.disabled = false;
